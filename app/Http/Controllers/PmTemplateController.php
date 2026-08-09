@@ -1,0 +1,192 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\MasterUnit;
+use App\Models\PmSchedule;
+use App\Models\PmTemplate;
+use App\Models\PmTemplateSubtask;
+use App\Models\PmTemplateTask;
+use App\Models\Site;
+use App\Models\UnitModel;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+
+class PmTemplateController extends Controller
+{
+    public function index()
+    {
+        $templates = PmTemplate::with(['unitModel', 'site'])->orderBy('created_at', 'desc')->paginate(10);
+        return view('pm-templates.index', compact('templates'));
+    }
+
+    public function create()
+    {
+        $unitModels = UnitModel::orderBy('name')->get();
+        $sites = Site::orderBy('name')->get();
+        return view('pm-templates.create', compact('unitModels', 'sites'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'site_id' => 'nullable|exists:sites,id',
+            'unit_model_id' => 'required|exists:unit_models,id',
+            'name' => 'required|string|max:255',
+            'interval_type' => 'required|in:hour_meter,kilometer,days',
+            'interval_value' => 'required|integer|min:1',
+            'tasks' => 'nullable|array',
+            'tasks.*.task_name' => 'required|string',
+            'tasks.*.subtasks' => 'nullable|array',
+            'tasks.*.subtasks.*.subtask_name' => 'required|string',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $template = PmTemplate::create([
+                'site_id' => $request->site_id ?? Auth::user()->site_id,
+                'unit_model_id' => $request->unit_model_id,
+                'name' => $request->name,
+                'interval_type' => $request->interval_type,
+                'interval_value' => $request->interval_value,
+            ]);
+
+            if ($request->has('tasks')) {
+                foreach ($request->tasks as $tIndex => $taskData) {
+                    $task = PmTemplateTask::create([
+                        'pm_template_id' => $template->id,
+                        'task_name' => $taskData['task_name'],
+                        'sequence' => $tIndex,
+                    ]);
+
+                    if (isset($taskData['subtasks'])) {
+                        foreach ($taskData['subtasks'] as $sIndex => $subtaskData) {
+                            PmTemplateSubtask::create([
+                                'pm_template_task_id' => $task->id,
+                                'subtask_name' => $subtaskData['subtask_name'],
+                                'sequence' => $sIndex,
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            // Auto-generate schedules for existing units of this model
+            $unitsQuery = MasterUnit::where('unit_model_id', $template->unit_model_id);
+            if ($template->site_id) {
+                $unitsQuery->where('site_id', $template->site_id);
+            }
+            $units = $unitsQuery->get();
+            
+            foreach ($units as $unit) {
+                PmSchedule::firstOrCreate([
+                    'master_unit_id' => $unit->id,
+                    'pm_template_id' => $template->id,
+                ], [
+                    'site_id' => $unit->site_id,
+                    'next_due_value' => $template->interval_value,
+                    'status_jadwal' => 'Upcoming',
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('pm-templates.index')->with('success', 'PM Template berhasil dibuat dan jadwal untuk unit terkait telah diinisialisasi.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+        }
+    }
+
+    public function edit(PmTemplate $pmTemplate)
+    {
+        $pmTemplate->load('tasks.subtasks');
+        $unitModels = UnitModel::orderBy('name')->get();
+        $sites = Site::orderBy('name')->get();
+        return view('pm-templates.edit', compact('pmTemplate', 'unitModels', 'sites'));
+    }
+
+    public function update(Request $request, PmTemplate $pmTemplate)
+    {
+        $request->validate([
+            'site_id' => 'nullable|exists:sites,id',
+            'unit_model_id' => 'required|exists:unit_models,id',
+            'name' => 'required|string|max:255',
+            'interval_type' => 'required|in:hour_meter,kilometer,days',
+            'interval_value' => 'required|integer|min:1',
+            'tasks' => 'nullable|array',
+            'tasks.*.task_name' => 'required|string',
+            'tasks.*.subtasks' => 'nullable|array',
+            'tasks.*.subtasks.*.subtask_name' => 'required|string',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $pmTemplate->update([
+                'site_id' => $request->site_id ?? Auth::user()->site_id,
+                'unit_model_id' => $request->unit_model_id,
+                'name' => $request->name,
+                'interval_type' => $request->interval_type,
+                'interval_value' => $request->interval_value,
+            ]);
+
+            // Re-create tasks & subtasks (simplest way to handle nested updates)
+            $pmTemplate->tasks()->delete();
+
+            if ($request->has('tasks')) {
+                foreach ($request->tasks as $tIndex => $taskData) {
+                    $task = PmTemplateTask::create([
+                        'pm_template_id' => $pmTemplate->id,
+                        'task_name' => $taskData['task_name'],
+                        'sequence' => $tIndex,
+                    ]);
+
+                    if (isset($taskData['subtasks'])) {
+                        foreach ($taskData['subtasks'] as $sIndex => $subtaskData) {
+                            PmTemplateSubtask::create([
+                                'pm_template_task_id' => $task->id,
+                                'subtask_name' => $subtaskData['subtask_name'],
+                                'sequence' => $sIndex,
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            // Optional: If unit_model_id changed, we might need to delete old schedules and create new ones.
+            // Assuming unit_model_id doesn't change often, but if it does:
+            $unitsQuery = MasterUnit::where('unit_model_id', $pmTemplate->unit_model_id);
+            if ($pmTemplate->site_id) {
+                $unitsQuery->where('site_id', $pmTemplate->site_id);
+            }
+            $units = $unitsQuery->get();
+            
+            foreach ($units as $unit) {
+                PmSchedule::firstOrCreate([
+                    'master_unit_id' => $unit->id,
+                    'pm_template_id' => $pmTemplate->id,
+                ], [
+                    'site_id' => $unit->site_id,
+                    'next_due_value' => $pmTemplate->interval_value,
+                    'status_jadwal' => 'Upcoming',
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('pm-templates.index')->with('success', 'PM Template berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+        }
+    }
+
+    public function destroy(PmTemplate $pmTemplate)
+    {
+        try {
+            $pmTemplate->delete();
+            return redirect()->route('pm-templates.index')->with('success', 'PM Template berhasil dihapus.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menghapus: ' . $e->getMessage());
+        }
+    }
+}

@@ -1,0 +1,72 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Part;
+use Illuminate\Http\Request;
+
+class PartController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('permission:view_parts')->only(['index', 'show']);
+        $this->middleware('permission:create_parts')->only(['create', 'store']);
+        $this->middleware('permission:edit_parts')->only(['edit', 'update']);
+        $this->middleware('permission:delete_parts')->only(['destroy']);
+    }
+
+    public function index()
+    {
+        $parts = Part::orderBy('part_number')->paginate(15);
+        $sites = \App\Models\Site::orderBy('name')->get();
+        return view('parts.index', compact('parts', 'sites'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'site_id' => 'nullable|exists:sites,id',
+            'part_number' => 'required|string|max:100|unique:parts,part_number',
+            'part_description' => 'required|string|max:255',
+            'satuan' => 'nullable|string|max:50',
+            'cost' => 'nullable|numeric|min:0',
+            'kategori_1' => 'nullable|string|max:100',
+            'kategori_2' => 'nullable|string|max:100',
+            'kategori_3' => 'nullable|string|max:100',
+            'kategori_4' => 'nullable|string|max:100',
+        ]);
+
+        Part::create($request->all());
+        return redirect()->route('parts.index')->with('success', 'Part berhasil ditambahkan.');
+    }
+
+    public function edit(Part $part)
+    {
+        $sites = \App\Models\Site::orderBy('name')->get();
+        return view('parts.edit', compact('part', 'sites'));
+    }
+
+    public function update(Request $request, Part $part)
+    {
+        $request->validate([
+            'site_id' => 'nullable|exists:sites,id',
+            'part_number' => 'required|string|max:100|unique:parts,part_number,' . $part->id,
+            'part_description' => 'required|string|max:255',
+            'satuan' => 'nullable|string|max:50',
+            'cost' => 'nullable|numeric|min:0',
+            'kategori_1' => 'nullable|string|max:100',
+            'kategori_2' => 'nullable|string|max:100',
+            'kategori_3' => 'nullable|string|max:100',
+            'kategori_4' => 'nullable|string|max:100',
+        ]);
+
+        $part->update($request->all());
+        return redirect()->route('parts.index')->with('success', 'Part berhasil diperbarui.');
+    }
+
+    public function destroy(Part $part)
+    {
+        $part->delete();
+        return redirect()->route('parts.index')->with('success', 'Part berhasil dihapus.');
+    }
+}

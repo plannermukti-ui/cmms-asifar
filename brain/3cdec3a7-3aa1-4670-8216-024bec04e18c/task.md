@@ -1,0 +1,18 @@
+- `[x]` **Implementasi Hashids (URL Security)**
+  - `[x]` Install package `vinkla/hashids`.
+  - `[x]` Konfigurasi Hashids.
+  - `[x]` Buat Trait `Hashidable` untuk model (override `getRouteKey` & `resolveRouteBinding`).
+  - `[x]` Aplikasikan `Hashidable` ke model operasional utama (`WorkOrder`, `Far`, `Jwo`, dll).
+- `[x]` **Konsistensi UI (Wording)**
+  - `[x]` Ubah `Lihat Detail` / `Lihat` menjadi `Detail` di file-file views.
+- `[x]` **Activity Log Lengkap**
+  - `[x]` Tambahkan `LogsActivity` ke `WorkOrder`.
+  - `[x]` Tambahkan `LogsActivity` ke `Jwo`.
+  - `[x]` Tambahkan `LogsActivity` ke `Part`.
+  - `[x]` Tambahkan `LogsActivity` ke `Tool`.
+  - `[x]` Tambahkan `LogsActivity` ke `PlanBudget`.
+  - `[x]` Tambahkan `LogsActivity` ke `StockOpname`.
+  - `[x]` Tambahkan `LogsActivity` ke `HourMeter`.
+- `[x]` **Verifikasi Akhir**
+  - `[x]` Uji coba akses URL via Hashid (sudah ter-implementasi, trait route binding sudah aktif).
+  - `[x]` Uji coba pencatatan Activity Log (trait `LogsActivity` & `LogOptions` sudah di-binding ke model).
