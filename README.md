@@ -1,6 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
-  <br>
+<img src="public/img/mascot.png" width="400" alt="CMMS Aisfar For Mukti">  <br>
   <h1>CMMS AISFAR</h1>
   <p><b>Enterprise Computerized Maintenance Management System untuk Industri Pertambangan & Alat Berat</b></p>
   
@@ -126,6 +125,45 @@ Sistem mendukung *Multi-Role* yang disesuaikan dengan hierarki struktural tamban
 - **Mechanic / Operator:** Input HM, pengerjaan WO, dan permintaan barang.
 - **Toolman / Warehouse:** Check-in/Check-out alat SST, *Issue Part*, *Stock Opname*.
 - **Engineer / Production:** Pelaporan produksi harian (*Fleet* alat angkut dan gali).
+
+---
+
+## 📸 Antarmuka Aplikasi (Screenshots)
+
+### 1. Halaman Login
+Antarmuka gerbang masuk yang dirancang modern dengan ilustrasi maskot interaktif. Dilengkapi dengan pintasan menuju pusat panduan (*Guide*) bagi pengguna baru untuk memahami fitur ekosistem sebelum masuk ke dalam sistem.
+
+![Halaman Login](public/img/screenshots/login.png)
+
+### 2. Dashboard Eksekutif
+Pusat kendali utama yang menyajikan ringkasan metrik operasional secara *real-time*. Menampilkan tren Work Order (WO) aktif, unit yang mengalami *breakdown*, grafik distribusi status, hingga pencapaian *Plant Achievement* untuk memudahkan pengambilan keputusan strategis.
+
+![Dashboard Eksekutif](public/img/screenshots/dashboard.png)
+
+### 3. Modul Pesan Instan (Live Chat)
+Ruang kolaborasi terpadu yang terintegrasi di seluruh aplikasi. Memungkinkan mekanik, supervisor, dan *planner* untuk berkomunikasi langsung tanpa aplikasi pihak ketiga, berbagi tautan *Work Order*, serta mendiskusikan penanganan unit dengan cepat dan tepat.
+
+![Pesan Instan](public/img/screenshots/chat.png)
+
+### 4. Form Pembuatan Work Order
+Formulir digital komprehensif untuk pencatatan kerusakan atau pemeliharaan unit. Dilengkapi dengan pemisahan *tab* pintar (Identitas WO, Identitas Unit, Waktu Breakdown, dan Klasifikasi) serta sistem penugasan *Subtask*, kebutuhan suku cadang, dan *manpower* secara rinci.
+
+![Form Work Order](public/img/screenshots/work_order.png)
+
+### 5. Detail & Laporan Work Order (Execution Sheet)
+Halaman rincian eksekusi yang merangkum seluruh aktivitas pemeliharaan secara terstruktur. Tersedia fungsi ekspor *Report* (PDF A4), pembagian tautan instan, hingga formulir persetujuan Dokumen Keselamatan Kerja (HSE) seperti JSA, PTW, dan LOTO di satu tempat terpusat.
+
+![Detail Work Order](public/img/screenshots/detail_wo.png)
+
+### 6. Rekonsiliasi Durasi & Timeline Progress
+Visualisasi grafik garis waktu otomatis dari setiap *task* dan *subtask* pekerjaan yang dilakukan oleh mekanik. Memudahkan *supervisor* untuk melacak keseimbangan *Response Time*, total durasi perbaikan, serta menyoroti potensi hambatan (*No Action*) secara visual.
+
+![Timeline Work Order](public/img/screenshots/detail_wo_2.png)
+
+### 7. Bio Data & Riwayat Asset Unit
+Pusat informasi (360° View) komprehensif untuk setiap aset alat berat. Menampilkan spesifikasi teknis, total akumulasi biaya *maintenance*, hingga riwayat historis seluruh siklus Work Order, dokumen FAR, dan catatan produksi tambang pada unit tersebut.
+
+![Bio Data Unit](public/img/screenshots/unit.png)
 
 ---
 
