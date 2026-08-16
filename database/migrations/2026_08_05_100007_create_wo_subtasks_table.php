@@ -10,6 +10,9 @@ return new class extends Migration {
             $table->foreignId('wo_task_id')->constrained('wo_tasks')->cascadeOnDelete();
             $table->longText('action');
             $table->dateTime('date_action')->nullable();
+            $table->dateTime('date_finish')->nullable();
+            $table->decimal('duration_hours', 8, 2)->nullable();
+            $table->foreignId('breakdown_type_id')->nullable()->constrained('breakdown_types')->nullOnDelete();
             $table->enum('status', ['Open','Inprogress','Completed','Cancel','Backlog'])->default('Open');
             $table->timestamps();
         });

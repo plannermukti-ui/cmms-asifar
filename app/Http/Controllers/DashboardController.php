@@ -25,8 +25,8 @@ class DashboardController extends Controller
         // Filter: Admin (no site) bisa pilih site; user biasa terkunci ke sitenya sendiri
         if ($user->site_id) {
             // User terikat ke satu site — tidak bisa memilih site lain
-            $filterSiteId = $user->site_id;
-            $selectedSite = $allSites->firstWhere('id', $filterSiteId);
+            $filterSiteId = [(int) $user->site_id];
+            $selectedSite = $allSites->firstWhere('id', $user->site_id);
         } else {
             // Admin / superuser — bisa pilih dari semua site, atau "Semua Site"
             $siteInput = $request->input('site_id');
@@ -39,9 +39,9 @@ class DashboardController extends Controller
         // Manual refresh: hapus cache untuk site ini
         $cacheSuffix = $filterSiteId ? implode('_', $filterSiteId) : 'all';
         if ($request->boolean('refresh')) {
-            Cache::forget('dashboard_stats_' . $cacheSuffix);
-            Cache::forget('dashboard_chart_' . $cacheSuffix);
-            Cache::forget('dashboard_unit_comparison');
+            Cache::forget('dashboard_stats_v2_' . $cacheSuffix);
+            Cache::forget('dashboard_chart_v2_' . $cacheSuffix);
+            Cache::forget('dashboard_unit_comparison_' . $cacheSuffix);
             return redirect()->route('dashboard', $filterSiteId ? ['site_id' => $filterSiteId] : [])
                 ->with('success', 'Data dashboard berhasil diperbarui.');
         }
@@ -49,10 +49,19 @@ class DashboardController extends Controller
         // =========================================================
         // LAYER: CACHING STATS (refresh every 10 minutes per site)
         // =========================================================
-        $cacheKey = 'dashboard_stats_' . $cacheSuffix;
+        $cacheKey = 'dashboard_stats_v2_' . $cacheSuffix;
 
         $stats = Cache::remember($cacheKey, 600, function () use ($filterSiteId) {
-            $woQuery   = WorkOrder::query();
+            $woQuery   = WorkOrder::query()
+                ->where(function($q) {
+                    $q->whereNull('opportunity')->orWhere('opportunity', 0);
+                })
+                ->where(function($q) {
+                    $q->where('tipe_wo', 'BD')
+                      ->orWhere(function($q2) {
+                          $q2->where('tipe_wo', 'Plan')->whereIn('status_wo', ['Completed', 'Close']);
+                      });
+                });
             $unitQuery = MasterUnit::query();
             $hmQuery   = HourMeter::query();
             $ttQuery   = ToolTransaction::query();
@@ -61,13 +70,14 @@ class DashboardController extends Controller
                 $woQuery->whereIn('site_id', $filterSiteId);
                 $unitQuery->whereIn('site_id', $filterSiteId);
                 $hmQuery->whereIn('site_id', $filterSiteId);
+                $ttQuery->whereHas('tool', fn($q) => $q->whereIn('site_id', $filterSiteId));
             }
 
             $now = Carbon::now();
 
             return [
                 'wo_open'         => (clone $woQuery)->where('status_wo', 'Open')->count(),
-                'wo_inprogress'   => (clone $woQuery)->where('status_wo', 'In Progress')->count(),
+                'wo_inprogress'   => (clone $woQuery)->whereIn('status_wo', ['In Progress', 'Inprogress'])->count(),
                 'wo_pending'      => (clone $woQuery)->where('status_wo', 'Pending')->count(),
                 'wo_completed'    => (clone $woQuery)->whereMonth('created_at', $now->month)->whereYear('created_at', $now->year)->whereIn('status_wo', ['Completed', 'Close'])->count(),
                 'wo_total'        => (clone $woQuery)->count(),
@@ -83,13 +93,25 @@ class DashboardController extends Controller
         // =========================================================
         // CHART DATA: Trends & Status
         // =========================================================
-        $chartCacheKey = 'dashboard_chart_' . ($filterSiteId ?? 'all');
+        $chartCacheKey = 'dashboard_chart_v2_' . $cacheSuffix;
 
         $chartData = Cache::remember($chartCacheKey, 600, function () use ($filterSiteId) {
             $months = collect(range(5, 0))->map(fn($i) => Carbon::now()->subMonths($i));
+            
+            $validWoScope = function($query) {
+                $query->where(function($q) {
+                    $q->whereNull('opportunity')->orWhere('opportunity', 0);
+                })->where(function($q) {
+                    $q->where('tipe_wo', 'BD')
+                      ->orWhere(function($q2) {
+                          $q2->where('tipe_wo', 'Plan')->whereIn('status_wo', ['Completed', 'Close']);
+                      });
+                });
+            };
 
             $woPerMonth = WorkOrder::query()
-                ->when($filterSiteId, fn($q) => $q->where('site_id', $filterSiteId))
+                ->where($validWoScope)
+                ->when($filterSiteId, fn($q) => $q->whereIn('site_id', $filterSiteId))
                 ->selectRaw('YEAR(created_at) as yr, MONTH(created_at) as mo, COUNT(*) as total')
                 ->where('created_at', '>=', Carbon::now()->subMonths(6)->startOfMonth())
                 ->groupByRaw('YEAR(created_at), MONTH(created_at)')
@@ -106,13 +128,15 @@ class DashboardController extends Controller
             }
 
             $woByStatus = WorkOrder::query()
-                ->when($filterSiteId, fn($q) => $q->where('site_id', $filterSiteId))
+                ->where($validWoScope)
+                ->when($filterSiteId, fn($q) => $q->whereIn('site_id', $filterSiteId))
                 ->selectRaw('status_wo, COUNT(*) as total')
                 ->groupBy('status_wo')
                 ->pluck('total', 'status_wo');
 
             $topUnits = WorkOrder::query()
-                ->when($filterSiteId, fn($q) => $q->where('work_orders.site_id', $filterSiteId))
+                ->where($validWoScope)
+                ->when($filterSiteId, fn($q) => $q->whereIn('work_orders.site_id', $filterSiteId))
                 ->join('master_units', 'work_orders.master_unit_id', '=', 'master_units.id')
                 ->selectRaw('master_units.nomor_unit, COUNT(work_orders.id) as wo_count')
                 ->groupBy('master_units.id', 'master_units.nomor_unit')
@@ -120,19 +144,111 @@ class DashboardController extends Controller
                 ->limit(5)
                 ->get();
 
-            return compact('trendLabels', 'trendValues', 'woByStatus', 'topUnits');
+            // Trend Duration Summary (4 Weeks)
+            $durationSvc = app(\App\Services\WorkOrderDurationService::class);
+            $durationTrendLabels = [];
+            $durationTrendRespon = [];
+            $durationTrendSubtask = [];
+            $durationTrendNoAction = [];
+            
+            $weeks = [];
+            for ($i = 3; $i >= 0; $i--) {
+                $start = Carbon::now()->subWeeks($i)->startOfWeek();
+                $end = Carbon::now()->subWeeks($i)->endOfWeek();
+                $weeks[] = [
+                    'start' => $start,
+                    'end' => $end,
+                    'label' => $start->format('d M') . ' - ' . $end->format('d M')
+                ];
+            }
+            
+            $start4Weeks = $weeks[0]['start'];
+            $end4Weeks = $weeks[3]['end'];
+            
+            $wos4Weeks = WorkOrder::query()
+                ->where($validWoScope)
+                ->when($filterSiteId, fn($q) => $q->whereIn('site_id', $filterSiteId))
+                ->whereBetween('waktu_bd', [$start4Weeks, $end4Weeks])
+                ->with(['tasks.subtasks', 'tasks.subtasks.breakdownType'])
+                ->get();
+                
+            foreach ($weeks as $w) {
+                $durationTrendLabels[] = $w['label'];
+                
+                $weekWos = $wos4Weeks->filter(function($wo) use ($w) {
+                    return $wo->waktu_bd && $wo->waktu_bd >= $w['start'] && $wo->waktu_bd <= $w['end'];
+                });
+                
+                $sumRespon = 0; $countRespon = 0;
+                $sumSubtask = 0; $countSubtask = 0;
+                $sumNoAction = 0; $countNoAction = 0;
+                
+                foreach ($weekWos as $wo) {
+                    $summary = $durationSvc->summarize($wo);
+                    
+                    if ($summary['respontime'] !== null) {
+                        $sumRespon += $summary['respontime'];
+                        $countRespon++;
+                    }
+                    if ($summary['adjusted_total_subtask'] !== null) {
+                        $sumSubtask += $summary['adjusted_total_subtask'];
+                        $countSubtask++;
+                    }
+                    if ($summary['no_action'] !== null) {
+                        $sumNoAction += $summary['no_action'];
+                        $countNoAction++;
+                    }
+                }
+                
+                $durationTrendRespon[] = $countRespon > 0 ? round($sumRespon / $countRespon, 2) : 0;
+                $durationTrendSubtask[] = $countSubtask > 0 ? round($sumSubtask / $countSubtask, 2) : 0;
+                $durationTrendNoAction[] = $countNoAction > 0 ? round($sumNoAction / $countNoAction, 2) : 0;
+            }
+
+            // Plan Achievement Trend (Last 6 Months)
+            $planAchievementData = WorkOrder::query()
+                ->when($filterSiteId, fn($q) => $q->whereIn('site_id', $filterSiteId))
+                ->where('tipe_wo', 'Plan')
+                ->where(function($q_opp) { $q_opp->whereNull('opportunity')->orWhere('opportunity', 0); })
+                ->where('created_at', '>=', Carbon::now()->subMonths(6)->startOfMonth())
+                ->selectRaw('YEAR(created_at) as yr, MONTH(created_at) as mo, status_wo, COUNT(*) as total')
+                ->groupByRaw('YEAR(created_at), MONTH(created_at), status_wo')
+                ->get();
+            
+            $planTrendLabels = [];
+            $planTrendCompleted = [];
+            $planTrendInProgress = [];
+            $planTrendCancel = [];
+
+            foreach ($months as $m) {
+                $planTrendLabels[] = $m->translatedFormat('M Y');
+                $yr = $m->year;
+                $mo = $m->month;
+
+                $records = $planAchievementData->where('yr', $yr)->where('mo', $mo);
+                $planTrendCompleted[] = $records->whereIn('status_wo', ['Completed', 'Close'])->sum('total');
+                $planTrendInProgress[] = $records->whereIn('status_wo', ['In Progress', 'Inprogress'])->sum('total');
+                $planTrendCancel[] = $records->whereIn('status_wo', ['Cancel', 'Cancelled'])->sum('total');
+            }
+
+            return compact('trendLabels', 'trendValues', 'woByStatus', 'topUnits', 'durationTrendLabels', 'durationTrendRespon', 'durationTrendSubtask', 'durationTrendNoAction', 'planTrendLabels', 'planTrendCompleted', 'planTrendInProgress', 'planTrendCancel');
         });
 
         // =========================================================
         // SITE vs SITE — Perbandingan unit per tipe per site
-        // Cache 15 menit, shared across all users (bukan per-site)
+        // Cache 15 menit per filter site.
         // =========================================================
-        $unitComparison = Cache::remember('dashboard_unit_comparison', 900, function () {
-            $sites     = Site::orderBy('name')->get(['id', 'name', 'code']);
+        $unitComparison = Cache::remember('dashboard_unit_comparison_' . $cacheSuffix, 900, function () use ($filterSiteId) {
+            $sites = Site::query()
+                ->when($filterSiteId, fn($q) => $q->whereIn('id', $filterSiteId))
+                ->orderBy('name')
+                ->get(['id', 'name', 'code']);
             $unitTypes = UnitType::orderBy('name')->get(['id', 'name']);
 
             // Aggregate: site_id + unit_type_id => count
-            $counts = MasterUnit::selectRaw('site_id, unit_type_id, COUNT(*) as total')
+            $counts = MasterUnit::query()
+                ->when($filterSiteId, fn($q) => $q->whereIn('site_id', $filterSiteId))
+                ->selectRaw('site_id, unit_type_id, COUNT(*) as total')
                 ->groupBy('site_id', 'unit_type_id')
                 ->get()
                 ->groupBy('site_id');
@@ -162,19 +278,31 @@ class DashboardController extends Controller
         // =========================================================
         // RECENT DATA — Paginated with eager loading (NO N+1)
         // =========================================================
+        $validWoScope = function($query) {
+            $query->where(function($q) {
+                $q->whereNull('opportunity')->orWhere('opportunity', 0);
+            })->where(function($q) {
+                $q->where('tipe_wo', 'BD')
+                  ->orWhere(function($q2) {
+                      $q2->where('tipe_wo', 'Plan')->whereIn('status_wo', ['Completed', 'Close']);
+                  });
+            });
+        };
+
         $recentWo = WorkOrder::query()
-            ->when($filterSiteId, fn($q) => $q->where('site_id', $filterSiteId))
-            ->with(['unit:id,nomor_unit', 'creator:id,nama_lengkap'])
+            ->where($validWoScope)
+            ->when($filterSiteId, fn($q) => $q->whereIn('site_id', $filterSiteId))
+            ->with(['unit', 'creator:id,nama_lengkap'])
             ->latest()
             ->limit(8)
-            ->get(['id', 'no_wo', 'status_wo', 'tipe_wo', 'master_unit_id', 'created_by', 'waktu_bd', 'created_at', 'opportunity']);
+            ->get(['id', 'no_wo', 'status_wo', 'tipe_wo', 'master_unit_id', 'site_id', 'created_by', 'waktu_bd', 'created_at', 'opportunity']);
 
         $recentHm = HourMeter::query()
-            ->when($filterSiteId, fn($q) => $q->where('site_id', $filterSiteId))
-            ->with(['masterUnit:id,nomor_unit'])
+            ->when($filterSiteId, fn($q) => $q->whereIn('site_id', $filterSiteId))
+            ->with(['masterUnit'])
             ->orderByDesc('date')
             ->limit(5)
-            ->get(['id', 'master_unit_id', 'hm', 'date']);
+            ->get(['id', 'master_unit_id', 'site_id', 'hm', 'date']);
 
         return view('dashboard', compact(
             'stats', 'chartData', 'recentWo', 'recentHm',

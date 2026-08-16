@@ -12,7 +12,7 @@ class IncidentReport extends Model {
         return LogOptions::defaults()->logAll()->logOnlyDirty();
     }
 
-    protected $fillable = ['tool_transaction_id', 'mechanic_id', 'kronologi', 'status_approval', 'approved_by'];
+    protected $fillable = ['tool_transaction_id', 'mechanic_id', 'kronologi', 'status_approval', 'approved_by', 'signed_document'];
     public function transaction() { return $this->belongsTo(ToolTransaction::class, 'tool_transaction_id'); }
     public function mechanic() { return $this->belongsTo(Mechanic::class); }
     public function approver() { return $this->belongsTo(User::class, 'approved_by'); }

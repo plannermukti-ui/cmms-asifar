@@ -67,4 +67,31 @@
     </div>
   </div>
 </div>
+
+@can('edit_incident_reports')
+<div class="card mt-4 d-print-none">
+  <div class="card-header">
+    <h3 class="card-title">Upload Dokumen Berita Acara yang Sudah Ditandatangani</h3>
+  </div>
+  <div class="card-body">
+    <form action="{{ route('incident-reports.upload-document', $incidentReport) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="mb-3">
+            <label class="form-label required">File Dokumen PDF (Maks. 5MB)</label>
+            <input type="file" name="signed_document" class="form-control" accept="application/pdf" required>
+            <small class="form-hint">Format yang diizinkan hanya .pdf</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Upload Dokumen</button>
+    </form>
+  </div>
+  @if($incidentReport->signed_document)
+  <div class="card-footer">
+    <p class="mb-0 text-success">
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+      Dokumen telah diunggah. Anda bisa melihatnya melalui tombol "Lihat PDF" pada halaman daftar Berita Acara.
+    </p>
+  </div>
+  @endif
+</div>
+@endcan
 @endsection

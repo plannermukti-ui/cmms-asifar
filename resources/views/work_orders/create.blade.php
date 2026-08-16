@@ -196,7 +196,10 @@
           </div>
           <div class="col-6">
             <label class="form-label small fw-semibold text-muted mb-1">Waktu RFU</label>
-            <input type="datetime-local" class="form-control form-control-sm" name="waktu_rfu" id="waktu_rfu" value="{{ old('waktu_rfu') }}">
+            <input type="datetime-local" class="form-control form-control-sm @error('waktu_rfu') is-invalid @enderror" name="waktu_rfu" id="waktu_rfu" value="{{ old('waktu_rfu') }}">
+            @error('waktu_rfu')
+              <div class="invalid-feedback small">{{ $message }}</div>
+            @enderror
           </div>
           <div class="col-6">
             <label class="form-label small fw-semibold text-muted mb-1">Durasi (Hrs)</label>
@@ -205,18 +208,6 @@
           <div class="col-6">
             <label class="form-label small fw-semibold text-muted mb-1">Hours Meter</label>
             <input type="number" class="form-control form-control-sm" name="hours_meter" step="0.1" value="{{ old('hours_meter', isset($praWorkOrder) ? $praWorkOrder->hours_meter : '') }}" placeholder="0.0">
-          </div>
-          <div class="col-12">
-            <label class="form-label small fw-semibold text-muted mb-1">Tipe Breakdown</label>
-            <div class="input-group input-group-sm">
-              <select name="breakdown_type_id" class="form-select" id="breakdown-type-select">
-                <option value="">Pilih</option>
-                @foreach($breakdownTypes as $bt)
-                  <option value="{{ $bt->id }}" {{ old('breakdown_type_id') == $bt->id ? 'selected' : '' }}>{{ $bt->code ? $bt->code . ' - ' : '' }}{{ $bt->name }}</option>
-                @endforeach
-              </select>
-              <button type="button" class="btn btn-outline-warning text-dark fw-bold" onclick="inlineAdd('breakdown_types','breakdown-type-select')">+</button>
-            </div>
           </div>
         </div>
       </div>
@@ -234,18 +225,6 @@
       </div>
       <div class="card-body p-2">
         <div class="row g-2">
-          <div class="col-6">
-            <label class="form-label small fw-semibold text-muted mb-1">Comp. Group</label>
-            <div class="input-group input-group-sm">
-              <select name="component_group_id" class="form-select" id="cg-select">
-                <option value="">Pilih</option>
-                @foreach($componentGroups as $cg)
-                  <option value="{{ $cg->id }}" {{ old('component_group_id') == $cg->id ? 'selected' : '' }}>{{ $cg->name }}</option>
-                @endforeach
-              </select>
-              <button type="button" class="btn btn-outline-teal fw-bold px-2" onclick="inlineAdd('component_groups','cg-select')">+</button>
-            </div>
-          </div>
           @for($i = 1; $i <= 5; $i++)
           <div class="col-6">
             <label class="form-label small fw-semibold text-muted mb-1">Kategori {{ $i }}</label>
@@ -429,6 +408,7 @@ let taskIndex = 0;
 const cgOptions = `<option value="">-- Pilih --</option>@foreach($componentGroups as $cg)<option value="{{ $cg->id }}">{{ $cg->name }}</option>@endforeach`;
 const mechanicOptions = `@foreach($mechanics as $m)<option value="{{ $m->id }}">{{ $m->nama_lengkap }}</option>@endforeach`;
 const partOptions = `<option value="">-- Pilih Part --</option>@foreach($parts as $p)<option value="{{ $p->id }}">{{ $p->part_number }} - {{ $p->part_description }}</option>@endforeach`;
+const unitOptions = `<option value="">-- Pilih Unit --</option>@foreach($units as $u)<option value="{{ $u->id }}">{{ $u->nomor_unit }} - {{ $u->model->name ?? '' }}</option>@endforeach`;
 const toolTxOptions = `<option value="">-- Pilih Transaksi --</option>@foreach($toolTransactions as $tx)<option value="{{ $tx->id }}">{{ $tx->tool->name ?? '' }} → {{ $tx->mechanic->nama_lengkap ?? '' }} ({{ $tx->tanggal_pinjam }})</option>@endforeach`;
 const statusOptions = `<option value="Open">Open</option><option value="Inprogress">Inprogress</option><option value="Completed">Completed</option><option value="Cancel">Cancel</option><option value="Backlog">Backlog</option>`;
 
@@ -436,7 +416,7 @@ function addTask() {
     const ti = taskIndex++;
     const container = document.getElementById('tasks-container');
     const div = document.createElement('div');
-    div.className = 'border-start border-4 border-indigo rounded-3 p-3 mb-3 bg-blue-lt shadow-sm position-relative';
+    div.className = 'border-start border-4 border-indigo rounded-3 p-2 mb-2 bg-blue-lt shadow-sm position-relative';
     div.id = 'task-' + ti;
     div.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -449,74 +429,165 @@ function addTask() {
                 Hapus Task
             </button>
         </div>
-        <div class="row g-2">
-            <div class="col-md-6 mb-2">
-                <label class="form-label required small fw-semibold text-muted">Deskripsi Problem</label>
-                <textarea class="form-control form-control-sm bg-white" name="tasks[${ti}][problem]" rows="2" placeholder="Uraikan problem/gejala..." required></textarea>
-            </div>
-            <div class="col-md-6 mb-2">
-                <div class="row g-2">
-                    <div class="col-12">
-                        <label class="form-label small fw-semibold text-muted">Component Group</label>
-                        <div class="input-group input-group-sm">
-                            <select name="tasks[${ti}][component_group_id]" class="form-select bg-white" id="task-cg-${ti}">${cgOptions}</select>
-                            <button type="button" class="btn btn-outline-indigo" onclick="inlineAddForSelect('component_groups', document.getElementById('task-cg-${ti}'))">+</button>
+        <div class="row g-3">
+            <!-- KIRI: Informasi Task / Problem -->
+            <div class="col-lg-5">
+                <div class="h-100 p-2 rounded bg-white border">
+                    <label class="form-label required small fw-semibold text-muted">Deskripsi Problem</label>
+                    <textarea class="form-control form-control-sm bg-white" name="tasks[${ti}][problem]" rows="2" placeholder="Uraikan problem/gejala..." required></textarea>
+                    <div class="row g-2 mt-1">
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold text-muted">Component Group</label>
+                            <div class="input-group input-group-sm">
+                                <select name="tasks[${ti}][component_group_id]" class="form-select bg-white" id="task-cg-${ti}">${cgOptions}</select>
+                                <button type="button" class="btn btn-outline-indigo" onclick="inlineAddForSelect('component_groups', document.getElementById('task-cg-${ti}'))">+</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label small fw-semibold text-muted">Date Problem</label>
-                        <input type="datetime-local" class="form-control form-control-sm bg-white" name="tasks[${ti}][date_problem]">
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label small fw-semibold text-muted">Status Task</label>
-                        <select name="tasks[${ti}][status]" class="form-select form-select-sm bg-white">${statusOptions}</select>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold text-muted">Date Problem</label>
+                            <input type="datetime-local" class="form-control form-control-sm bg-white" name="tasks[${ti}][date_problem]">
+                            <div class="invalid-feedback d-block mt-1" data-field="date_problem"></div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold text-muted">Status Task</label>
+                            <select name="tasks[${ti}][status]" class="form-select form-select-sm bg-white">${statusOptions}</select>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="mt-3 pt-3 border-top border-blue-subtle">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <strong class="text-indigo small text-uppercase">SubTasks (Tindakan / Action)</strong>
-                <button type="button" class="btn btn-sm btn-outline-success bg-white shadow-xs" onclick="addSubtask(${ti})">
-                    + Tambah SubTask
-                </button>
+            <!-- KANAN: Subtasks -->
+            <div class="col-lg-7">
+                <div class="h-100 p-2 rounded bg-white border border-success">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong class="text-indigo small text-uppercase">SubTasks (Tindakan / Action)</strong>
+                        <button type="button" class="btn btn-sm btn-outline-success bg-white shadow-xs" onclick="addSubtask(${ti})">
+                            + Tambah SubTask
+                        </button>
+                    </div>
+                    <div id="subtasks-container-${ti}"></div>
+                </div>
             </div>
-            <div id="subtasks-container-${ti}"></div>
         </div>
     `;
     container.appendChild(div);
+    bindTaskDateProblemField(div);
+}
+
+function bindTaskDateProblemField(taskEl) {
+    const taskDateInput = taskEl.querySelector('input[name$="[date_problem]"]');
+    const taskFeedback = taskEl.querySelector('[data-field="date_problem"]');
+    const showTaskError = () => {
+        const taskDate = taskDateInput && taskDateInput.value ? new Date(taskDateInput.value) : null;
+        const workOrderDateInput = document.getElementById('waktu_bd');
+        const workOrderDate = workOrderDateInput && workOrderDateInput.value ? new Date(workOrderDateInput.value) : null;
+        if (taskFeedback) {
+            taskFeedback.textContent = '';
+            if (workOrderDate && taskDate && taskDate < workOrderDate) {
+                taskFeedback.textContent = 'Date Problem tidak boleh kurang dari Waktu BD.';
+            }
+        }
+        taskEl.querySelectorAll('.subtask-item').forEach(function(subtaskEl) {
+            const feedback = subtaskEl.querySelector('[data-field="date_action"]');
+            if (feedback) {
+                feedback.textContent = '';
+                const actionDate = subtaskEl.querySelector('input[name$="[date_action]"]')?.value;
+                const actionDateValue = actionDate ? new Date(actionDate) : null;
+                if (taskDate && actionDateValue && actionDateValue < taskDate) {
+                    feedback.textContent = 'Date Action tidak boleh kurang dari Date Problem.';
+                }
+            }
+        });
+    };
+
+    [taskDateInput, document.getElementById('waktu_bd')].forEach(input => input && input.addEventListener('change', showTaskError));
+    [taskDateInput, document.getElementById('waktu_bd')].forEach(input => input && input.addEventListener('input', showTaskError));
+    showTaskError();
 }
 
 let subtaskCounters = {};
+function bindSubtaskDateFields(subtaskEl) {
+    const dateAction = subtaskEl.querySelector('input[name$="[date_action]"]');
+    const dateFinish = subtaskEl.querySelector('input[name$="[date_finish]"]');
+    const duration = subtaskEl.querySelector('input[name$="[duration_hours]"]');
+    const syncDuration = () => {
+        const start = dateAction && dateAction.value ? new Date(dateAction.value) : null;
+        const end = dateFinish && dateFinish.value ? new Date(dateFinish.value) : null;
+        let value = '';
+        if (start) {
+            const reference = end || new Date();
+            value = (((reference - start) / 3600000)).toFixed(2);
+        }
+        if (duration) duration.value = value;
+    };
+    const showDateError = () => {
+        const taskDateInput = subtaskEl.closest('[id^="task-"]')?.querySelector('input[name$="[date_problem]"]');
+        const taskDate = taskDateInput && taskDateInput.value ? new Date(taskDateInput.value) : null;
+        const actionDate = dateAction && dateAction.value ? new Date(dateAction.value) : null;
+        const feedback = subtaskEl.querySelector('[data-field="date_action"]');
+        if (feedback) {
+            feedback.textContent = '';
+            if (taskDate && actionDate && actionDate < taskDate) {
+                feedback.textContent = 'Date Action tidak boleh kurang dari Date Problem.';
+            }
+        }
+    };
+    [dateAction, dateFinish].forEach(input => input && input.addEventListener('change', syncDuration));
+    [dateAction, dateFinish].forEach(input => input && input.addEventListener('input', syncDuration));
+    [dateAction].forEach(input => input && input.addEventListener('change', showDateError));
+    [dateAction].forEach(input => input && input.addEventListener('input', showDateError));
+    syncDuration();
+    showDateError();
+}
+
 function addSubtask(taskIdx) {
     if (!subtaskCounters[taskIdx]) subtaskCounters[taskIdx] = 0;
     const si = subtaskCounters[taskIdx]++;
     const container = document.getElementById('subtasks-container-' + taskIdx);
     const div = document.createElement('div');
-    div.className = 'border-start border-3 border-success rounded-3 p-3 mb-2 bg-white shadow-xs ms-2';
+    div.className = 'border-start border-3 border-success rounded-3 p-2 mb-1 bg-white shadow-xs subtask-item';
     div.id = `subtask-${taskIdx}-${si}`;
     div.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-2">
             <span class="badge bg-success-lt text-success fw-bold">SubTask #${si+1}</span>
             <button type="button" class="btn btn-sm btn-outline-danger border-0 p-1" onclick="document.getElementById('subtask-${taskIdx}-${si}').remove()">✕ Hapus SubTask</button>
         </div>
-        <div class="row g-2 mb-2">
-            <div class="col-md-6">
+        <div class="row g-1 mb-1 align-items-end" style="display:flex; flex-wrap:wrap; gap:0.35rem;">
+            <div style="flex:1 1 220px; min-width:220px;">
                 <label class="form-label required small fw-semibold text-muted mb-1">Action / Tindakan</label>
-                <textarea class="form-control form-control-sm" name="tasks[${taskIdx}][subtasks][${si}][action]" rows="2" placeholder="Uraian perbaikan..." required></textarea>
+                <textarea class="form-control form-control-sm py-1" name="tasks[${taskIdx}][subtasks][${si}][action]" rows="1" placeholder="Uraian perbaikan..." required></textarea>
             </div>
-            <div class="col-md-3">
+            <div style="flex:1 1 140px; min-width:140px;">
                 <label class="form-label small fw-semibold text-muted mb-1">Date Action</label>
-                <input type="datetime-local" class="form-control form-control-sm" name="tasks[${taskIdx}][subtasks][${si}][date_action]">
+                <input type="datetime-local" class="form-control form-control-sm py-1" name="tasks[${taskIdx}][subtasks][${si}][date_action]">
+                <div class="invalid-feedback d-block mt-1" data-field="date_action"></div>
             </div>
-            <div class="col-md-3">
+            <div style="flex:1 1 140px; min-width:140px;">
+                <label class="form-label small fw-semibold text-muted mb-1">Date Finish</label>
+                <input type="datetime-local" class="form-control form-control-sm py-1" name="tasks[${taskIdx}][subtasks][${si}][date_finish]">
+            </div>
+            <div style="flex:0 0 90px; min-width:90px;">
+                <label class="form-label small fw-semibold text-muted mb-1">Durasi</label>
+                <input type="number" step="0.01" class="form-control form-control-sm py-1" name="tasks[${taskIdx}][subtasks][${si}][duration_hours]" readonly>
+            </div>
+        </div>
+        <div class="row g-1 mb-1 align-items-end" style="display:flex; flex-wrap:wrap; gap:0.35rem;">
+            <div style="flex:1 1 220px; min-width:220px;">
+                <label class="form-label small fw-semibold text-muted mb-1">Tipe Breakdown</label>
+                <select name="tasks[${taskIdx}][subtasks][${si}][breakdown_type_id]" class="form-select form-select-sm py-1">
+                    <option value="">-- Pilih --</option>
+                    @foreach($breakdownTypes as $bt)
+                        <option value="{{ $bt->id }}">{{ $bt->code ? $bt->code . ' - ' : '' }}{{ $bt->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div style="flex:1 1 220px; min-width:220px;">
                 <label class="form-label small fw-semibold text-muted mb-1">Status</label>
-                <select name="tasks[${taskIdx}][subtasks][${si}][status]" class="form-select form-select-sm">${statusOptions}</select>
+                <select name="tasks[${taskIdx}][subtasks][${si}][status]" class="form-select form-select-sm py-1">${statusOptions}</select>
             </div>
         </div>
         <div class="row g-3 mt-1">
             <!-- Manpower -->
-            <div class="col-md-4">
+            <div class="col-12">
                 <div class="p-2 rounded bg-light border">
                     <label class="form-label small fw-bold text-azure mb-1 d-flex justify-content-between">
                         <span>👷 Manpower (Mekanik)</span>
@@ -526,7 +597,7 @@ function addSubtask(taskIdx) {
                 </div>
             </div>
             <!-- Parts -->
-            <div class="col-md-4">
+            <div class="col-12">
                 <div class="p-2 rounded bg-light border">
                     <label class="form-label small fw-bold text-orange mb-1 d-flex justify-content-between">
                         <span>⚙️ Spareparts</span>
@@ -536,7 +607,7 @@ function addSubtask(taskIdx) {
                 </div>
             </div>
             <!-- Tools -->
-            <div class="col-md-4">
+            <div class="col-12">
                 <div class="p-2 rounded bg-light border">
                     <label class="form-label small fw-bold text-purple mb-1 d-flex justify-content-between">
                         <span>🔧 Tools (Peminjaman)</span>
@@ -568,23 +639,112 @@ function addManpower(taskIdx, subtaskIdx) {
 }
 
 let partCounters = {};
-function addPartRow(taskIdx, subtaskIdx) {
-    const key = taskIdx + '-' + subtaskIdx;
+function addPartRow(taskIdx, subtaskIdx, data) {
+    const key = taskIdx+'-'+subtaskIdx;
     if (!partCounters[key]) partCounters[key] = 0;
     const pi = partCounters[key]++;
-    const container = document.getElementById('parts-' + key);
-    const row = document.createElement('div');
-    row.className = 'd-flex gap-1 mb-1 align-items-center';
+    const container = document.getElementById('parts-'+key);
+    const row = document.createElement('div'); row.className = 'border rounded p-2 mb-2 bg-light';
+    
+    // Default values
+    const status = data?.part_status || 'Replace';
+    
     row.innerHTML = `
-        <div class="input-group input-group-sm" style="flex:2">
-            <select name="tasks[${taskIdx}][subtasks][${subtaskIdx}][parts][${pi}][part_id]" class="form-select form-select-sm" id="part-sel-${key}-${pi}">${partOptions}</select>
-            <button type="button" class="btn btn-outline-orange btn-sm px-1" onclick="inlineAddPart(document.getElementById('part-sel-${key}-${pi}'))">+</button>
+        <div class="d-flex gap-2 mb-2 align-items-end">
+            <div class="input-group input-group-sm" style="flex:3">
+                <select name="tasks[${taskIdx}][subtasks][${subtaskIdx}][parts][${pi}][part_id]" class="form-select form-select-sm" id="part-sel-${key}-${pi}" required>
+                    ${partOptions}
+                </select>
+                <button type="button" class="btn btn-outline-primary btn-sm px-1" onclick="inlineAddPart(document.getElementById('part-sel-${key}-${pi}'))">+</button>
+            </div>
+            <div style="flex:1">
+                <label class="form-label small text-muted mb-0">Status</label>
+                <select name="tasks[${taskIdx}][subtasks][${subtaskIdx}][parts][${pi}][part_status]" class="form-select form-select-sm" id="part-status-${key}-${pi}" onchange="togglePartStatusFields('${key}-${pi}')">
+                    <option value="Replace">Replace</option>
+                    <option value="Repair">Repair</option>
+                    <option value="Order Part">Order Part</option>
+                    <option value="Swap / Canibal">Swap / Canibal</option>
+                </select>
+            </div>
+            <div style="flex:1">
+                <label class="form-label small text-muted mb-0">Qty</label>
+                <input type="number" name="tasks[${taskIdx}][subtasks][${subtaskIdx}][parts][${pi}][qty]" class="form-control form-control-sm" min="1" value="${data?.qty||1}">
+            </div>
+            <div style="flex:1">
+                <label class="form-label small text-muted mb-0">Satuan</label>
+                <input type="text" name="tasks[${taskIdx}][subtasks][${subtaskIdx}][parts][${pi}][satuan]" class="form-control form-control-sm" value="${data?.satuan||''}">
+            </div>
+            <div>
+                <button type="button" class="btn btn-sm btn-outline-danger p-1" onclick="this.parentElement.parentElement.parentElement.remove()">✕</button>
+            </div>
         </div>
-        <input type="number" name="tasks[${taskIdx}][subtasks][${subtaskIdx}][parts][${pi}][qty]" class="form-control form-control-sm" style="width:50px" min="1" value="1" placeholder="Qty">
-        <input type="text" name="tasks[${taskIdx}][subtasks][${subtaskIdx}][parts][${pi}][satuan]" class="form-control form-control-sm" style="width:60px" placeholder="Sat">
-        <button type="button" class="btn btn-sm btn-outline-danger p-1" onclick="this.parentElement.remove()">✕</button>
+        
+        <!-- Order Part Fields -->
+        <div class="row g-2 mb-1 d-none" id="order-fields-${key}-${pi}">
+            <div class="col-6">
+                <input type="text" class="form-control form-control-sm" name="tasks[${taskIdx}][subtasks][${subtaskIdx}][parts][${pi}][mol_pr_order]" placeholder="MOL/PR" value="${status === 'Order Part' ? (data?.mol_pr||'') : ''}">
+            </div>
+            <div class="col-6">
+                <select class="form-select form-select-sm" name="tasks[${taskIdx}][subtasks][${subtaskIdx}][parts][${pi}][order_status]">
+                    <option value="">-- Status Orderan --</option>
+                    <option value="Waiting Approve" ${data?.order_status === 'Waiting Approve' ? 'selected' : ''}>Waiting Approve</option>
+                    <option value="Waiting PO" ${data?.order_status === 'Waiting PO' ? 'selected' : ''}>Waiting PO</option>
+                    <option value="On The Way" ${data?.order_status === 'On The Way' ? 'selected' : ''}>On The Way</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Swap Component Fields -->
+        <div class="row g-2 mb-1 d-none" id="swap-fields-${key}-${pi}">
+            <div class="col-3">
+                <select class="form-select form-select-sm" name="tasks[${taskIdx}][subtasks][${subtaskIdx}][parts][${pi}][swap_type]">
+                    <option value="">-- Tipe Swap --</option>
+                    <option value="Swap To" ${data?.swap_type === 'Swap To' ? 'selected' : ''}>Swap To</option>
+                    <option value="Swap From" ${data?.swap_type === 'Swap From' ? 'selected' : ''}>Swap From</option>
+                </select>
+            </div>
+            <div class="col-3">
+                <select class="form-select form-select-sm" name="tasks[${taskIdx}][subtasks][${subtaskIdx}][parts][${pi}][swap_unit_id]">
+                    ${unitOptions}
+                </select>
+            </div>
+            <div class="col-2">
+                <input type="text" class="form-control form-control-sm" name="tasks[${taskIdx}][subtasks][${subtaskIdx}][parts][${pi}][mol_pr_swap]" placeholder="MOL/PR" value="${status === 'Swap / Canibal' ? (data?.mol_pr||'') : ''}">
+            </div>
+            <div class="col-2">
+                <select class="form-select form-select-sm" name="tasks[${taskIdx}][subtasks][${subtaskIdx}][parts][${pi}][swap_status]">
+                    <option value="">-- Status --</option>
+                    <option value="Waiting Part" ${data?.swap_status === 'Waiting Part' ? 'selected' : ''}>Waiting Part</option>
+                    <option value="Completed" ${data?.swap_status === 'Completed' ? 'selected' : ''}>Completed</option>
+                    <option value="Cancel" ${data?.swap_status === 'Cancel' ? 'selected' : ''}>Cancel</option>
+                </select>
+            </div>
+            <div class="col-2">
+                <input type="text" class="form-control form-control-sm" name="tasks[${taskIdx}][subtasks][${subtaskIdx}][parts][${pi}][swap_remarks]" placeholder="Remarks" value="${data?.swap_remarks||''}">
+            </div>
+        </div>
     `;
     container.appendChild(row);
+    if (data?.part_id) row.querySelector(`#part-sel-${key}-${pi}`).value = data.part_id;
+    if (data?.part_status) row.querySelector(`#part-status-${key}-${pi}`).value = data.part_status;
+    if (data?.swap_unit_id) row.querySelector(`[name="tasks[${taskIdx}][subtasks][${subtaskIdx}][parts][${pi}][swap_unit_id]"]`).value = data.swap_unit_id;
+    
+    togglePartStatusFields(`${key}-${pi}`);
+}
+
+function togglePartStatusFields(id) {
+    const status = document.getElementById(`part-status-${id}`).value;
+    const orderFields = document.getElementById(`order-fields-${id}`);
+    const swapFields = document.getElementById(`swap-fields-${id}`);
+    
+    orderFields.classList.add('d-none');
+    swapFields.classList.add('d-none');
+    
+    if (status === 'Order Part') {
+        orderFields.classList.remove('d-none');
+    } else if (status === 'Swap / Canibal') {
+        swapFields.classList.remove('d-none');
+    }
 }
 
 let toolCounters = {};

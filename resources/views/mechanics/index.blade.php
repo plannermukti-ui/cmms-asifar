@@ -51,6 +51,9 @@
                 @endif
               </td>
               <td>
+                @can('view_mechanics')
+                <a href="{{ route('mechanics.show', $mech) }}" class="btn btn-sm btn-info">Detail</a>
+                @endcan
                 @can('edit_mechanics')
                 <a href="{{ route('mechanics.edit', $mech) }}" class="btn btn-sm btn-primary">Edit</a>
                 @endcan

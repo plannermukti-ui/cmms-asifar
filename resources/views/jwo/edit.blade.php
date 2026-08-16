@@ -52,8 +52,8 @@
 
         <!-- Part -->
         <div class="col-md-6">
-          <label class="form-label required">Part / Komponen yang Dikirim</label>
-          <select class="form-select" name="part_id" required>
+          <label class="form-label">Part / Komponen yang Dikirim</label>
+          <select class="form-select" name="part_id">
             @foreach($parts as $part)
               <option value="{{ $part->id }}" {{ $part->id == $jwo->part_id ? 'selected' : '' }}>{{ $part->part_number }} - {{ $part->part_description }}</option>
             @endforeach

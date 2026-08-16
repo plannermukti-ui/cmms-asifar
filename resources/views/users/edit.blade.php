@@ -132,7 +132,18 @@
           <div class="row">
             <div class="col-md-12">
               <h3 class="mb-3">Spesifik Hak Akses (Opsional)</h3>
-              <p class="text-muted">Centang pada kotak di bawah ini <b>HANYA</b> jika Anda ingin memberikan hak akses khusus (spesifik) kepada user ini di luar dari hak akses yang sudah diberikan melalui <b>Role</b>-nya.</p>
+              <p class="text-muted">Jika minimal satu hak akses dicentang lalu disimpan, daftar ini menjadi <b>pengaturan utama</b> user dan menggantikan hak akses dari <b>Role</b>. Kosongkan seluruh pilihan untuk kembali menggunakan hak akses Role.</p>
+              <div class="alert alert-info d-flex flex-wrap align-items-center gap-2 py-2" role="alert">
+                <span class="fw-semibold">Salin hak akses spesifik dari user lain:</span>
+                <select id="copyPermissionsFrom" class="form-select form-select-sm" style="max-width: 360px;">
+                  <option value="">-- Pilih user sumber --</option>
+                  @foreach($permissionSources as $source)
+                    <option value="{{ $source['id'] }}">{{ $source['label'] }}</option>
+                  @endforeach
+                </select>
+                <button type="button" id="copyPermissionsButton" class="btn btn-sm btn-info">Salin Hak Akses</button>
+                <span class="small text-secondary">Hanya hak akses spesifik yang akan disalin; role user ini tidak berubah.</span>
+              </div>
               <div class="table-responsive">
                 <table class="table table-vcenter card-table table-striped">
                   <thead>
@@ -191,3 +202,29 @@
   </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const sources = @json($permissionSources);
+  const selector = document.getElementById('copyPermissionsFrom');
+  const button = document.getElementById('copyPermissionsButton');
+
+  button.addEventListener('click', function () {
+    const source = sources.find(item => String(item.id) === selector.value);
+    if (!source) {
+      alert('Pilih user sumber terlebih dahulu.');
+      return;
+    }
+
+    if (!confirm(`Salin ${source.permissions.length} hak akses spesifik dari ${source.label}? Pilihan saat ini akan diganti.`)) {
+      return;
+    }
+
+    document.querySelectorAll('input[name="permissions[]"]').forEach(input => {
+      input.checked = source.permissions.includes(input.value);
+    });
+  });
+});
+</script>
+@endpush

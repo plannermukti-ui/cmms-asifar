@@ -7,10 +7,11 @@ use Spatie\Activitylog\LogOptions;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\BelongsToSite;
 
 class HseLoto extends Model
 {
-    use LogsActivity;
+    use LogsActivity, BelongsToSite;
 
     public function getActivitylogOptions(): LogOptions
     {

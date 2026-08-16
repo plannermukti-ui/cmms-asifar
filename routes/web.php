@@ -3,6 +3,52 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/dev-migrate', function () {
+    \Illuminate\Support\Facades\Artisan::call('cache:clear');
+    \Illuminate\Support\Facades\Artisan::call('config:clear');
+    
+    // Force column addition directly
+    $msg = [];
+    if (!\Illuminate\Support\Facades\Schema::hasColumn('pm_schedule_histories', 'hm_service')) {
+        \Illuminate\Support\Facades\Schema::table('pm_schedule_histories', function (\Illuminate\Database\Schema\Blueprint $table) {
+            $table->decimal('hm_service', 10, 1)->nullable()->after('pm_schedule_id');
+        });
+        $msg[] = "Column 'hm_service' successfully added to pm_schedule_histories.";
+    }
+
+    if (!\Illuminate\Support\Facades\Schema::hasColumn('wo_subtask_parts', 'part_status')) {
+        \Illuminate\Support\Facades\Schema::table('wo_subtask_parts', function (\Illuminate\Database\Schema\Blueprint $table) {
+            $table->string('part_status')->default('Replace');
+            $table->string('mol_pr')->nullable();
+            $table->string('order_status')->nullable();
+            $table->string('swap_type')->nullable();
+            $table->foreignId('swap_unit_id')->nullable()->constrained('master_units')->nullOnDelete();
+            $table->string('swap_status')->nullable();
+            $table->text('swap_remarks')->nullable();
+        });
+        $msg[] = "Columns added to wo_subtask_parts.";
+    }
+
+    return implode("<br>", $msg) . "<br>Done. " . \Illuminate\Support\Facades\Artisan::output();
+});
+
+Route::get('/dev-dump-excel', function () {
+    try {
+        $path = base_path('DMBD 13 Agustus 2026 (HW).xlsx');
+        if (!file_exists($path)) {
+            return "File not found: " . $path;
+        }
+        $data = \Maatwebsite\Excel\Facades\Excel::toArray(new class implements \Maatwebsite\Excel\Concerns\ToArray {
+            public function array(array $array) { return $array; }
+        }, $path);
+        
+        // Output as pre-formatted json or just text
+        return "<pre>" . json_encode($data, JSON_PRETTY_PRINT) . "</pre>";
+    } catch (\Exception $e) {
+        return "Error: " . $e->getMessage();
+    }
+});
+
 Route::get('/', function () {
     return redirect()->route('login');
 });
@@ -11,12 +57,14 @@ Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'ind
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+// Public route - accessible without login
+Route::get('/guide', [\App\Http\Controllers\GuideController::class, 'index'])->name('guide');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.update-password');
-    Route::get('/guide', [\App\Http\Controllers\GuideController::class, 'index'])->name('guide');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -75,19 +123,39 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('/tools', \App\Http\Controllers\ToolController::class);
     Route::resource('/tool-stocks', \App\Http\Controllers\ToolStockController::class);
     Route::resource('/tool-transactions', \App\Http\Controllers\ToolTransactionController::class);
+    Route::post('/incident-reports/{incidentReport}/upload-document', [\App\Http\Controllers\IncidentReportController::class, 'uploadDocument'])->name('incident-reports.upload-document');
     Route::resource('/incident-reports', \App\Http\Controllers\IncidentReportController::class);
+    Route::post('/stock-opnames/{stockOpname}/upload', [\App\Http\Controllers\StockOpnameController::class, 'uploadDocument'])->name('stock-opnames.upload');
+    Route::post('/stock-opnames/{stockOpname}/approve', [\App\Http\Controllers\StockOpnameController::class, 'approve'])->name('stock-opnames.approve');
+    Route::post('/stock-opnames/{stockOpname}/reject', [\App\Http\Controllers\StockOpnameController::class, 'reject'])->name('stock-opnames.reject');
     Route::resource('/stock-opnames', \App\Http\Controllers\StockOpnameController::class);
+    
+    // Approval Stok Tool
+    Route::resource('/tool-stock-requests', \App\Http\Controllers\ToolStockRequestController::class)->only(['index', 'show', 'store']);
+    Route::post('/tool-stock-requests/{toolStockRequest}/approve', [\App\Http\Controllers\ToolStockRequestController::class, 'approve'])->name('tool-stock-requests.approve');
+    Route::post('/tool-stock-requests/{toolStockRequest}/reject', [\App\Http\Controllers\ToolStockRequestController::class, 'reject'])->name('tool-stock-requests.reject');
 
     // Work Order
     Route::get('/work-orders-kanban', [\App\Http\Controllers\WorkOrderController::class, 'kanban'])->name('work-orders.kanban');
     Route::get('/work-orders/export', [\App\Http\Controllers\WorkOrderController::class, 'export'])->name('work-orders.export');
+    Route::get('/work-orders/export-dmbd', [\App\Http\Controllers\WorkOrderController::class, 'exportDmbd'])->name('work-orders.export-dmbd');
     Route::resource('/work-orders', \App\Http\Controllers\WorkOrderController::class);
-    Route::resource('/parts', \App\Http\Controllers\PartController::class);
+    Route::post('parts/category', [\App\Http\Controllers\PartController::class, 'storeCategory'])->name('parts.category.store');
+    Route::resource('parts', \App\Http\Controllers\PartController::class);
+    Route::get('/work-orders/{workOrder}/comments', [\App\Http\Controllers\WoCommentController::class, 'index'])->name('work-orders.comments.index');
+    Route::post('/work-orders/{workOrder}/comments', [\App\Http\Controllers\WoCommentController::class, 'store'])->name('work-orders.comments.store');
+    Route::delete('/work-orders/{workOrder}/comments/{comment}', [\App\Http\Controllers\WoCommentController::class, 'destroy'])->name('work-orders.comments.destroy');
 
     // Preventive Maintenance
     Route::resource('/pm-templates', \App\Http\Controllers\PmTemplateController::class);
+    Route::post('/pm-templates/{pmTemplate}/copy', [\App\Http\Controllers\PmTemplateController::class, 'copy'])->name('pm-templates.copy');
     Route::resource('/pm-schedules', \App\Http\Controllers\PmScheduleController::class);
-    Route::post('/pm-schedules/{pm_schedule}/generate-wo', [\App\Http\Controllers\PmScheduleController::class, 'generateWorkOrder'])->name('pm-schedules.generate-wo');
+    Route::post('/pm-schedules/{pmSchedule}/generate-wo', [\App\Http\Controllers\PmScheduleController::class, 'generateWorkOrder'])->name('pm-schedules.generate-wo');
+    Route::get('/pm-schedules/{pmSchedule}/history', [\App\Http\Controllers\PmScheduleController::class, 'historyIndex'])->name('pm-schedules.history');
+    Route::post('/pm-schedules-history/import', [\App\Http\Controllers\PmScheduleController::class, 'importHistory'])->name('pm-schedules.import-history');
+    Route::get('/pm-schedules-history/download-template', [\App\Http\Controllers\PmScheduleController::class, 'downloadHistoryTemplate'])->name('pm-schedules.download-history-template');
+    Route::get('/pm-schedules-history', [\App\Http\Controllers\PmScheduleController::class, 'allHistory'])->name('pm-schedules.all-history');
+    Route::post('/pm-schedules/{pmSchedule}/history', [\App\Http\Controllers\PmScheduleController::class, 'historyStore'])->name('pm-schedules.history.store');
 
     // Pra-Work Order (Request)
     Route::resource('fars', \App\Http\Controllers\FarController::class);
@@ -100,14 +168,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/work-orders/{workOrder}/jsa-template', [\App\Http\Controllers\HseController::class, 'printJsaTemplate'])->name('hse.jsa.template');
     Route::get('/work-orders/{workOrder}/ptw-template', [\App\Http\Controllers\HseController::class, 'printPtwTemplate'])->name('hse.ptw.template');
     Route::post('/work-orders/{workOrder}/jsa', [\App\Http\Controllers\HseController::class, 'storeJsa'])->name('hse.jsa.store');
+    Route::get('/hse/jsa/{jsa}/edit', [\App\Http\Controllers\HseController::class, 'editJsa'])->name('hse.jsa.edit');
+    Route::put('/hse/jsa/{jsa}', [\App\Http\Controllers\HseController::class, 'updateJsa'])->name('hse.jsa.update');
     Route::post('/hse/jsa/{jsa}/approve', [\App\Http\Controllers\HseController::class, 'approveJsa'])->name('hse.jsa.approve');
     Route::delete('/hse/jsa/{jsa}', [\App\Http\Controllers\HseController::class, 'destroyJsa'])->name('hse.jsa.destroy');
 
     Route::post('/work-orders/{workOrder}/ptw', [\App\Http\Controllers\HseController::class, 'storePtw'])->name('hse.ptw.store');
+    Route::get('/hse/ptw/{ptw}/edit', [\App\Http\Controllers\HseController::class, 'editPtw'])->name('hse.ptw.edit');
+    Route::put('/hse/ptw/{ptw}', [\App\Http\Controllers\HseController::class, 'updatePtw'])->name('hse.ptw.update');
     Route::post('/hse/ptw/{ptw}/approve', [\App\Http\Controllers\HseController::class, 'approvePtw'])->name('hse.ptw.approve');
     Route::delete('/hse/ptw/{ptw}', [\App\Http\Controllers\HseController::class, 'destroyPtw'])->name('hse.ptw.destroy');
 
     Route::post('/work-orders/{workOrder}/loto', [\App\Http\Controllers\HseController::class, 'storeLoto'])->name('hse.loto.store');
+    Route::get('/hse/loto/{loto}/edit', [\App\Http\Controllers\HseController::class, 'editLoto'])->name('hse.loto.edit');
+    Route::put('/hse/loto/{loto}', [\App\Http\Controllers\HseController::class, 'updateLoto'])->name('hse.loto.update');
     Route::post('/hse/loto/{loto}/remove', [\App\Http\Controllers\HseController::class, 'removeLoto'])->name('hse.loto.remove');
 
     // API endpoints for WO cascading dropdowns & inline-add & status update
@@ -120,6 +194,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // KPI & Reporting
     Route::get('/kpi/master-data', [\App\Http\Controllers\KpiController::class, 'masterData'])->name('kpi.master-data');
     Route::get('/reports/breakdown', [\App\Http\Controllers\ReportController::class, 'breakdown'])->name('reports.breakdown');
+    Route::resource('/swap-components', \App\Http\Controllers\SwapComponentController::class)->only(['index', 'edit', 'update', 'destroy']);
     
     // Plan Budget Bulanan
     Route::resource('plan-budgets', \App\Http\Controllers\PlanBudgetController::class);
@@ -135,5 +210,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Laporan Produksi (Fleet Production)
     Route::resource('productions', \App\Http\Controllers\ProductionController::class);
 });
-
 require __DIR__.'/auth.php';

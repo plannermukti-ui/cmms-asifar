@@ -13,9 +13,9 @@
 </div>
 
 <div class="card mt-3">
-  <div class="card-header">
+  <div class="card-body border-bottom py-3">
     <form class="row g-2" method="GET" action="{{ route('activity-log.index') }}">
-      <div class="col-md-3">
+      <div class="col-sm-6 col-lg-3">
         <select name="causer_id" class="form-select">
           <option value="">-- Semua User --</option>
           @foreach ($users as $u)
@@ -23,20 +23,27 @@
           @endforeach
         </select>
       </div>
-      <div class="col-md-2">
+      <div class="col-sm-3 col-lg-2">
         <input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}" placeholder="Dari Tanggal">
       </div>
-      <div class="col-md-2">
+      <div class="col-sm-3 col-lg-2">
         <input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}" placeholder="Sampai Tanggal">
       </div>
-      <div class="col-md-auto">
+      <div class="col-sm-12 col-lg-auto d-flex gap-2">
         <button type="submit" class="btn btn-primary">Filter</button>
         <a href="{{ route('activity-log.index') }}" class="btn btn-secondary">Reset</a>
       </div>
     </form>
   </div>
   <div class="table-responsive">
-    <table class="table table-vcenter card-table table-striped">
+    <table class="table table-vcenter card-table table-hover mb-0">
+      <colgroup>
+        <col style="width: 18%">
+        <col style="width: 25%">
+        <col style="width: 21%">
+        <col style="width: 18%">
+        <col style="width: 18%">
+      </colgroup>
       <thead>
         <tr>
           <th>Waktu</th>
@@ -49,34 +56,46 @@
       <tbody>
         @forelse ($activities as $activity)
         <tr>
-          <td class="text-nowrap">{{ $activity->created_at->format('d/m/Y H:i') }}</td>
+          <td class="text-nowrap text-secondary">{{ $activity->created_at->format('d/m/Y H:i') }}</td>
           <td>
             @if ($activity->causer)
-              <span class="avatar avatar-xs me-2">{{ strtoupper(substr($activity->causer->nama_lengkap, 0, 1)) }}</span>
-              {{ $activity->causer->nama_lengkap }}
+              <div class="d-flex align-items-center">
+                <span class="avatar avatar-xs me-2 bg-azure-lt text-azure">{{ strtoupper(substr($activity->causer->nama_lengkap, 0, 1)) }}</span>
+                <span class="fw-semibold text-truncate">{{ $activity->causer->nama_lengkap }}</span>
+              </div>
             @else
               <span class="text-muted">System</span>
             @endif
           </td>
           <td>
             @php
-              $badgeClass = match($activity->event ?? $activity->description) {
-                'created' => 'bg-success',
-                'updated' => 'bg-warning',
-                'deleted' => 'bg-danger',
-                default   => 'bg-secondary',
+              $event = $activity->event;
+              $isAccessLog = in_array($activity->log_name, ['user_access', 'role_access']);
+              $actionLabel = match($event) {
+                'created' => 'Dibuat',
+                'updated' => 'Diperbarui',
+                'deleted' => 'Dihapus',
+                default => $isAccessLog
+                  ? ($activity->log_name === 'role_access' ? 'Hak Akses Role' : 'Hak Akses User')
+                  : ($activity->description ?: 'Aktivitas Sistem'),
+              };
+              $badgeClass = match($event) {
+                'created' => 'bg-success text-white',
+                'updated' => 'bg-warning text-dark',
+                'deleted' => 'bg-danger text-white',
+                default => 'bg-secondary text-white',
               };
             @endphp
-            <span class="badge {{ $badgeClass }}">{{ $activity->event ?? $activity->description }}</span>
+            <span class="badge d-inline-flex align-items-center text-nowrap {{ $badgeClass }}">{{ $actionLabel }}</span>
           </td>
-          <td>{{ $activity->subject_type ? class_basename($activity->subject_type) : '-' }}</td>
+          <td class="text-secondary">{{ $activity->subject_type ? \Illuminate\Support\Str::headline(class_basename($activity->subject_type)) : '-' }}</td>
           <td>
             @if ($activity->properties && count($activity->properties))
-              <button class="btn btn-sm btn-ghost-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#log-{{ $activity->id }}">
-                Detail
+              <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#log-{{ $activity->id }}" aria-expanded="false">
+                Lihat detail
               </button>
-              <div class="collapse mt-1" id="log-{{ $activity->id }}">
-                <pre class="small bg-light p-2 rounded">{{ json_encode($activity->properties, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+              <div class="collapse mt-2" id="log-{{ $activity->id }}">
+                <pre class="small bg-light border p-2 rounded mb-0 text-wrap">{{ json_encode($activity->properties, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
               </div>
             @else
               <span class="text-muted">-</span>

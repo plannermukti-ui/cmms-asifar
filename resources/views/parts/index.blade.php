@@ -35,8 +35,8 @@
           <td>{{ $part->part_description }}</td>
           <td>{{ $part->satuan ?? '-' }}</td>
           <td>{{ number_format($part->cost, 0, ',', '.') }}</td>
-          <td>{{ $part->kategori_1 ?? '-' }}</td>
-          <td>{{ $part->kategori_2 ?? '-' }}</td>
+          <td>{{ $part->kategori1->name ?? '-' }}</td>
+          <td>{{ $part->kategori2->name ?? '-' }}</td>
           <td>
             @can('edit_parts')
             <a href="{{ route('parts.edit', $part) }}" class="btn btn-sm btn-primary">Edit</a>
@@ -98,22 +98,32 @@
               <label class="form-label">Cost (Rp)</label>
               <input type="number" class="form-control" name="cost" min="0" step="0.01" value="0">
             </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Kategori 1</label>
-              <input type="text" class="form-control" name="kategori_1">
+            <div class="col-md-12 mb-3">
+              <label class="form-label">Expenditure Type</label>
+              <select name="expenditure_type" class="form-select">
+                <option value="">-- Pilih --</option>
+                <option value="Capex">Capex</option>
+                <option value="Opex">Opex</option>
+              </select>
             </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Kategori 2</label>
-              <input type="text" class="form-control" name="kategori_2">
+            @for($i = 1; $i <= 4; $i++)
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Kategori {{ $i }}</label>
+              <div class="input-group">
+                <select name="kategori_{{ $i }}_id" id="kategori_{{ $i }}_select" class="form-select">
+                  <option value="">-- Pilih Kategori {{ $i }} --</option>
+                  @if(isset($categories["kategori_$i"]))
+                    @foreach($categories["kategori_$i"] as $cat)
+                      <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                    @endforeach
+                  @endif
+                </select>
+                <button type="button" class="btn btn-outline-primary px-2 btn-add-category" data-type="kategori_{{ $i }}" data-target="kategori_{{ $i }}_select" title="Tambah Kategori {{ $i }}">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon m-0" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                </button>
+              </div>
             </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Kategori 3</label>
-              <input type="text" class="form-control" name="kategori_3">
-            </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label">Kategori 4</label>
-              <input type="text" class="form-control" name="kategori_4">
-            </div>
+            @endfor
           </div>
         </div>
         <div class="modal-footer">
@@ -124,4 +134,43 @@
     </div>
   </div>
 </div>
+
+@push('scripts')
+<script>
+document.querySelectorAll('.btn-add-category').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const type = this.dataset.type;
+        const targetId = this.dataset.target;
+        
+        let label = 'Kategori ' + type.split('_')[1];
+        
+        let val = prompt('Masukkan nama ' + label + ' baru:');
+        if (val && val.trim() !== '') {
+            fetch('{{ route("parts.category.store") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ type: type, name: val.trim() })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const select = document.getElementById(targetId);
+                    const opt = document.createElement('option');
+                    opt.value = data.category.id;
+                    opt.textContent = data.category.name;
+                    opt.selected = true;
+                    select.appendChild(opt);
+                } else {
+                    alert('Gagal menambahkan kategori.');
+                }
+            })
+            .catch(e => console.error(e));
+        }
+    });
+});
+</script>
+@endpush
 @endsection

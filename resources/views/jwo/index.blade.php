@@ -64,7 +64,7 @@
           </td>
           <td class="fw-semibold">{{ $jwo->vendor->name ?? '-' }}</td>
           <td>
-            <div class="fw-bold">{{ $jwo->part->part_description ?? $jwo->part->part_number ?? '-' }}</div>
+            <div class="fw-bold">{{ $jwo->part ? ($jwo->part->part_description ?? $jwo->part->part_number) : '-' }}</div>
             @if($jwo->part && $jwo->part->part_description && $jwo->part->part_number)
               <div class="text-muted small">PN: {{ $jwo->part->part_number }}</div>
             @endif
@@ -184,8 +184,8 @@
 
             <!-- Part -->
             <div class="col-md-12">
-              <label class="form-label required">Part / Komponen yang Dikirim</label>
-              <select class="form-select" name="part_id" required>
+              <label class="form-label">Part / Komponen yang Dikirim</label>
+              <select class="form-select" name="part_id">
                 <option value="">-- Pilih Part / Sparepart --</option>
                 @foreach($parts as $part)
                   <option value="{{ $part->id }}">{{ $part->part_number }} - {{ $part->part_name }}</option>

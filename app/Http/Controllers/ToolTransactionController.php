@@ -25,7 +25,13 @@ class ToolTransactionController extends Controller
         $transactions = ToolTransaction::with(['tool', 'mechanic', 'admin'])->orderBy('created_at', 'desc')->paginate(10);
         $tools = Tool::whereHas('stocks', function($q) { $q->where('location_type', 'ToolRoom')->where('quantity', '>', 0); })->get();
         $mechanics = Mechanic::where('is_active', true)->orderBy('nama_lengkap')->get();
-        return view('tool_transactions.index', compact('transactions', 'tools', 'mechanics'));
+        
+        $openWorkOrders = \App\Models\WorkOrder::with(['tasks.subtasks'])
+            ->whereIn('status_wo', ['Open', 'Inprogress'])
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return view('tool_transactions.index', compact('transactions', 'tools', 'mechanics', 'openWorkOrders'));
     }
 
     public function create()
@@ -46,6 +52,7 @@ class ToolTransactionController extends Controller
             'mechanic_id' => 'required|exists:mechanics,id',
             'tipe_transaksi' => 'required|in:Pinjam Sementara,Pinjam Permanen',
             'borrow_qty' => 'required|integer|min:1',
+            'wo_subtask_id' => 'nullable|exists:wo_subtasks,id'
         ]);
 
         DB::beginTransaction();
@@ -71,7 +78,7 @@ class ToolTransactionController extends Controller
             $mechanicStock->increment('quantity', $request->borrow_qty);
 
             // Create Transaction
-            ToolTransaction::create([
+            $transaction = ToolTransaction::create([
                 'tool_id' => $request->tool_id,
                 'mechanic_id' => $request->mechanic_id,
                 'user_id' => auth()->id(),
@@ -80,6 +87,14 @@ class ToolTransactionController extends Controller
                 'borrow_qty' => $request->borrow_qty,
                 'status' => 'Borrowed'
             ]);
+
+            // If linked to a subtask, record it
+            if ($request->filled('wo_subtask_id')) {
+                \App\Models\WoSubtaskTool::create([
+                    'wo_subtask_id' => $request->wo_subtask_id,
+                    'tool_transaction_id' => $transaction->id
+                ]);
+            }
 
             DB::commit();
             return redirect()->route('tool-transactions.index')->with('success', 'Peminjaman tool berhasil diproses.');
@@ -181,7 +196,47 @@ class ToolTransactionController extends Controller
 
     public function destroy(ToolTransaction $toolTransaction)
     {
-        $toolTransaction->delete();
-        return redirect()->route('tool-transactions.index')->with('success', 'Transaksi berhasil dihapus.');
+        DB::beginTransaction();
+        try {
+            if ($toolTransaction->status === 'Borrowed') {
+                // Kembalikan stok dari mekanik ke ToolRoom
+                $mechanicStock = ToolStock::where('tool_id', $toolTransaction->tool_id)
+                    ->where('location_type', 'Mechanic')
+                    ->where('mechanic_id', $toolTransaction->mechanic_id)
+                    ->first();
+                if ($mechanicStock) {
+                    $mechanicStock->decrement('quantity', $toolTransaction->borrow_qty);
+                }
+
+                $toolRoomStock = ToolStock::where('tool_id', $toolTransaction->tool_id)
+                    ->where('location_type', 'ToolRoom')
+                    ->first();
+                if ($toolRoomStock) {
+                    $toolRoomStock->increment('quantity', $toolTransaction->borrow_qty);
+                }
+            } else if ($toolTransaction->status === 'Returned') {
+                // Jika sudah returned, maka yang hilang belum kembali ke ToolRoom
+                if ($toolTransaction->returned_lost_qty > 0) {
+                    $toolRoomStock = ToolStock::where('tool_id', $toolTransaction->tool_id)
+                        ->where('location_type', 'ToolRoom')
+                        ->first();
+                    if ($toolRoomStock) {
+                        $toolRoomStock->increment('quantity', $toolTransaction->returned_lost_qty);
+                    }
+                }
+                // Hapus incident report terkait
+                IncidentReport::where('tool_transaction_id', $toolTransaction->id)->delete();
+            }
+
+            // Hapus referensi dari wo subtask jika ada
+            \App\Models\WoSubtaskTool::where('tool_transaction_id', $toolTransaction->id)->delete();
+
+            $toolTransaction->delete();
+            DB::commit();
+            return redirect()->route('tool-transactions.index')->with('success', 'Transaksi berhasil dihapus dan stok telah disesuaikan kembali.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('tool-transactions.index')->with('error', 'Terjadi kesalahan saat menghapus: ' . $e->getMessage());
+        }
     }
 }

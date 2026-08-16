@@ -55,6 +55,10 @@
               <textarea class="form-control" name="spesifikasi" rows="3">{{ old('spesifikasi', $tool->spesifikasi) }}</textarea>
             </div>
             <div class="col-md-12 mb-3">
+              <label class="form-label">Cost / Harga Satuan (Rp)</label>
+              <input type="number" class="form-control" name="price" value="{{ old('price', $tool->price) }}" min="0" step="0.01">
+            </div>
+            <div class="col-md-12 mb-3">
               <label class="form-label">Foto Tool</label>
               @if($tool->foto)
                 <div class="mb-2">

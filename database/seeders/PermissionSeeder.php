@@ -33,6 +33,8 @@ class PermissionSeeder extends Seeder
             'unit_types' => 'Master Tipe Unit',
             'unit_models' => 'Master Model Unit',
             'chat' => 'Pesan Instan',
+            'kpi_master_data' => 'KPI Master Data',
+            'breakdown_reports' => 'Report Breakdown',
             
             // Administrasi ToolRoom
             'mechanics' => 'Data Mekanik',
@@ -42,6 +44,7 @@ class PermissionSeeder extends Seeder
             'tool_transactions' => 'Peminjaman Tool',
             'incident_reports' => 'Berita Acara',
             'stock_opnames' => 'Stock Opname',
+            'tool_stock_requests' => 'Approval Stok Tool',
             
             // Produksi
             'productions' => 'Laporan Produksi Harian',
@@ -62,9 +65,12 @@ class PermissionSeeder extends Seeder
             'pm_schedules' => 'Jadwal PM (Schedule)',
             'pra_work_orders' => 'Pra-Work Order (PWO)',
             'work_orders' => 'Work Order (WO)',
+            'work_orders_kanban' => 'Kanban Board (WO)',
             'plan_budgets' => 'RAB / Budget Plan',
             'jwos' => 'Job Work Order (JWO)',
             'fars' => 'Form Analisa Rusak (FAR)',
+            'wo_comments' => 'Diskusi Work Order',
+            'swap_components' => 'Swap Component Report',
         ];
 
         // Aksi standar (CRUD)
@@ -84,8 +90,10 @@ class PermissionSeeder extends Seeder
         // Tambahkan permission tambahan jika ada (misal: download_backup)
         Permission::firstOrCreate(['name' => 'download_backup']);
         Permission::firstOrCreate(['name' => 'send_chat']);
+        Permission::firstOrCreate(['name' => 'export_kpi']);
         $permissions[] = 'download_backup';
         $permissions[] = 'send_chat';
+        $permissions[] = 'export_kpi';
 
         // Berikan semua akses ke Role Super Admin (ID 1 atau role dengan nama Super Admin)
         $superAdminRole = Role::firstOrCreate(['name' => 'Super Admin']);

@@ -15,6 +15,12 @@ use App\Exports\KpiMasterDataExport;
 
 class KpiController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_kpi_master_data')->only(['masterData']);
+        $this->middleware('permission:export_kpi')->only(['exportMasterData']);
+    }
+
     public function masterData(Request $request)
     {
         $sites = Site::all();
@@ -154,7 +160,7 @@ class KpiController extends Controller
 
             $pa = $ewh > 0 ? (($ewh - $bdHrsTotal) / $ewh) * 100 : 0;
             $ma = ($opHrs + $bdHrsTotal) > 0 ? ($opHrs / ($opHrs + $bdHrsTotal)) * 100 : 0;
-            $mtbf = ($eventBd > 0 && $opHrs > 0) ? ($opHrs / $eventBd) : 0;
+            $mtbf = $eventBd > 0 ? ($opHrs / $eventBd) : $opHrs;
             $mttr = $eventBd > 0 ? $bdHrsTotal / $eventBd : 0;
             $ua = ($ewh - $bdHrsTotal) > 0 ? ($opHrs / ($ewh - $bdHrsTotal)) * 100 : 0;
             $eu = $ewh > 0 ? ($opHrs / $ewh) * 100 : 0;
@@ -295,7 +301,7 @@ class KpiController extends Controller
 
             $pa = $ewh > 0 ? (($ewh - $bdHrsTotal) / $ewh) * 100 : 0;
             $ma = ($opHrs + $bdHrsTotal) > 0 ? ($opHrs / ($opHrs + $bdHrsTotal)) * 100 : 0;
-            $mtbf = ($eventBd > 0 && $opHrs > 0) ? ($opHrs / $eventBd) : 0;
+            $mtbf = $eventBd > 0 ? ($opHrs / $eventBd) : $opHrs;
             $mttr = $eventBd > 0 ? $bdHrsTotal / $eventBd : 0;
             $ua = ($ewh - $bdHrsTotal) > 0 ? ($opHrs / ($ewh - $bdHrsTotal)) * 100 : 0;
             $eu = $ewh > 0 ? ($opHrs / $ewh) * 100 : 0;

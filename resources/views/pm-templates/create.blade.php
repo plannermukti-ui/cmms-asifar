@@ -62,17 +62,22 @@
         <label class="form-label required">Nama Template</label>
         <input type="text" name="name" value="{{ old('name') }}" required placeholder="Contoh: Service 250H" class="form-control">
       </div>
-      <div class="col-md-6">
+      <div class="col-md-4 mb-3">
         <label class="form-label required">Tipe Interval</label>
-        <select name="interval_type" required class="form-select">
-            <option value="hour_meter" {{ old('interval_type') == 'hour_meter' ? 'selected' : '' }}>Hour Meter (HM)</option>
-            <option value="kilometer" {{ old('interval_type') == 'kilometer' ? 'selected' : '' }}>Kilometer (KM)</option>
-            <option value="days" {{ old('interval_type') == 'days' ? 'selected' : '' }}>Hari (Days)</option>
+        <select name="interval_type" class="form-select" required>
+          <option value="hour_meter" {{ old('interval_type') == 'hour_meter' ? 'selected' : '' }}>Hour Meter (HM)</option>
+          <option value="kilometer" {{ old('interval_type') == 'kilometer' ? 'selected' : '' }}>Kilometer (KM)</option>
+          <option value="days" {{ old('interval_type') == 'days' ? 'selected' : '' }}>Hari (Days)</option>
         </select>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-4 mb-3">
         <label class="form-label required">Nilai Interval</label>
-        <input type="number" name="interval_value" value="{{ old('interval_value') }}" required placeholder="Contoh: 250" min="1" class="form-control">
+        <input type="number" name="interval_value" class="form-control" value="{{ old('interval_value', 250) }}" required min="1">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label required">Opr Hrs/Day</label>
+        <input type="number" step="0.1" name="opr_hrs_per_day" class="form-control" value="{{ old('opr_hrs_per_day', 20) }}" required min="1">
+        <small class="form-hint">Estimasi jam operasi unit per hari.</small>
       </div>
     </div>
   </div>
@@ -105,6 +110,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         let taskIndex = 0;
         const container = document.getElementById('tasksContainer');
+        const partsData = @json($parts);
 
         document.getElementById('addTaskBtn').addEventListener('click', function() {
             addTask();
@@ -145,12 +151,25 @@
             const subIndex = subContainer.querySelectorAll('.subtask-item').length;
             const subId = `sub-${taskId}-${Date.now()}`;
             
+            let partsOptions = '<option value="">-- Pilih Part --</option>';
+            partsData.forEach(p => {
+                partsOptions += `<option value="${p.id}">${p.part_number} - ${p.part_description}</option>`;
+            });
+
             const div = document.createElement('div');
-            div.className = 'subtask-item d-flex align-items-center gap-2 mb-2';
+            div.className = 'subtask-item mb-3 p-2 border rounded';
             div.id = subId;
             div.innerHTML = `
-                <input type="text" name="tasks[${taskId}][subtasks][${subIndex}][subtask_name]" required placeholder="Contoh: Cek level oli mesin" class="form-control form-control-sm">
-                <button type="button" onclick="document.getElementById('${subId}').remove()" class="btn btn-sm btn-outline-danger px-2 py-1">✕</button>
+                <div class="d-flex align-items-start gap-2">
+                    <div class="flex-grow-1">
+                        <input type="text" name="tasks[${taskId}][subtasks][${subIndex}][subtask_name]" required placeholder="Contoh: Cek level oli mesin" class="form-control form-control-sm mb-2">
+                        <select name="tasks[${taskId}][subtasks][${subIndex}][parts][]" class="form-select form-select-sm" multiple data-placeholder="Pilih Parts (Opsional)">
+                            ${partsOptions}
+                        </select>
+                        <small class="text-muted">Tahan CTRL/CMD untuk memilih lebih dari satu part.</small>
+                    </div>
+                    <button type="button" onclick="document.getElementById('${subId}').remove()" class="btn btn-sm btn-outline-danger px-2 py-1 mt-1">✕</button>
+                </div>
             `;
             subContainer.appendChild(div);
         }

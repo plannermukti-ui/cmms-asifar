@@ -260,9 +260,6 @@
                 </thead>
                 <tbody>
                   @forelse($workOrders as $wo)
-                    @php
-                      $woCost = $wo->jwos->sum('cost');
-                    @endphp
                     <tr>
                       <td class="font-weight-bold text-primary">{{ $wo->no_wo }}</td>
                       <td><span class="badge bg-blue text-white">{{ $wo->status_wo }}</span></td>
@@ -271,8 +268,8 @@
                       <td class="small">{{ $wo->waktu_bd ? \Carbon\Carbon::parse($wo->waktu_bd)->format('d/m/Y H:i') : '-' }}</td>
                       <td class="small">{{ $wo->waktu_rfu ? \Carbon\Carbon::parse($wo->waktu_rfu)->format('d/m/Y H:i') : '-' }}</td>
                       <td class="fw-bold text-danger small">
-                        @if($woCost > 0)
-                          Rp {{ number_format($woCost, 0, ',', '.') }}
+                        @if($wo->maintenance_cost > 0)
+                          Rp {{ number_format($wo->maintenance_cost, 0, ',', '.') }}
                         @else
                           <span class="text-muted font-weight-normal">-</span>
                         @endif

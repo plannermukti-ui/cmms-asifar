@@ -42,6 +42,35 @@
     height: 55px;
   }
 
+  /* =========================================================
+     DARK MODE — pastikan laporan FAR tetap terbaca
+     ========================================================= */
+  [data-bs-theme="dark"] .wo-report-card .app-address {
+    color: #94a3b8 !important;
+  }
+  [data-bs-theme="dark"] .wo-report-card .text-dark {
+    color: #f1f5f9 !important;
+  }
+  [data-bs-theme="dark"] .wo-report-card .badge.bg-primary.text-white {
+    color: #0f172a !important;
+  }
+  [data-bs-theme="dark"] .table-report-header th {
+    background-color: rgba(15, 23, 42, 0.85) !important;
+    color: #fbbf24 !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+  }
+  [data-bs-theme="dark"] .table-condensed th,
+  [data-bs-theme="dark"] .table-condensed td {
+    color: #e2e8f0 !important;
+  }
+  [data-bs-theme="dark"] .signature-box {
+    background-color: rgba(15, 23, 42, 0.5) !important;
+    color: #f1f5f9 !important;
+  }
+  [data-bs-theme="dark"] .wo-report-card .bg-body-tertiary {
+    background-color: rgba(15, 23, 42, 0.5) !important;
+  }
+
   @media print {
     body {
       background: #fff !important;
@@ -57,10 +86,32 @@
       max-width: 100% !important;
       width: 100% !important;
     }
-    .wo-report-card {
+    .card.wo-report-card {
+      --tblr-body-color: #000 !important;
+      --tblr-muted-color: #4a5568 !important;
+      background-color: #fff !important;
+      color: #000 !important;
       border: 1px solid #000 !important;
       box-shadow: none !important;
       padding: 12px !important;
+    }
+    .card.wo-report-card .app-address {
+      color: #333 !important;
+    }
+    .card.wo-report-card .table {
+      color: #000 !important;
+    }
+    .wo-report-card .table-report-header th {
+      background-color: #f1f5f9 !important;
+      color: #000 !important;
+    }
+    .card.wo-report-card .signature-box,
+    .card.wo-report-card .bg-body-tertiary {
+      background-color: #f8fafc !important;
+      color: #000 !important;
+    }
+    .card.wo-report-card .text-dark {
+      color: #000 !important;
     }
     .table-condensed th, .table-condensed td {
       padding: 2px 4px !important;
@@ -128,10 +179,12 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" /><path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" /><path d="M7 13m0 2a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2z" /></svg>
                     Cetak Report (A4)
                 </button>
+                @can('edit_fars')
                 <a href="{{ route('fars.edit', $far) }}" class="btn btn-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" /><path d="M13.5 6.5l4 4" /></svg>
                     Edit FAR
                 </a>
+                @endcan
                 <a href="{{ route('fars.index') }}" class="btn btn-outline-secondary">Kembali</a>
             </div>
         </div>
@@ -165,7 +218,7 @@
                     <div>
                         <h2 class="m-0 fw-extrabold text-uppercase text-body tracking-wide" style="font-size: 1.3rem;">{{ $appName }}</h2>
                         @if($appAddress)
-                            <div style="font-size: 0.75rem; color: #555; margin-bottom: 2px;">{{ $appAddress }}</div>
+                            <div class="app-address" style="font-size: 0.75rem; color: #555; margin-bottom: 2px;">{{ $appAddress }}</div>
                         @endif
                         <div class="text-muted small fw-semibold text-uppercase">FAILURE ANALYSIS REPORT & EVALUATION SHEET</div>
                     </div>

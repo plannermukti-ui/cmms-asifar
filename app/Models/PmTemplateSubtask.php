@@ -25,4 +25,9 @@ class PmTemplateSubtask extends Model
     {
         return $this->belongsTo(PmTemplateTask::class);
     }
+
+    public function parts()
+    {
+        return $this->belongsToMany(Part::class, 'pm_template_subtask_parts')->withPivot('quantity')->withTimestamps();
+    }
 }

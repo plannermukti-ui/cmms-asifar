@@ -48,6 +48,7 @@
 
 
         {{-- Engineer & Produksi --}}
+        @if(auth()->user()->can('view_pra_work_orders') || auth()->user()->can('view_productions'))
         @php
             $isEngProdActive = request()->is('pra-work-orders*') || request()->is('productions*');
         @endphp
@@ -59,45 +60,46 @@
             <span class="nav-link-title">Engineer & Produksi</span>
           </a>
           <div class="dropdown-menu {{ $isEngProdActive ? 'show' : '' }}">
+            @can('view_pra_work_orders')
             <a class="dropdown-item py-1.5 {{ request()->routeIs('pra-work-orders.*') ? 'active font-weight-bold text-danger' : '' }}" href="{{ route('pra-work-orders.index') }}">
               Laporan Kerusakan
             </a>
+            @endcan
+            @can('view_productions')
             <a class="dropdown-item py-1.5 {{ request()->routeIs('productions.*') ? 'active font-weight-bold text-primary' : '' }}" href="{{ route('productions.index') }}">
               Laporan Produksi Harian
             </a>
+            @endcan
           </div>
         </li>
+        @endif
 
         <!-- CATEGORY 2: PEMELIHARAAN -->
         <li class="nav-item text-muted text-uppercase fw-bold px-3 pt-3 pb-1" style="font-size: 0.65rem; letter-spacing: 0.08em; opacity: 0.5;">
           Pemeliharaan & Tool
         </li>
 
-        {{-- Work Order --}}
-        @if(auth()->user()->can('view_work_orders') || auth()->user()->can('view_parts'))
+        {{-- WorkOrder --}}
+        @if(auth()->user()->can('view_work_orders') || auth()->user()->can('view_work_orders_kanban') || auth()->user()->can('view_parts'))
         @php
-            $isWoActive = request()->is('work-orders*', 'parts*', 'vendors*', 'jwos*', 'fars*');
+            $isWoActive = request()->is('work-orders*', 'parts*');
         @endphp
         <li class="nav-item dropdown {{ $isWoActive ? 'active' : '' }}">
           <a class="nav-link dropdown-toggle rounded-2 mx-2 mb-1 px-2.5 {{ $isWoActive ? 'active bg-primary-lt font-weight-bold' : '' }}" href="#navbar-wo" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="{{ $isWoActive ? 'true' : 'false' }}">
             <span class="nav-link-icon me-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="icon text-azure" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /><path d="M9 14l2 2l4 -4" /></svg>
             </span>
-            <span class="nav-link-title">Work Order & Eksternal</span>
+            <span class="nav-link-title">WorkOrder</span>
           </a>
           <div class="dropdown-menu {{ $isWoActive ? 'show' : '' }}">
             @can('view_work_orders')
             <a class="dropdown-item py-1.5 {{ request()->routeIs('work-orders.index') ? 'active font-weight-bold' : '' }}" href="{{ route('work-orders.index') }}">
               Daftar Work Order
             </a>
+            @endcan
+            @can('view_work_orders_kanban')
             <a class="dropdown-item py-1.5 {{ request()->routeIs('work-orders.kanban') ? 'active font-weight-bold' : '' }}" href="{{ route('work-orders.kanban') }}">
               Kanban Board
-            </a>
-            <a class="dropdown-item py-1.5 {{ request()->is('jwos*') ? 'active font-weight-bold text-primary' : '' }}" href="{{ route('jwos.index') }}">
-              Job Work Order (JWO)
-            </a>
-            <a class="dropdown-item py-1.5 {{ request()->is('fars*') ? 'active font-weight-bold text-danger' : '' }}" href="{{ route('fars.index') }}">
-              Failure Analysis Report
             </a>
             @endcan
             @can('view_parts')
@@ -105,6 +107,30 @@
             <a class="dropdown-item py-1.5 {{ request()->is('parts*') ? 'active font-weight-bold' : '' }}" href="{{ route('parts.index') }}">
               Master Part
             </a>
+            @endcan
+          </div>
+        </li>
+        @endif
+
+        {{-- Job Work Order (JWO) --}}
+        @if(auth()->user()->can('view_jwos') || auth()->user()->can('view_vendors'))
+        @php
+            $isJwoActive = request()->is('jwos*', 'vendors*');
+        @endphp
+        <li class="nav-item dropdown {{ $isJwoActive ? 'active' : '' }}">
+          <a class="nav-link dropdown-toggle rounded-2 mx-2 mb-1 px-2.5 {{ $isJwoActive ? 'active bg-primary-lt font-weight-bold' : '' }}" href="#navbar-jwo" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="{{ $isJwoActive ? 'true' : 'false' }}">
+            <span class="nav-link-icon me-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon text-primary" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M9 17h6" /><path d="M9 13h6" /></svg>
+            </span>
+            <span class="nav-link-title">Job Work Order (JWO)</span>
+          </a>
+          <div class="dropdown-menu {{ $isJwoActive ? 'show' : '' }}">
+            @can('view_jwos')
+            <a class="dropdown-item py-1.5 {{ request()->is('jwos*') ? 'active font-weight-bold' : '' }}" href="{{ route('jwos.index') }}">
+              Daftar JWO
+            </a>
+            @endcan
+            @can('view_vendors')
             <a class="dropdown-item py-1.5 {{ request()->is('vendors*') ? 'active font-weight-bold' : '' }}" href="{{ route('vendors.index') }}">
               Master Vendor / Bengkel
             </a>
@@ -113,7 +139,32 @@
         </li>
         @endif
 
+        {{-- Failure Analysis Report --}}
+        @can('view_fars')
+        <li class="nav-item">
+          <a class="nav-link rounded-2 mx-2 mb-1 px-2.5 {{ request()->is('fars*') ? 'active bg-primary-lt font-weight-bold' : '' }}" href="{{ route('fars.index') }}">
+            <span class="nav-link-icon me-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon text-red" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v4" /><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" /><path d="M12 16h.01" /></svg>
+            </span>
+            <span class="nav-link-title">Failure Analysis Report</span>
+          </a>
+        </li>
+        @endcan
+
+        {{-- Swap Component Report --}}
+        @can('view_swap_components')
+        <li class="nav-item">
+          <a class="nav-link rounded-2 mx-2 mb-1 px-2.5 {{ request()->is('swap-components*') ? 'active bg-primary-lt font-weight-bold' : '' }}" href="{{ route('swap-components.index') }}">
+            <span class="nav-link-icon me-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon text-purple" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 10h14l-4 -4" /><path d="M17 14h-14l4 4" /></svg>
+            </span>
+            <span class="nav-link-title">Swap Component Report</span>
+          </a>
+        </li>
+        @endcan
+
         {{-- Preventive Maintenance --}}
+        @if(auth()->user()->can('view_pm_templates') || auth()->user()->can('view_pm_schedules'))
         @php
             $isPmActive = request()->is('pm-templates*', 'pm-schedules*');
         @endphp
@@ -125,14 +176,22 @@
             <span class="nav-link-title">Preventive Maint.</span>
           </a>
           <div class="dropdown-menu {{ $isPmActive ? 'show' : '' }}">
+            @can('view_pm_templates')
             <a class="dropdown-item py-1.5 {{ request()->routeIs('pm-templates.index') ? 'active font-weight-bold' : '' }}" href="{{ route('pm-templates.index') }}">
               Templates (Checklist)
             </a>
+            @endcan
+            @can('view_pm_schedules')
             <a class="dropdown-item py-1.5 {{ request()->routeIs('pm-schedules.index') ? 'active font-weight-bold' : '' }}" href="{{ route('pm-schedules.index') }}">
-              Jadwal & Generate WO
+              Jadwal PM
             </a>
+            <a class="dropdown-item py-1.5 {{ request()->routeIs('pm-schedules.all-history') ? 'active font-weight-bold' : '' }}" href="{{ route('pm-schedules.all-history') }}">
+              History Service
+            </a>
+            @endcan
           </div>
         </li>
+        @endif
 
         {{-- Budget --}}
         @can('view_plan_budgets')
@@ -155,9 +214,9 @@
         @endcan
 
         {{-- Administrasi ToolRoom --}}
-        @if(auth()->user()->can('view_tools') || auth()->user()->can('view_tool_stocks') || auth()->user()->can('view_mechanics') || auth()->user()->can('view_tool_transactions') || auth()->user()->can('view_incident_reports') || auth()->user()->can('view_stock_opnames'))
+        @if(auth()->user()->can('view_tools') || auth()->user()->can('view_tool_categories') || auth()->user()->can('view_tool_stocks') || auth()->user()->can('view_mechanics') || auth()->user()->can('view_tool_transactions') || auth()->user()->can('view_incident_reports') || auth()->user()->can('view_stock_opnames') || auth()->user()->can('view_tool_stock_requests'))
         @php
-            $isToolRoomActive = request()->is('tools*', 'tool-categories*', 'tool-stocks*', 'mechanics*', 'tool-transactions*', 'incident-reports*', 'stock-opnames*');
+            $isToolRoomActive = request()->is('tools*', 'tool-categories*', 'tool-stocks*', 'mechanics*', 'tool-transactions*', 'incident-reports*', 'stock-opnames*', 'tool-stock-requests*');
         @endphp
         <li class="nav-item dropdown {{ $isToolRoomActive ? 'active' : '' }}">
           <a class="nav-link dropdown-toggle rounded-2 mx-2 mb-1 px-2.5 {{ $isToolRoomActive ? 'active bg-primary-lt font-weight-bold' : '' }}" href="#navbar-toolroom" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="{{ $isToolRoomActive ? 'true' : 'false' }}">
@@ -167,11 +226,16 @@
             <span class="nav-link-title">ToolRoom</span>
           </a>
           <div class="dropdown-menu {{ $isToolRoomActive ? 'show' : '' }}">
-            @can('view_tools')
-            <a class="dropdown-item py-1.5 {{ request()->is('tools*') || request()->is('tool-categories*') || request()->is('tool-stocks*') ? 'active font-weight-bold' : '' }}" href="{{ route('tools.index') }}">
+            @if(auth()->user()->can('view_tools') || auth()->user()->can('view_tool_categories') || auth()->user()->can('view_tool_stocks'))
+            @php
+                $toolMasterUrl = auth()->user()->can('view_tools')
+                    ? route('tools.index')
+                    : (auth()->user()->can('view_tool_stocks') ? route('tool-stocks.index') : route('tool-categories.index'));
+            @endphp
+            <a class="dropdown-item py-1.5 {{ request()->is('tools*') || request()->is('tool-categories*') || request()->is('tool-stocks*') ? 'active font-weight-bold' : '' }}" href="{{ $toolMasterUrl }}">
               Master Tool & Stok
             </a>
-            @endcan
+            @endif
             @can('view_mechanics')
             <a class="dropdown-item py-1.5 {{ request()->is('mechanics*') ? 'active font-weight-bold' : '' }}" href="{{ route('mechanics.index') }}">
               Data Mekanik
@@ -190,6 +254,11 @@
             @can('view_stock_opnames')
             <a class="dropdown-item py-1.5 {{ request()->is('stock-opnames*') ? 'active font-weight-bold' : '' }}" href="{{ route('stock-opnames.index') }}">
               Stock Opname
+            </a>
+            @endcan
+            @can('view_tool_stock_requests')
+            <a class="dropdown-item py-1.5 {{ request()->is('tool-stock-requests*') ? 'active font-weight-bold' : '' }}" href="{{ route('tool-stock-requests.index') }}">
+              Approval Stok Tool
             </a>
             @endcan
           </div>
@@ -239,6 +308,7 @@
         @endif
 
         <!-- CATEGORY 4: KPI & REPORTING -->
+        @if(auth()->user()->can('view_kpi_master_data') || auth()->user()->can('view_breakdown_reports'))
         <li class="nav-item text-muted text-uppercase fw-bold px-3 pt-3 pb-1" style="font-size: 0.65rem; letter-spacing: 0.08em; opacity: 0.5;">
           KPI & Reporting
         </li>
@@ -255,15 +325,22 @@
             <span class="nav-link-title">Key Performance Indicator</span>
           </a>
           <div class="dropdown-menu {{ $isKpiActive ? 'show' : '' }}">
+            @can('view_kpi_master_data')
             <a class="dropdown-item py-1.5 {{ request()->routeIs('kpi.master-data') ? 'active font-weight-bold' : '' }}" href="{{ route('kpi.master-data') }}">
               Master Data
             </a>
+            @endcan
+            @can('view_kpi_master_data') @can('view_breakdown_reports')
             <div class="dropdown-divider"></div>
+            @endcan @endcan
+            @can('view_breakdown_reports')
             <a class="dropdown-item py-1.5 {{ request()->routeIs('reports.breakdown') ? 'active font-weight-bold' : '' }}" href="{{ route('reports.breakdown') }}">
               Report Breakdown
             </a>
+            @endcan
           </div>
         </li>
+        @endif
 
         {{-- Administrator General --}}
         @if(auth()->user()->can('view_users') || auth()->user()->can('view_departments') || auth()->user()->can('view_jabatans') || auth()->user()->can('view_roles') || auth()->user()->can('view_modules') || auth()->user()->can('view_approval_matrix') || auth()->user()->can('view_activity_log') || auth()->user()->can('view_backup') || auth()->user()->can('view_settings'))

@@ -13,6 +13,13 @@ use Illuminate\Support\Facades\DB;
 
 class ProductionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_productions')->only(['index', 'show']);
+        $this->middleware('permission:create_productions')->only(['create', 'store']);
+        $this->middleware('permission:edit_productions')->only(['edit', 'update']);
+        $this->middleware('permission:delete_productions')->only(['destroy']);
+    }
     public function index()
     {
         $productions = Production::with(['fleets.digger', 'fleets.haulers', 'delays'])->latest()->paginate(10);

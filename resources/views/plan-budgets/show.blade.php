@@ -8,6 +8,22 @@
 
 @section('content')
 <style>
+  /* =========================================================
+     DARK MODE — pastikan dokumen plan budget tetap terbaca
+     ========================================================= */
+  [data-bs-theme="dark"] .card .text-dark {
+    color: #f1f5f9 !important;
+  }
+  [data-bs-theme="dark"] .card .bg-light {
+    background-color: rgba(15, 23, 42, 0.85) !important;
+  }
+  [data-bs-theme="dark"] .table tfoot.bg-light td {
+    background-color: rgba(15, 23, 42, 0.9) !important;
+  }
+  [data-bs-theme="dark"] .card-footer.bg-white {
+    background-color: rgba(15, 23, 42, 0.5) !important;
+  }
+
   @media print {
     body {
       background: #fff !important;
@@ -28,13 +44,25 @@
       box-shadow: none !important;
       background: transparent !important;
     }
-    .table {
+    .card .table {
       border-color: #000 !important;
       color: #000 !important;
     }
-    .table th, .table td {
+    .card .table th, .card .table td {
       border-color: #000 !important;
       padding: 4px 6px !important;
+    }
+    .card .table tfoot.bg-light td {
+      background-color: #f1f5f9 !important;
+    }
+    .card .bg-light {
+      background-color: #f1f5f9 !important;
+    }
+    .card .text-dark {
+      color: #000 !important;
+    }
+    .card .card-footer.bg-white {
+      background-color: #fff !important;
     }
     .badge {
       border: none !important;

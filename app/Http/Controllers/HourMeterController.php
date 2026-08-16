@@ -22,7 +22,7 @@ class HourMeterController extends Controller
 
     public function create()
     {
-        $masterUnits = \App\Models\MasterUnit::with(['model', 'site'])->orderBy('nomor_unit')->get();
+        $masterUnits = \App\Models\MasterUnit::with(['model', 'siteRelation'])->orderBy('nomor_unit')->get();
         return view('hour-meters.create', compact('masterUnits'));
     }
 
@@ -48,7 +48,7 @@ class HourMeterController extends Controller
 
     public function edit(\App\Models\HourMeter $hourMeter)
     {
-        $masterUnits = \App\Models\MasterUnit::with(['model', 'site'])->orderBy('nomor_unit')->get();
+        $masterUnits = \App\Models\MasterUnit::with(['model', 'siteRelation'])->orderBy('nomor_unit')->get();
         return view('hour-meters.edit', compact('hourMeter', 'masterUnits'));
     }
 

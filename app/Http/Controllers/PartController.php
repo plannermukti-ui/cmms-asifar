@@ -19,7 +19,8 @@ class PartController extends Controller
     {
         $parts = Part::orderBy('part_number')->paginate(15);
         $sites = \App\Models\Site::orderBy('name')->get();
-        return view('parts.index', compact('parts', 'sites'));
+        $categories = \App\Models\PartCategory::all()->groupBy('type');
+        return view('parts.index', compact('parts', 'sites', 'categories'));
     }
 
     public function store(Request $request)
@@ -30,10 +31,11 @@ class PartController extends Controller
             'part_description' => 'required|string|max:255',
             'satuan' => 'nullable|string|max:50',
             'cost' => 'nullable|numeric|min:0',
-            'kategori_1' => 'nullable|string|max:100',
-            'kategori_2' => 'nullable|string|max:100',
-            'kategori_3' => 'nullable|string|max:100',
-            'kategori_4' => 'nullable|string|max:100',
+            'expenditure_type' => 'nullable|string|in:Capex,Opex',
+            'kategori_1_id' => 'nullable|exists:part_categories,id',
+            'kategori_2_id' => 'nullable|exists:part_categories,id',
+            'kategori_3_id' => 'nullable|exists:part_categories,id',
+            'kategori_4_id' => 'nullable|exists:part_categories,id',
         ]);
 
         Part::create($request->all());
@@ -43,7 +45,8 @@ class PartController extends Controller
     public function edit(Part $part)
     {
         $sites = \App\Models\Site::orderBy('name')->get();
-        return view('parts.edit', compact('part', 'sites'));
+        $categories = \App\Models\PartCategory::all()->groupBy('type');
+        return view('parts.edit', compact('part', 'sites', 'categories'));
     }
 
     public function update(Request $request, Part $part)
@@ -54,10 +57,11 @@ class PartController extends Controller
             'part_description' => 'required|string|max:255',
             'satuan' => 'nullable|string|max:50',
             'cost' => 'nullable|numeric|min:0',
-            'kategori_1' => 'nullable|string|max:100',
-            'kategori_2' => 'nullable|string|max:100',
-            'kategori_3' => 'nullable|string|max:100',
-            'kategori_4' => 'nullable|string|max:100',
+            'expenditure_type' => 'nullable|string|in:Capex,Opex',
+            'kategori_1_id' => 'nullable|exists:part_categories,id',
+            'kategori_2_id' => 'nullable|exists:part_categories,id',
+            'kategori_3_id' => 'nullable|exists:part_categories,id',
+            'kategori_4_id' => 'nullable|exists:part_categories,id',
         ]);
 
         $part->update($request->all());
@@ -68,5 +72,23 @@ class PartController extends Controller
     {
         $part->delete();
         return redirect()->route('parts.index')->with('success', 'Part berhasil dihapus.');
+    }
+
+    public function storeCategory(Request $request)
+    {
+        $request->validate([
+            'type' => 'required|string|in:kategori_1,kategori_2,kategori_3,kategori_4',
+            'name' => 'required|string|max:255',
+        ]);
+
+        $category = \App\Models\PartCategory::firstOrCreate([
+            'type' => $request->type,
+            'name' => $request->name,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'category' => $category
+        ]);
     }
 }

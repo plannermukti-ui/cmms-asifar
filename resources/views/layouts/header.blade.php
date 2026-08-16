@@ -4,6 +4,11 @@
     <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar-menu" aria-controls="sidebar-menu" aria-label="Toggle navigation" style="border: none; padding: 0;">
       <span class="navbar-toggler-icon"></span>
     </button>
+
+    <!-- Sidebar Toggle on Desktop (sembunyikan / tampilkan sidebar) -->
+    <button type="button" class="navbar-toggler d-none d-lg-inline-flex me-2" id="sidebar-toggle" aria-label="Tampilkan / sembunyikan sidebar" title="Tampilkan / sembunyikan sidebar" style="border: none; padding: 0;">
+      <span class="navbar-toggler-icon"></span>
+    </button>
     
     <!-- Brand / Logo in Header -->
     <div class="navbar-brand navbar-brand-autodark me-auto ms-3 ms-lg-0" style="position: static !important; transform: none !important; left: auto;">
@@ -65,7 +70,9 @@
                     }
                 }
 
-                $totalNotif = $pendingCount + $unreadMessages + $pendingSignatures;
+                $dbNotifCount = auth()->user()->unreadNotifications->count();
+
+                $totalNotif = $pendingCount + $unreadMessages + $pendingSignatures + $dbNotifCount;
             @endphp
             @if($totalNotif > 0)
               <span class="badge bg-red" id="notif-badge">{{ $totalNotif }}</span>
@@ -115,6 +122,20 @@
                   </div>
                 </div>
                 @endif
+                
+                @foreach(auth()->user()->unreadNotifications as $notification)
+                <div class="list-group-item">
+                  <div class="row align-items-center">
+                    <div class="col text-truncate">
+                      <a href="{{ $notification->data['url'] ?? '#' }}" class="text-body d-block text-warning fw-bold">{{ $notification->data['title'] ?? 'Notifikasi' }}</a>
+                      <div class="d-block text-secondary text-truncate mt-n1">
+                        {{ $notification->data['message'] ?? '' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                @endforeach
+                
                 @if($totalNotif == 0)
                 <div class="list-group-item text-center text-muted py-3">
                   Tidak ada notifikasi baru.

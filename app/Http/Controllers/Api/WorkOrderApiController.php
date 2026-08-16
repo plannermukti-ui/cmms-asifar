@@ -14,6 +14,12 @@ use Illuminate\Http\Request;
 
 class WorkOrderApiController extends Controller
 {
+    public function __construct()
+    {
+        // Status update (drag & drop kanban) is a kanban-specific edit action
+        $this->middleware('permission:edit_work_orders_kanban')->only(['updateStatus']);
+    }
+
     /**
      * Get distinct unit types based on site filter from master_units.
      * GET /api/wo/unit-types?site=XX
@@ -143,7 +149,7 @@ class WorkOrderApiController extends Controller
                     'success' => false,
                     'requires_rfu' => true,
                     'message' => 'Waktu RFU wajib diisi sebelum mengubah status Work Order ' . $wo->no_wo . ' menjadi Completed.',
-                    'edit_url' => route('work-orders.edit', $wo->id),
+                    'edit_url' => route('work-orders.edit', $wo),
                 ], 422);
             }
             
@@ -167,9 +173,28 @@ class WorkOrderApiController extends Controller
             $schedule = \App\Models\PmSchedule::with('pmTemplate')->find($wo->pm_schedule_id);
             if ($schedule && $schedule->pmTemplate) {
                 $schedule->last_executed_value = $wo->hours_meter ?? $schedule->next_due_value;
-                $schedule->next_due_value = $schedule->next_due_value + $schedule->pmTemplate->interval_value;
+                $interval = $schedule->pmTemplate->interval_value ?: 250;
+                $schedule->next_due_value = floor($schedule->last_executed_value / $interval) * $interval + $interval;
+
+                $opr_hrs = $schedule->pmTemplate->opr_hrs_per_day ?? 20;
+                if ($opr_hrs > 0) {
+                    $hrs_to_go = $schedule->next_due_value - $schedule->last_executed_value;
+                    $days_to_go = $hrs_to_go / $opr_hrs;
+                    $baseDate = $wo->date_end ?? now();
+                    $schedule->next_due_date = \Carbon\Carbon::parse($baseDate)->addHours(round($days_to_go * 24));
+                }
                 $schedule->status_jadwal = 'Upcoming';
                 $schedule->save();
+
+                // Record history
+                $schedule->histories()->firstOrCreate([
+                    'work_order_no' => $wo->no_wo,
+                ], [
+                    'hm_service' => $schedule->last_executed_value,
+                    'executed_at' => $wo->date_end ?? now(),
+                    'notes' => 'Generated otomatis dari Work Order ' . $wo->no_wo,
+                    'created_by' => auth()->id() ?? $wo->created_by,
+                ]);
             }
         }
 
@@ -178,7 +203,7 @@ class WorkOrderApiController extends Controller
             'message' => 'Status Work Order ' . $wo->no_wo . ' beserta seluruh Task & SubTask berhasil diubah ke ' . $wo->status_wo,
             'status_wo' => $wo->status_wo,
             'waktu_rfu' => $wo->waktu_rfu ? $wo->waktu_rfu->format('d/m/Y H:i') : null,
-            'edit_url' => route('work-orders.edit', $wo->id),
+            'edit_url' => route('work-orders.edit', $wo),
             'is_completed' => $request->status_wo === 'Completed',
         ]);
     }

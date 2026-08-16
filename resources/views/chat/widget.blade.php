@@ -112,7 +112,7 @@
     </div>
 
     <!-- Active Conversation View -->
-    <div id="widgetConversationView" class="flex-fill flex-column" style="display: none!important;">
+    <div id="widgetConversationView" class="flex-fill flex-column overflow-hidden" style="display: none!important;">
       <!-- Message Area -->
       <div id="widgetMessages" class="flex-fill overflow-auto p-3" style="background: #f8fafc !important;">
         <!-- Messages rendered here -->
@@ -387,6 +387,7 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   // Global unread badge update every 10 sec
+  let lastUnreadCount = null;
   setInterval(() => {
     if (!widgetCard.classList.contains('open')) {
       fetch('/chat/unread-count')
@@ -396,9 +397,28 @@ document.addEventListener("DOMContentLoaded", function() {
           if (data.count > 0) {
             badge.textContent = data.count;
             badge.style.display = 'inline-block';
+            
+            if (lastUnreadCount !== null && data.count > lastUnreadCount) {
+              if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                  toast: true,
+                  position: 'bottom-end',
+                  icon: 'info',
+                  title: 'Pesan Baru Masuk',
+                  text: 'Anda menerima pesan baru dari rekan kerja.',
+                  showConfirmButton: false,
+                  timer: 4000,
+                  timerProgressBar: true,
+                  customClass: {
+                    container: 'd-print-none'
+                  }
+                });
+              }
+            }
           } else {
             badge.style.display = 'none';
           }
+          lastUnreadCount = data.count;
         });
     }
   }, 10000);

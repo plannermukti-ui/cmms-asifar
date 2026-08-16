@@ -11,7 +11,7 @@
     <link href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler-vendors.min.css" rel="stylesheet"/>
     <style>
       @import url('https://rsms.me/inter/inter.css');
-      
+
       /* =========================================================
          HEAVY EQUIPMENT INDUSTRIAL THEME (APPLIES ONLY IN DARK MODE)
          ========================================================= */
@@ -28,12 +28,12 @@
         --tblr-border-color: rgba(245, 158, 11, 0.18);
         --tblr-border-color-translucent: rgba(245, 158, 11, 0.12);
       }
-      
+
       body[data-bs-theme="dark"] {
         background-color: #0f172a !important;
         color: #f1f5f9 !important;
         font-feature-settings: "cv03", "cv04", "cv11";
-        background-image: 
+        background-image:
           radial-gradient(circle at 50% 20%, rgba(245, 158, 11, 0.08), transparent 50%),
           linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
           linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px) !important;
@@ -88,6 +88,24 @@
         }
       }
 
+      /* Sidebar collapse via tombol hamburger di header (desktop only) */
+      @media (min-width: 992px) {
+        .navbar-vertical {
+          transition: transform 0.3s ease;
+        }
+        body.sidebar-collapsed .navbar-vertical {
+          transform: translateX(-100%);
+        }
+        .navbar-vertical ~ .navbar,
+        .navbar-vertical ~ .page-wrapper {
+          transition: margin-left 0.3s ease;
+        }
+        body.sidebar-collapsed .navbar-vertical ~ .navbar,
+        body.sidebar-collapsed .navbar-vertical ~ .page-wrapper {
+          margin-left: 0 !important;
+        }
+      }
+
       /* Hide empty sidebar on mobile so header is the only top bar */
       @media (max-width: 991.98px) {
         .sidebar-transparent-mobile {
@@ -130,7 +148,7 @@
         z-index: 9999;
         display: block;
       }
-      
+
       .hazard-stripe-top {
         display: none;
       }
@@ -143,7 +161,7 @@
         border-radius: 12px !important;
         color: #f8fafc !important;
       }
-      
+
       [data-bs-theme="dark"] .card-header {
         border-bottom: 1px solid rgba(245, 158, 11, 0.2) !important;
         background: rgba(15, 23, 42, 0.5) !important;
@@ -164,8 +182,8 @@
         box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3) !important;
       }
 
-      [data-bs-theme="dark"] .btn-primary:hover, 
-      [data-bs-theme="dark"] .btn-primary:focus, 
+      [data-bs-theme="dark"] .btn-primary:hover,
+      [data-bs-theme="dark"] .btn-primary:focus,
       [data-bs-theme="dark"] .btn-primary:active {
         background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
         color: #000000 !important;
@@ -173,7 +191,7 @@
       }
 
       /* Active Nav Links in Dark Mode */
-      [data-bs-theme="dark"] .nav-link.active, 
+      [data-bs-theme="dark"] .nav-link.active,
       [data-bs-theme="dark"] .dropdown-item.active {
         background: rgba(245, 158, 11, 0.18) !important;
         color: #fbbf24 !important;
@@ -195,15 +213,15 @@
       [data-bs-theme="dark"] .table td {
         border-color: rgba(245, 158, 11, 0.1) !important;
       }
-      
+
       /* Form inputs in Dark Mode */
-      [data-bs-theme="dark"] .form-control, 
+      [data-bs-theme="dark"] .form-control,
       [data-bs-theme="dark"] .form-select {
         background-color: rgba(15, 23, 42, 0.7) !important;
         border: 1px solid rgba(245, 158, 11, 0.25) !important;
         color: #ffffff !important;
       }
-      [data-bs-theme="dark"] .form-control:focus, 
+      [data-bs-theme="dark"] .form-control:focus,
       [data-bs-theme="dark"] .form-select:focus {
         border-color: #f59e0b !important;
         box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25) !important;
@@ -233,6 +251,9 @@
         var defaultTheme = "dark"; // Default to dark industrial theme, but toggleable to light
         var theme = localStorage.getItem(themeStorageKey) ? localStorage.getItem(themeStorageKey) : defaultTheme;
         document.body.setAttribute("data-bs-theme", theme);
+        if (localStorage.getItem("tablerSidebarCollapsed") === "1") {
+            document.body.classList.add("sidebar-collapsed");
+        }
     </script>
     <div class="page">
       <!-- Sidebar -->
@@ -241,7 +262,7 @@
       @endif
       <!-- Navbar -->
       @include('layouts.header')
-      
+
       <div class="page-wrapper">
         <!-- Page body -->
         <div class="page-body">
@@ -295,27 +316,95 @@
                 showValueAsTags: false,
                 dropboxWidth: 'max-content'
             });
-            @if(session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: '{{ session('success') }}',
-                    timer: 3000,
-                    showConfirmButton: false
-                });
-            @endif
-
-            @if(session('error'))
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Akses Ditolak',
-                    text: '{{ session('error') }}',
-                    confirmButtonText: 'Tutup'
-                });
-            @endif
         });
+    </script>
+    <script>
+        // Toggle sidebar (desktop) — simpan preferensi biar inget saat pindah halaman
+        (function () {
+            var toggleBtn = document.getElementById('sidebar-toggle');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function () {
+                    var collapsed = document.body.classList.toggle('sidebar-collapsed');
+                    try { localStorage.setItem('tablerSidebarCollapsed', collapsed ? '1' : '0'); } catch (e) {}
+                });
+            }
+        })();
     </script>
     @stack('scripts')
     @include('chat.widget')
+
+    <!-- GLOBAL TABLER UI ERROR NOTIFICATION POPUP MODAL -->
+    <div class="modal modal-blur fade" id="globalTablerErrorModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 9999;">
+      <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+        <div class="modal-content shadow-lg border-0">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <div class="modal-status bg-danger"></div>
+          <div class="modal-body text-center py-4">
+            <div class="avatar avatar-lg bg-danger-lt text-danger mb-3 rounded-circle mx-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alert-triangle" width="36" height="36" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v4" /><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" /><path d="M12 16h.01" /></svg>
+            </div>
+            <h3 class="fw-bold text-danger mb-2" id="globalTablerErrorTitle">Gagal Disimpan / Tidak Dapat Dilaksanakan</h3>
+            <p class="text-muted small mb-3">Sistem menemukan kendala saat memproses data Anda. Silakan periksa rincian penjelasan berikut untuk memperbaikinya:</p>
+            <div class="text-start bg-danger-lt p-3 rounded border border-danger-subtle mb-0" id="globalTablerErrorBody">
+              <!-- Detailed error items -->
+            </div>
+          </div>
+          <div class="modal-footer bg-light">
+            <div class="w-100">
+              <button type="button" class="btn btn-danger w-100 fw-bold shadow-sm" data-bs-dismiss="modal">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
+                Tutup & Perbaiki Form
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      window.showTablerErrorModal = function(title, messages) {
+        const titleEl = document.getElementById('globalTablerErrorTitle');
+        const bodyEl = document.getElementById('globalTablerErrorBody');
+        if (titleEl) titleEl.innerText = title || 'Gagal Disimpan / Tidak Dapat Dilaksanakan';
+
+        let htmlContent = '';
+        if (Array.isArray(messages) && messages.length > 0) {
+          htmlContent = '<ul class="mb-0 ps-3 text-danger fw-semibold small">';
+          messages.forEach(msg => {
+            htmlContent += `<li class="mb-1">${msg}</li>`;
+          });
+          htmlContent += '</ul>';
+        } else if (typeof messages === 'string' && messages.trim() !== '') {
+          htmlContent = `<div class="text-danger fw-semibold small mb-0"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-info-circle me-1" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /></svg> ${messages}</div>`;
+        } else {
+          htmlContent = '<div class="text-danger fw-semibold small">Terjadi kesalahan pada sistem. Silakan periksa kembali data masukan Anda.</div>';
+        }
+
+        if (bodyEl) bodyEl.innerHTML = htmlContent;
+
+        const modalEl = document.getElementById('globalTablerErrorModal');
+        if (modalEl) {
+          const bsModal = new bootstrap.Modal(modalEl);
+          bsModal.show();
+        }
+      };
+
+      document.addEventListener("DOMContentLoaded", function() {
+        @if($errors->any())
+          const formErrors = [
+            @foreach ($errors->all() as $error)
+              "{{ addslashes($error) }}",
+            @endforeach
+          ];
+          window.showTablerErrorModal("Gagal Disimpan / Form Tidak Valid", formErrors);
+        @elseif(session('error_popup'))
+          window.showTablerErrorModal("Gagal Mengeksekusi Operasi", "{{ addslashes(session('error_popup')) }}");
+        @elseif(session('error'))
+          window.showTablerErrorModal("Perhatian / Kendala Operasi", "{{ addslashes(session('error')) }}");
+        @endif
+      });
+    </script>
+
+    @yield('scripts')
   </body>
 </html>

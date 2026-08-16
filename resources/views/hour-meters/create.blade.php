@@ -30,7 +30,7 @@
             @foreach($masterUnits as $unit)
               <option value="{{ $unit->id }}" 
                       data-model="{{ $unit->model ? $unit->model->name : '-' }}" 
-                      data-site="{{ $unit->site ? $unit->site->name : '-' }}"
+                      data-site="{{ $unit->siteRelation->name ?? $unit->site ?? '-' }}"
                       {{ old('master_unit_id') == $unit->id ? 'selected' : '' }}>
                 {{ $unit->nomor_unit }}
               </option>

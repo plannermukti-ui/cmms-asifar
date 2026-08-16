@@ -31,6 +31,8 @@ class RolePermissionSeeder extends Seeder
             'unit_types' => 'Master Tipe Unit',
             'unit_models' => 'Master Model Unit',
             'chat' => 'Pesan Instan',
+            'kpi_master_data' => 'KPI Master Data',
+            'breakdown_reports' => 'Report Breakdown',
             
             // Administrasi ToolRoom
             'mechanics' => 'Data Mekanik',
@@ -60,9 +62,11 @@ class RolePermissionSeeder extends Seeder
             'pm_schedules' => 'Jadwal PM (Schedule)',
             'pra_work_orders' => 'Pra-Work Order (PWO)',
             'work_orders' => 'Work Order (WO)',
+            'work_orders_kanban' => 'Kanban Board (WO)',
             'plan_budgets' => 'RAB / Budget Plan',
             'jwos' => 'Job Work Order (JWO)',
             'fars' => 'Form Analisa Rusak (FAR)',
+            'swap_components' => 'Swap Component Report',
         ];
 
         $actions = ['view', 'create', 'edit', 'delete'];

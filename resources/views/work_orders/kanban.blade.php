@@ -26,14 +26,14 @@
     min-height: 200px;
     overflow-y: auto;
     padding: 8px;
-    background-color: #f8fafc;
+    background-color: var(--tblr-bg-surface, #f8fafc);
     border-radius: 8px;
-    border: 1px dashed #cbd5e1;
+    border: 1px dashed var(--tblr-border-color, #cbd5e1);
     transition: background-color 0.2s ease;
   }
 
   .kanban-column.sortable-ghost-target {
-    background-color: #e2e8f0;
+    background-color: var(--tblr-bg-surface-secondary, #e2e8f0);
   }
 
   .kanban-card {
@@ -70,7 +70,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
         Tampilan Table
       </a>
-      @can('create_work_orders')
+      @can('create_work_orders_kanban')
       <button type="button" class="btn btn-primary btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#modal-tambah-wo">
         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
         Buat Work Order
@@ -167,38 +167,35 @@
             </div>
           </div>
 
-          <!-- Subheader: No WO & Unit Type & HM -->
+          <!-- Subheader: No WO -->
           <div class="d-flex justify-content-between align-items-center mb-2 small">
             <div>
               <a href="{{ route('work-orders.show', $wo) }}" class="fw-semibold text-secondary text-decoration-none">
                 {{ $wo->no_wo }}
               </a>
-              <span class="text-muted ms-1" style="font-size: 0.75rem;">({{ $wo->unit->type->name ?? '-' }})</span>
             </div>
-            <div class="text-muted" style="font-size: 0.7rem;">HM: {{ $wo->hours_meter ?? '-' }}</div>
           </div>
 
           <!-- Problem & BD Info Box -->
-          <div class="p-1.5 rounded bg-light border mb-2 small" style="font-size: 0.75rem;">
+          <div class="p-1.5 rounded border mb-2 small" style="font-size: 0.75rem;">
             <div class="d-flex justify-content-between">
               <span>BD: {{ $wo->waktu_bd ? $wo->waktu_bd->format('d/m H:i') : '-' }}</span>
               <strong class="text-danger">{{ $wo->durasi_hrs ? $wo->durasi_hrs . ' Hrs' : '-' }}</strong>
             </div>
             @php
-              $firstTaskProblem = $wo->tasks->first()->problem ?? '-';
+              $firstTaskProblem = $wo->tasks->first()?->problem ?? 'Tidak ada task';
             @endphp
-            <div class="text-dark fw-medium text-truncate mt-1" title="{{ $firstTaskProblem }}">
+            <div class="fw-medium text-truncate mt-1" title="{{ $firstTaskProblem }}">
               {{ $firstTaskProblem }}
             </div>
           </div>
 
-          <div class="d-flex justify-content-between align-items-center pt-1 border-top" style="font-size: 0.7rem;">
-            <span class="text-muted">By: {{ $wo->creator->name ?? 'System' }}</span>
+          <div class="d-flex justify-content-end align-items-center pt-1 border-top" style="font-size: 0.7rem;">
             <div class="btn-group">
               <a href="{{ route('work-orders.show', $wo) }}" class="btn btn-xs btn-outline-info py-0 px-1" title="Detail">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye m-0" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
               </a>
-              @can('edit_work_orders')
+              @can('edit_work_orders_kanban')
               <a href="{{ route('work-orders.edit', $wo) }}" class="btn btn-xs btn-outline-primary py-0 px-1" title="Edit">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil m-0" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" /><path d="M13.5 6.5l4 4" /></svg>
               </a>
@@ -235,7 +232,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 waktu_rfu: waktuRfuValue
             })
         })
-        .then(r => r.json())
+        .then(r => {
+            if (r.status === 401 || r.status === 403) {
+                throw new Error('Anda tidak memiliki izin untuk mengubah status Work Order ini. (HTTP ' + r.status + ' — hubungi administrator untuk permission edit_work_orders_kanban)');
+            }
+            if (!r.ok) {
+                throw new Error('Terjadi kesalahan pada server. (HTTP ' + r.status + ')');
+            }
+            return r.json();
+        })
         .then(data => {
             if (data.success) {
                 if (waktuRfuValue) {
@@ -299,7 +304,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(e => {
-            alert('Terjadi kesalahan: ' + e);
+            let msg = (e && e.message) ? e.message : String(e);
+            if (/Unexpected token|is not valid JSON/.test(msg)) {
+                msg = 'Terjadi kesalahan: respons server tidak valid. Kemungkinan sesi berakhir atau Anda tidak memiliki izin untuk aksi ini.';
+            }
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({ icon: 'error', title: 'Gagal Memindahkan WO', text: msg });
+            } else {
+                alert('Terjadi kesalahan: ' + msg);
+            }
             evtRevert(evt);
         });
     }
@@ -487,7 +500,10 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
           <div class="col-6">
             <label class="form-label small fw-semibold text-muted mb-1">Waktu RFU</label>
-            <input type="datetime-local" class="form-control form-control-sm" name="waktu_rfu" id="waktu_rfu" value="{{ old('waktu_rfu') }}">
+            <input type="datetime-local" class="form-control form-control-sm @error('waktu_rfu') is-invalid @enderror" name="waktu_rfu" id="waktu_rfu" value="{{ old('waktu_rfu') }}">
+            @error('waktu_rfu')
+              <div class="invalid-feedback small">{{ $message }}</div>
+            @enderror
           </div>
           <div class="col-6">
             <label class="form-label small fw-semibold text-muted mb-1">Durasi (Hrs)</label>
@@ -496,18 +512,6 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="col-6">
             <label class="form-label small fw-semibold text-muted mb-1">Hours Meter</label>
             <input type="number" class="form-control form-control-sm" name="hours_meter" step="0.1" value="{{ old('hours_meter') }}" placeholder="0.0">
-          </div>
-          <div class="col-12">
-            <label class="form-label small fw-semibold text-muted mb-1">Tipe Breakdown</label>
-            <div class="input-group input-group-sm">
-              <select name="breakdown_type_id" class="form-select" id="breakdown-type-select">
-                <option value="">Pilih</option>
-                @foreach($breakdownTypes as $bt)
-                  <option value="{{ $bt->id }}" {{ old('breakdown_type_id') == $bt->id ? 'selected' : '' }}>{{ $bt->code ? $bt->code . ' - ' : '' }}{{ $bt->name }}</option>
-                @endforeach
-              </select>
-              <button type="button" class="btn btn-outline-warning text-dark fw-bold" onclick="inlineAdd('breakdown_types','breakdown-type-select')">+</button>
-            </div>
           </div>
         </div>
       </div>
@@ -525,18 +529,6 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="card-body p-2">
         <div class="row g-2">
-          <div class="col-6">
-            <label class="form-label small fw-semibold text-muted mb-1">Comp. Group</label>
-            <div class="input-group input-group-sm">
-              <select name="component_group_id" class="form-select" id="cg-select">
-                <option value="">Pilih</option>
-                @foreach($componentGroups as $cg)
-                  <option value="{{ $cg->id }}" {{ old('component_group_id') == $cg->id ? 'selected' : '' }}>{{ $cg->name }}</option>
-                @endforeach
-              </select>
-              <button type="button" class="btn btn-outline-teal fw-bold px-2" onclick="inlineAdd('component_groups','cg-select')">+</button>
-            </div>
-          </div>
           @for($i = 1; $i <= 5; $i++)
           <div class="col-6">
             <label class="form-label small fw-semibold text-muted mb-1">Kategori {{ $i }}</label>

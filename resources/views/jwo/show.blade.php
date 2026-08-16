@@ -27,6 +27,8 @@
     }
     .page-header, .navbar, .footer, .d-print-none { display: none !important; }
     .card { border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+    .wo-report-card { background-color: #fff !important; color: #000 !important; }
+    .jwo-grid-table td.bg-light { background-color: #f1f5f9 !important; color: #000 !important; }
     .badge { background: transparent !important; border: 0 !important; color: #000 !important; font-weight: bold !important; padding: 0 !important; font-size: inherit !important; }
     .page-wrapper { margin: 0 !important; padding: 0 !important; }
     .table-sm th, .table-sm td { padding: 0.2rem 0.4rem !important; }
@@ -38,6 +40,26 @@
     .mt-4 { margin-top: 0.5rem !important; }
     .pb-3 { padding-bottom: 0.5rem !important; }
     h4 { font-size: 0.85rem !important; margin-bottom: 0.3rem !important; }
+  }
+
+  /* =========================================================
+     DARK MODE — pastikan laporan JWO tetap terbaca
+     ========================================================= */
+  [data-bs-theme="dark"] .wo-report-card {
+    color: #f1f5f9 !important;
+  }
+  [data-bs-theme="dark"] .jwo-grid-table td.bg-light {
+    background-color: rgba(15, 23, 42, 0.9) !important;
+    color: #fbbf24 !important;
+  }
+  [data-bs-theme="dark"] .wo-report-card .app-address {
+    color: #94a3b8 !important;
+  }
+  [data-bs-theme="dark"] .wo-report-card .border-dark {
+    border-color: rgba(245, 158, 11, 0.55) !important;
+  }
+  [data-bs-theme="dark"] .wo-report-card .badge.bg-primary.text-white {
+    color: #0f172a !important;
   }
 </style>
 
@@ -124,7 +146,7 @@
         <div>
           <h3 class="m-0 fw-bold text-uppercase text-body">{{ $appName }}</h3>
           @if($appAddress)
-            <div style="font-size: 0.7rem; color: #555; margin-bottom: 2px;">{{ $appAddress }}</div>
+            <div class="app-address" style="font-size: 0.7rem; color: #555; margin-bottom: 2px;">{{ $appAddress }}</div>
           @endif
           <div class="text-muted fw-bold small">JOB WORK ORDER (JWO)</div>
         </div>
@@ -185,7 +207,7 @@
                 <td class="bg-light fw-bold">STATUS JWO</td>
                 <td>: <span class="badge {{ $badgeClass }} px-2 py-0">{{ $jwo->status }}</span></td>
                 <td class="bg-light fw-bold">NAMA KOMPONEN</td>
-                <td>: <strong>{{ $jwo->part->part_description ? $jwo->part->part_description . ' (' . $jwo->part->part_number . ')' : ($jwo->part->part_number ?? '-') }}</strong></td>
+                <td>: <strong>{{ $jwo->part ? ($jwo->part->part_description ? $jwo->part->part_description . ' (' . $jwo->part->part_number . ')' : ($jwo->part->part_number ?? '-')) : '-' }}</strong></td>
             </tr>
             <tr>
                 <td class="bg-light fw-bold">BIAYA AKTUAL</td>

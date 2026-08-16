@@ -66,6 +66,31 @@ class MechanicController extends Controller
         return redirect()->route('mechanics.index')->with('success', 'Data mekanik berhasil diperbarui.');
     }
 
+    public function show(Mechanic $mechanic)
+    {
+        // Calculate Total Work Orders
+        $totalWO = \App\Models\WoSubtaskManpower::where('mechanic_id', $mechanic->id)
+            ->join('wo_subtasks', 'wo_subtask_manpower.wo_subtask_id', '=', 'wo_subtasks.id')
+            ->join('wo_tasks', 'wo_subtasks.wo_task_id', '=', 'wo_tasks.id')
+            ->distinct('wo_tasks.work_order_id')
+            ->count('wo_tasks.work_order_id');
+
+        // Calculate Total Duration
+        $totalDuration = \App\Models\WoSubtaskManpower::where('mechanic_id', $mechanic->id)
+            ->join('wo_subtasks', 'wo_subtask_manpower.wo_subtask_id', '=', 'wo_subtasks.id')
+            ->sum('wo_subtasks.duration_hours');
+
+        // Get Tools Allocated
+        $toolsAllocated = \App\Models\ToolStock::with('tool.category')
+            ->where('location_type', 'Mechanic')
+            ->where('mechanic_id', $mechanic->id)
+            ->get();
+            
+        $totalTools = $toolsAllocated->sum('quantity');
+
+        return view('mechanics.show', compact('mechanic', 'totalWO', 'totalDuration', 'toolsAllocated', 'totalTools'));
+    }
+
     public function destroy(Mechanic $mechanic)
     {
         $mechanic->delete();

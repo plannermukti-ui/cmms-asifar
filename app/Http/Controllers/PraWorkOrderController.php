@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Auth;
 
 class PraWorkOrderController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_pra_work_orders')->only(['index', 'show']);
+        $this->middleware('permission:create_pra_work_orders')->only(['create', 'store', 'generate']);
+        $this->middleware('permission:edit_pra_work_orders')->only(['edit', 'update', 'cancel']);
+        $this->middleware('permission:delete_pra_work_orders')->only(['destroy']);
+    }
     public function index(Request $request)
     {
         $query = PraWorkOrder::with(['masterUnit', 'creator', 'workOrder']);
@@ -94,6 +101,14 @@ class PraWorkOrderController extends Controller
 
     public function generate(PraWorkOrder $praWorkOrder)
     {
+        if ($praWorkOrder->status !== 'Pending') {
+            return back()->with('error_popup', 'Request ini tidak dapat digenerate karena statusnya sudah ' . $praWorkOrder->status . '.');
+        }
+
+        if (!auth()->user()->can('create_work_orders')) {
+            return back()->with('error_popup', 'Anda tidak memiliki hak akses untuk membuat Work Order. Hubungi Administrator untuk mendapatkan akses Create Work Order.');
+        }
+
         $activeWO = \App\Models\WorkOrder::where('master_unit_id', $praWorkOrder->master_unit_id)
             ->whereIn('status_wo', ['Open', 'Inprogress'])
             ->first();

@@ -10,6 +10,9 @@
             font-size: 12px;
             margin: 0;
             padding: 20px;
+            background: #fff;
+            color: #000;
+            color-scheme: light;
         }
         .header {
             text-align: center;
@@ -128,7 +131,7 @@
         </tr>
         <tr>
             <td class="label">Deskripsi Pekerjaan</td>
-            <td colspan="3">: {{ $workOrder->description }}</td>
+            <td colspan="3">: {{ $workOrder->tasks->pluck('problem')->filter()->implode(' | ') ?: '-' }}</td>
         </tr>
     </table>
 

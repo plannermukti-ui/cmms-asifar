@@ -3,6 +3,25 @@
 @section('title', 'Live Chat - CMMS Aisfar')
 
 @section('content')
+<style>
+  .chat-shell { height: calc(100vh - 200px); min-height: 400px; overflow: hidden; display: flex; flex-direction: column; }
+  .chat-contact-pane { min-width: 280px; background: var(--tblr-bg-surface); min-height: 0; }
+  .chat-conversation-pane { min-width: 0; min-height: 0; background: #f6f8fb; }
+  #chatMessages { min-height: 0; background: #f6f8fb !important; flex: 1; overflow-y: auto; }
+  .user-item { transition: background-color .15s ease, border-color .15s ease; }
+  .user-item:hover { background: var(--tblr-primary-lt); }
+  .message-bubble { max-width: min(76%, 680px); overflow-wrap: anywhere; }
+  .message-bubble .fs-3 { font-size: .95rem !important; }
+  @media (max-width: 767.98px) {
+    .chat-shell { height: calc(100vh - 150px); min-height: 350px; }
+    .chat-contact-pane { height: 160px; min-width: 0; border-bottom: 1px solid var(--tblr-border-color); }
+    #userList { display: flex; overflow-x: auto !important; }
+    .user-item { min-width: 210px; border-bottom: 0 !important; border-right: 1px solid var(--tblr-border-color); }
+    .message-bubble { max-width: 88%; }
+    #chatHeader { padding: .75rem !important; }
+    #chatHeader .btn span { display: none; }
+  }
+</style>
 <div class="page-header d-print-none">
   <div class="row align-items-center">
     <div class="col">
@@ -12,10 +31,10 @@
   </div>
 </div>
 
-<div class="card mt-3" style="height: calc(100vh - 240px); min-height: 520px;">
-  <div class="row g-0 h-100">
+<div class="card mt-3 chat-shell">
+  <div class="row g-0 flex-fill flex-column flex-md-row" style="min-height: 0; flex-wrap: nowrap;">
     <!-- Sidebar kontak -->
-    <div class="col-md-3 border-end d-flex flex-column">
+    <div class="col-md-4 col-lg-3 border-end d-flex flex-column chat-contact-pane">
       <div class="p-3 border-bottom bg-light-lt">
         <div class="input-icon">
           <span class="input-icon-addon">
@@ -54,8 +73,8 @@
     </div>
 
     <!-- Area chat -->
-    <div class="col-md-9 d-flex flex-column">
-      <div id="chatHeader" class="p-3 border-bottom d-flex align-items-center justify-content-between bg-white" style="display:none!important;">
+    <div class="col-md-8 col-lg-9 d-flex flex-column chat-conversation-pane">
+      <div id="chatHeader" class="p-3 border-bottom d-none align-items-center justify-content-between bg-white">
         <div class="d-flex align-items-center">
           <span id="chatAvatar" class="avatar me-3 fw-bold bg-primary text-white"></span>
           <div>
@@ -77,7 +96,7 @@
         </div>
       </div>
 
-      <div id="chatMessages" class="flex-fill overflow-auto p-3" style="background: #f4f6f8;">
+      <div id="chatMessages" class="flex-fill overflow-auto p-3 p-lg-4">
         <div class="text-center text-muted my-5 py-5">
           <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-lg mb-2 text-primary opacity-50" width="64" height="64" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 9h8" /><path d="M8 13h6" /><path d="M9 18h-3a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-3l-3 3l-3 -3z" /></svg>
           <h4 class="fw-bold text-dark mb-1">Ruang Percakapan</h4>
@@ -121,7 +140,7 @@
         </div>
 
         <!-- Form Input Utama -->
-        <form id="chatForm" class="d-flex gap-2 position-relative">
+        <form id="chatForm" class="d-flex gap-2 position-relative align-items-end">
           <!-- Popover Picker Full Emoji -->
           <div class="dropdown">
             <button type="button" class="btn btn-light btn-icon" data-bs-toggle="dropdown" title="Pilih Emoji Full">
@@ -233,7 +252,8 @@ document.querySelectorAll('.user-item').forEach(function(el) {
     const selectedUserAvatar = this.dataset.userAvatar;
 
     document.getElementById('btnViewBio').href = `/profile/${selectedUserId}`;
-    document.getElementById('chatHeader').style.display = 'flex';
+    document.getElementById('chatHeader').classList.remove('d-none');
+    document.getElementById('chatHeader').classList.add('d-flex');
     document.getElementById('chatUserName').textContent = selectedUserName;
 
     const avatarEl = document.getElementById('chatAvatar');
@@ -366,7 +386,7 @@ function loadMessages() {
       const bubble = document.createElement('div');
       bubble.className = `d-flex ${isMine ? 'justify-content-end' : 'justify-content-start'} mb-3`;
       bubble.innerHTML = `
-        <div class="rounded-3 p-3 shadow-xs ${isMine ? 'bg-primary text-white' : 'bg-white border text-dark'}" style="max-width:75%; word-wrap:break-word;">
+        <div class="message-bubble rounded-3 p-3 shadow-xs ${isMine ? 'bg-primary text-white' : 'bg-white border text-dark'}">
           ${!isMine ? `<div class="small fw-bold text-azure mb-1">${msg.sender?.nama_lengkap ?? 'User'}</div>` : ''}
           <div class="fs-3" style="line-height: 1.5;">${formattedBody}</div>
           <div class="small mt-1 d-flex justify-content-end align-items-center ${isMine ? 'text-white-50' : 'text-muted'}" style="font-size: 11px;">
@@ -377,8 +397,10 @@ function loadMessages() {
       container.appendChild(bubble);
     });
 
-    // Auto scroll down if user was at bottom or initially loaded
-    container.scrollTop = container.scrollHeight;
+    // Jangan paksa scroll jika pengguna sedang membaca pesan lama.
+    if (isAtBottom || messages.length === 0) {
+      container.scrollTop = container.scrollHeight;
+    }
   });
 }
 
@@ -576,4 +598,3 @@ if (autoUserId) {
 }
 </script>
 @endsection
-

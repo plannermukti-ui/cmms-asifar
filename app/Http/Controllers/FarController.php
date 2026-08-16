@@ -14,6 +14,14 @@ use Illuminate\Support\Facades\DB;
 
 class FarController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_fars')->only(['index', 'show']);
+        $this->middleware('permission:create_fars')->only(['create', 'store']);
+        $this->middleware('permission:edit_fars')->only(['edit', 'update']);
+        $this->middleware('permission:delete_fars')->only(['destroy']);
+    }
+
     public function index(Request $request)
     {
         $site_id = Auth::user()->site_id ?? null;

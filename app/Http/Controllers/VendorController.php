@@ -10,6 +10,10 @@ class VendorController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permission:view_vendors')->only(['index', 'show']);
+        $this->middleware('permission:create_vendors')->only(['create', 'store']);
+        $this->middleware('permission:edit_vendors')->only(['edit', 'update']);
+        $this->middleware('permission:delete_vendors')->only(['destroy']);
     }
 
     public function index(Request $request)

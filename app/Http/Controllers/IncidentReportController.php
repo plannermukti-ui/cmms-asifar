@@ -11,7 +11,7 @@ class IncidentReportController extends Controller
     {
         $this->middleware('permission:view_incident_reports')->only(['index', 'show']);
         $this->middleware('permission:create_incident_reports')->only(['create', 'store']);
-        $this->middleware('permission:edit_incident_reports')->only(['edit', 'update']);
+        $this->middleware('permission:edit_incident_reports')->only(['edit', 'update', 'uploadDocument']);
         $this->middleware('permission:delete_incident_reports')->only(['destroy']);
     }
 
@@ -55,5 +55,26 @@ class IncidentReportController extends Controller
     {
         $incidentReport->delete();
         return redirect()->route('incident-reports.index')->with('success', 'Berita Acara berhasil dihapus.');
+    }
+
+    public function uploadDocument(Request $request, IncidentReport $incidentReport)
+    {
+        $request->validate([
+            'signed_document' => 'required|mimes:pdf|max:5120', // Max 5MB PDF
+        ]);
+
+        if ($request->hasFile('signed_document')) {
+            $file = $request->file('signed_document');
+            $filename = 'IR_' . $incidentReport->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('public/incident_reports', $filename);
+            
+            $incidentReport->update([
+                'signed_document' => $filename
+            ]);
+
+            return redirect()->back()->with('success', 'Dokumen hasil scan berhasil diupload.');
+        }
+
+        return redirect()->back()->with('error', 'Gagal mengupload dokumen.');
     }
 }

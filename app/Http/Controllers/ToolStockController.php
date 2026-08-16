@@ -24,7 +24,23 @@ class ToolStockController extends Controller
             $query->where('tool_id', $request->tool_id);
         }
         $stocks = $query->orderBy('tool_id')->paginate(10);
-        return view('tool_stocks.index', compact('stocks'));
+        
+        $tools = Tool::orderBy('name')->get();
+        $mechanics = Mechanic::orderBy('nama_lengkap')->get();
+        
+        $user = auth()->user();
+        $approversQuery = \App\Models\User::whereHas('roles', function($q) {
+            $q->whereIn('name', ['Supervisor', 'Superintendent', 'Manager', 'Super Admin', 'Admin']);
+        });
+        
+        if (!$user->hasRole('Super Admin')) {
+            $approversQuery->where(function($q) use ($user) {
+                $q->where('site_id', $user->site_id)->orWhereNull('site_id');
+            });
+        }
+        $approvers = $approversQuery->get();
+
+        return view('tool_stocks.index', compact('stocks', 'tools', 'mechanics', 'approvers'));
     }
 
     public function create()

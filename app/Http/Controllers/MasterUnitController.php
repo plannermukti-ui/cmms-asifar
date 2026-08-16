@@ -6,6 +6,7 @@ use App\Models\MasterUnit;
 use App\Models\UnitType;
 use App\Models\UnitModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MasterUnitController extends Controller
 {
@@ -89,14 +90,41 @@ class MasterUnitController extends Controller
 
         // 1. Work Orders History
         $workOrders = \App\Models\WorkOrder::where('master_unit_id', $id)
-            ->with(['creator', 'tasks', 'jwos'])
+            ->with(['creator', 'tasks.subtasks.parts.part', 'jwos'])
             ->latest('waktu_bd')
             ->get();
 
-        // Total maintenance cost from Work Order JWO references
+        // Biaya maintenance = biaya JWO + pemakaian part (qty x harga master part).
         $woIds = $workOrders->pluck('id');
-        $totalWoCost = \App\Models\Jwo::whereIn('work_order_id', $woIds)->sum('cost') 
-                     + \App\Models\Jwo::where('unit_id', $id)->whereNull('work_order_id')->sum('cost');
+        $totalPartCost = DB::table('wo_subtask_parts')
+            ->join('wo_subtasks', 'wo_subtask_parts.wo_subtask_id', '=', 'wo_subtasks.id')
+            ->join('wo_tasks', 'wo_subtasks.wo_task_id', '=', 'wo_tasks.id')
+            ->join('parts', 'wo_subtask_parts.part_id', '=', 'parts.id')
+            ->whereIn('wo_tasks.work_order_id', $woIds)
+            ->where(function($q) {
+                $q->where('wo_subtask_parts.part_status', 'Replace')
+                  ->orWhereNull('wo_subtask_parts.part_status')
+                  ->orWhere('wo_subtask_parts.part_status', '');
+            })
+            ->sum(DB::raw('COALESCE(wo_subtask_parts.qty, 0) * COALESCE(parts.cost, 0)'));
+
+        $totalJwoCost = \App\Models\Jwo::whereIn('work_order_id', $woIds)->sum('cost')
+            + \App\Models\Jwo::where('unit_id', $id)->whereNull('work_order_id')->sum('cost');
+
+        $totalWoCost = (float) $totalPartCost + (float) $totalJwoCost;
+
+        $workOrders->each(function ($workOrder) {
+            $workOrder->part_cost = $workOrder->tasks->sum(function ($task) {
+                return $task->subtasks->sum(function ($subtask) {
+                    return $subtask->parts->filter(function ($usedPart) {
+                        return in_array($usedPart->part_status, ['Replace', null, '']);
+                    })->sum(function ($usedPart) {
+                        return (float) $usedPart->qty * (float) ($usedPart->part->cost ?? 0);
+                    });
+                });
+            });
+            $workOrder->maintenance_cost = (float) $workOrder->part_cost + (float) $workOrder->jwos->sum('cost');
+        });
 
         $totalPlannedCost = \App\Models\PlanBudgetUnit::where('master_unit_id', $id)->sum('planned_cost');
 

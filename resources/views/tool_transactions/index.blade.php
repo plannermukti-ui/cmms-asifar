@@ -133,6 +133,28 @@
                 <option value="Pinjam Permanen" {{ old('tipe_transaksi') == 'Pinjam Permanen' ? 'selected' : '' }}>Pinjam Permanen</option>
               </select>
             </div>
+            
+            <div class="col-12 mt-2 mb-2">
+              <hr>
+              <strong>Referensi Penggunaan (Opsional)</strong>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">No Workorder (Open / In Progress)</label>
+              <select id="workorder_select" name="wo_id" class="form-select">
+                <option value="">-- Tidak Terkait Workorder --</option>
+                @foreach($openWorkOrders as $wo)
+                  <option value="{{ $wo->id }}">{{ $wo->no_wo }} - {{ $wo->unit->nomor_unit ?? '' }}</option>
+                @endforeach
+              </select>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Pilih Subtask</label>
+              <select name="wo_subtask_id" id="subtask_select" class="form-select" disabled>
+                <option value="">-- Pilih Workorder Terlebih Dahulu --</option>
+              </select>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -143,4 +165,52 @@
     </div>
   </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+  // Data Workorder dan Subtask dalam bentuk JSON
+  const openWorkOrders = @json($openWorkOrders);
+
+  document.getElementById('workorder_select').addEventListener('change', function() {
+      const woId = this.value;
+      const subtaskSelect = document.getElementById('subtask_select');
+      
+      // Bersihkan opsi saat ini
+      subtaskSelect.innerHTML = '<option value="">-- Pilih Subtask --</option>';
+      
+      if (!woId) {
+          subtaskSelect.disabled = true;
+          return;
+      }
+      
+      // Cari Workorder yang dipilih
+      const selectedWo = openWorkOrders.find(wo => wo.id == woId);
+      
+      if (selectedWo && selectedWo.tasks && selectedWo.tasks.length > 0) {
+          subtaskSelect.disabled = false;
+          let hasSubtasks = false;
+          
+          selectedWo.tasks.forEach(function(task) {
+              if (task.subtasks && task.subtasks.length > 0) {
+                  hasSubtasks = true;
+                  task.subtasks.forEach(function(subtask) {
+                      const option = document.createElement('option');
+                      option.value = subtask.id;
+                      option.textContent = subtask.action;
+                      subtaskSelect.appendChild(option);
+                  });
+              }
+          });
+          
+          if (!hasSubtasks) {
+              subtaskSelect.innerHTML = '<option value="">-- Workorder ini belum memiliki subtask --</option>';
+              subtaskSelect.disabled = true;
+          }
+      } else {
+          subtaskSelect.innerHTML = '<option value="">-- Workorder ini tidak memiliki subtask --</option>';
+          subtaskSelect.disabled = true;
+      }
+  });
+</script>
 @endsection

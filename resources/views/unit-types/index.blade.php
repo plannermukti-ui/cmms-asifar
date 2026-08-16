@@ -17,6 +17,26 @@
   </div>
 </div>
 
+<div class="row align-items-center mb-3">
+  <div class="col">
+    <ul class="nav nav-tabs" data-bs-toggle="tabs">
+      @can('view_master_units')
+      <li class="nav-item">
+        <a href="{{ route('master-units.index') }}" class="nav-link">Populasi Asset (Unit)</a>
+      </li>
+      @endcan
+      <li class="nav-item">
+        <a href="{{ route('unit-types.index') }}" class="nav-link active">Master Tipe Unit</a>
+      </li>
+      @can('view_unit_models')
+      <li class="nav-item">
+        <a href="{{ route('unit-models.index') }}" class="nav-link">Master Model Unit</a>
+      </li>
+      @endcan
+    </ul>
+  </div>
+</div>
+
 @if (session('success'))
     <div class="alert alert-success mt-3">{{ session('success') }}</div>
 @endif

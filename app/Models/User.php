@@ -13,7 +13,33 @@ use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\SoftDeletes;
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, LogsActivity, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles {
+        HasRoles::hasPermissionTo as protected hasRoleOrDirectPermissionTo;
+    }
+    use LogsActivity, SoftDeletes;
+
+    /**
+     * Permission langsung menjadi prioritas ketika user memilikinya.
+     *
+     * Dengan demikian, "Spesifik Hak Akses" dapat membatasi akses role,
+     * bukan hanya menambahkannya seperti perilaku default Spatie Permission.
+     */
+    public function hasPermissionTo($permission, $guardName = null): bool
+    {
+        // Super Admin selalu memiliki seluruh hak akses, walau ada permission
+        // spesifik lama yang tersimpan pada akun tersebut.
+        if ($this->hasRole('Super Admin')) {
+            return true;
+        }
+
+        if ($this->getDirectPermissions()->isNotEmpty()) {
+            $permission = $this->filterPermission($permission, $guardName);
+
+            return $this->hasDirectPermission($permission);
+        }
+
+        return $this->hasRoleOrDirectPermissionTo($permission, $guardName);
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

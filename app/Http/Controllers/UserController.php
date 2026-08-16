@@ -31,6 +31,8 @@ class UserController extends Controller
         'unit_types' => 'Master Tipe Unit',
         'unit_models' => 'Master Model Unit',
         'chat' => 'Pesan Instan',
+        'kpi_master_data' => 'KPI Master Data',
+        'breakdown_reports' => 'Report Breakdown',
         
         // Administrasi ToolRoom
         'mechanics' => 'Data Mekanik',
@@ -40,6 +42,7 @@ class UserController extends Controller
         'tool_transactions' => 'Peminjaman Tool',
         'incident_reports' => 'Berita Acara',
         'stock_opnames' => 'Stock Opname',
+        'tool_stock_requests' => 'Approval Stok Tool',
         
         // Produksi
         'productions' => 'Laporan Produksi Harian',
@@ -60,9 +63,11 @@ class UserController extends Controller
         'pm_schedules' => 'Jadwal PM (Schedule)',
         'pra_work_orders' => 'Pra-Work Order (PWO)',
         'work_orders' => 'Work Order (WO)',
+        'work_orders_kanban' => 'Kanban Board (WO)',
         'plan_budgets' => 'RAB / Budget Plan',
         'jwos' => 'Job Work Order (JWO)',
         'fars' => 'Form Analisa Rusak (FAR)',
+        'wo_comments' => 'Diskusi Work Order',
     ];
 
     private $actions = ['view', 'create', 'edit', 'delete'];
@@ -115,6 +120,12 @@ class UserController extends Controller
 
         $user->assignRole($request->role);
 
+        activity('user_access')
+            ->causedBy(auth()->user())
+            ->performedOn($user)
+            ->withProperties(['role' => $request->role, 'direct_permissions' => []])
+            ->log('Pengguna dibuat dengan hak akses');
+
         return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan.');
     }
 
@@ -132,7 +143,17 @@ class UserController extends Controller
         // Get permissions that are specifically assigned to user (not via role)
         $userDirectPermissions = $user->permissions->pluck('name')->toArray();
 
-        return view('users.edit', compact('user', 'departments', 'jabatans', 'roles', 'sites', 'modules', 'actions', 'userDirectPermissions'));
+        $permissionSources = \App\Models\User::with('permissions')
+            ->where('id', '!=', $user->id)
+            ->orderBy('nama_lengkap')
+            ->get(['id', 'nama_lengkap', 'email'])
+            ->map(fn ($source) => [
+                'id' => $source->id,
+                'label' => $source->nama_lengkap . ' (' . $source->email . ')',
+                'permissions' => $source->getDirectPermissions()->pluck('name')->values(),
+            ]);
+
+        return view('users.edit', compact('user', 'departments', 'jabatans', 'roles', 'sites', 'modules', 'actions', 'userDirectPermissions', 'permissionSources'));
     }
 
     public function update(Request $request, string $id)
@@ -174,6 +195,15 @@ class UserController extends Controller
         // Sync direct permissions
         $permissions = $request->permissions ?? [];
         $user->syncPermissions($permissions);
+
+        activity('user_access')
+            ->causedBy(auth()->user())
+            ->performedOn($user)
+            ->withProperties([
+                'role' => $request->role,
+                'direct_permissions' => $permissions,
+            ])
+            ->log('Hak akses pengguna diperbarui');
 
         return redirect()->route('users.index')->with('success', 'User berhasil diperbarui.');
     }

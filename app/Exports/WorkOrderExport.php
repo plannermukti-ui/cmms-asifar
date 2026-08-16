@@ -44,8 +44,6 @@ class WorkOrderExport implements FromCollection, WithHeadings, WithMapping, With
                 'Waktu RFU',
                 'Durasi BD (Jam)',
                 'Problem',
-                'Breakdown Type',
-                'Component Group',
                 'Category 1',
                 'Category 2',
                 'Category 3',
@@ -91,8 +89,6 @@ class WorkOrderExport implements FromCollection, WithHeadings, WithMapping, With
             $wo->waktu_rfu ? Carbon::parse($wo->waktu_rfu)->format('Y-m-d H:i') : '-',
             number_format($durasiBd, 1),
             $problem,
-            $wo->breakdownType->name ?? '-',
-            $wo->componentGroup->name ?? '-',
             $wo->category1->name ?? '-',
             $wo->category2->name ?? '-',
             $wo->category3->name ?? '-',
@@ -103,8 +99,8 @@ class WorkOrderExport implements FromCollection, WithHeadings, WithMapping, With
 
     public function styles(Worksheet $sheet)
     {
-        $sheet->mergeCells('A1:T1');
-        $sheet->mergeCells('A2:T2');
+        $sheet->mergeCells('A1:R1');
+        $sheet->mergeCells('A2:R2');
         
         return [
             1    => ['font' => ['bold' => true, 'size' => 14], 'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER]],

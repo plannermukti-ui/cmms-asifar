@@ -25,10 +25,9 @@ class WorkOrder extends Model {
         'no_wo', 'status_wo', 'tipe_wo', 'downtime_code', 'opportunity',
         'master_unit_id', 'hours_meter', 'lokasi_kerusakan', 'pm_schedule_id',
         'waktu_bd', 'waktu_rfu',
-        'breakdown_type_id', 'component_group_id',
         'wo_category_1_id', 'wo_category_2_id', 'wo_category_3_id',
         'wo_category_4_id', 'wo_category_5_id',
-        'created_by',
+        'created_by', 'updated_by',
     ];
 
     protected $casts = [
@@ -63,8 +62,6 @@ class WorkOrder extends Model {
     }
 
     public function unit() { return $this->belongsTo(MasterUnit::class, 'master_unit_id')->withoutGlobalScope('active'); }
-    public function breakdownType() { return $this->belongsTo(BreakdownType::class); }
-    public function componentGroup() { return $this->belongsTo(ComponentGroup::class); }
     public function category1() { return $this->belongsTo(WoCategory::class, 'wo_category_1_id'); }
     public function category2() { return $this->belongsTo(WoCategory::class, 'wo_category_2_id'); }
     public function category3() { return $this->belongsTo(WoCategory::class, 'wo_category_3_id'); }
@@ -83,4 +80,5 @@ class WorkOrder extends Model {
     public function jwos() { return $this->hasMany(Jwo::class, 'work_order_id'); }
 
     public function signatures() { return $this->morphMany(DocumentSignature::class, 'document'); }
+    public function comments() { return $this->hasMany(WoComment::class); }
 }

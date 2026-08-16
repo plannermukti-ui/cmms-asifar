@@ -67,4 +67,9 @@ class MasterUnit extends Model
     {
         return $this->belongsTo(Site::class, 'site_id');
     }
+
+    public function latestHourMeter()
+    {
+        return $this->hasOne(HourMeter::class, 'master_unit_id')->latestOfMany('date');
+    }
 }

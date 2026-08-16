@@ -20,7 +20,7 @@ class Tool extends Model {
     }
 
     protected $fillable = [
-        'site_id','tool_category_id', 'name', 'spesifikasi', 'foto'];
+        'site_id','tool_category_id', 'name', 'spesifikasi', 'price', 'foto'];
     public function category() { return $this->belongsTo(ToolCategory::class, 'tool_category_id'); }
     public function stocks() { return $this->hasMany(ToolStock::class); }
 }

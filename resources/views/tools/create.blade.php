@@ -43,6 +43,10 @@
               <textarea class="form-control" name="spesifikasi" rows="3">{{ old('spesifikasi') }}</textarea>
             </div>
             <div class="col-md-12 mb-3">
+              <label class="form-label">Cost / Harga Satuan (Rp)</label>
+              <input type="number" class="form-control" name="price" value="{{ old('price', 0) }}" min="0" step="0.01">
+            </div>
+            <div class="col-md-12 mb-3">
               <label class="form-label">Foto Tool</label>
               <input type="file" class="form-control" name="foto" accept="image/*">
             </div>

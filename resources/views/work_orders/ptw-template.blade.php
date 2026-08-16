@@ -10,6 +10,9 @@
             font-size: 12px;
             margin: 0;
             padding: 20px;
+            background: #fff;
+            color: #000;
+            color-scheme: light;
         }
         .company-header {
             margin-bottom: 20px;
@@ -142,7 +145,7 @@
         </tr>
         <tr>
             <td class="label">Deskripsi Pekerjaan</td>
-            <td>: {{ $workOrder->description }}</td>
+            <td>: {{ $workOrder->tasks->pluck('problem')->filter()->implode(' | ') ?: '-' }}</td>
             <td class="label">Berlaku Sampai</td>
             <td>: ____________________</td>
         </tr>

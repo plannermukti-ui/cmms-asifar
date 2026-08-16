@@ -10,6 +10,14 @@ use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
+    public function __construct()
+    {
+        // Require specific permissions for chat
+        $this->middleware('permission:view_chat')->only(['index', 'getUsers', 'getMessages', 'unreadCount', 'searchDocument']);
+        $this->middleware('permission:send_chat')->only(['send']);
+        $this->middleware('permission:delete_chat')->only(['clearChat']);
+    }
+
     public function index()
     {
         $authId = Auth::id();
@@ -125,7 +133,7 @@ class ChatController extends Controller
                     'type' => 'Work Order',
                     'title' => $wo->no_wo,
                     'desc' => 'Unit: ' . ($wo->unit->nomor_unit ?? '-'),
-                    'url' => route('work-orders.show', $wo->id),
+                    'url' => route('work-orders.show', $wo),
                 ];
             }
 

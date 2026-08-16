@@ -26,23 +26,25 @@
             <form action="{{ route('stock-opnames.create') }}" method="GET" class="row align-items-end">
                 <div class="col-md-3">
                     <label class="form-label">Tipe Lokasi Audit</label>
-                    <select name="tipe_audit" class="form-select" id="tipeAuditSelect" onchange="toggleMekanikFilter()">
+                    <select name="tipe_audit" class="form-select" id="tipeAuditSelect" onchange="if(this.value === 'ToolRoom') { this.form.submit(); } else { toggleMekanikFilter(); }">
                         <option value="ToolRoom" {{ request('tipe_audit') == 'ToolRoom' ? 'selected' : '' }}>Tool Room (Gudang)</option>
                         <option value="Mechanic" {{ request('tipe_audit') == 'Mechanic' ? 'selected' : '' }}>Mekanik</option>
                     </select>
                 </div>
                 <div class="col-md-4" id="mechanicFilterWrap" style="{{ request('tipe_audit') == 'Mechanic' ? '' : 'display:none;' }}">
                     <label class="form-label">Pilih Mekanik</label>
-                    <select name="mechanic_id" class="form-select">
+                    <select name="mechanic_id" class="form-select" onchange="this.form.submit()">
                         <option value="">-- Pilih Mekanik --</option>
                         @foreach($mechanics as $mechanic)
                             <option value="{{ $mechanic->id }}" {{ request('mechanic_id') == $mechanic->id ? 'selected' : '' }}>{{ $mechanic->nama_lengkap }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-secondary w-100">Load Data Sistem</button>
-                </div>
+                <noscript>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-secondary w-100">Load Data Sistem</button>
+                    </div>
+                </noscript>
             </form>
         </div>
     </div>
@@ -100,8 +102,26 @@
         </div>
         
         @if($stocks->count() > 0)
-        <div class="card-footer text-end">
-            <button type="submit" class="btn btn-primary" onclick="return confirm('Data akan disimpan dan Stok Sistem akan di-update sesuai Stok Fisik Aktual yang anda input. Lanjutkan?')">Simpan Hasil Stock Opname</button>
+        <div class="card-footer">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="mb-3 mb-md-0">
+                        <label class="form-label">Approval To (Jika Terdapat Selisih)</label>
+                        <select name="approver_id" class="form-select">
+                            <option value="">-- Pilih Atasan (Supervisor/Superintendent/Manager) --</option>
+                            @foreach($approvers as $approver)
+                                <option value="{{ $approver->id }}" {{ old('approver_id') == $approver->id ? 'selected' : '' }}>
+                                    {{ $approver->nama_lengkap ?? $approver->name }} ({{ $approver->roles->first()->name ?? '-' }})
+                                </option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Pilih atasan untuk menyetujui Berita Acara jika terjadi selisih stok fisik & sistem.</small>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button type="submit" class="btn btn-primary" onclick="return confirm('Simpan hasil Stock Opname? Jika terdapat selisih stok, data akan berstatus Pending dan memerlukan Approval serta Berita Acara.')">Simpan Hasil Stock Opname</button>
+                </div>
+            </div>
         </div>
         @endif
         </form>

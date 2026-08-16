@@ -31,6 +31,8 @@ class RoleController extends Controller
         'unit_types' => 'Master Tipe Unit',
         'unit_models' => 'Master Model Unit',
         'chat' => 'Pesan Instan',
+        'kpi_master_data' => 'KPI Master Data',
+        'breakdown_reports' => 'Report Breakdown',
         
         // Administrasi ToolRoom
         'mechanics' => 'Data Mekanik',
@@ -40,6 +42,7 @@ class RoleController extends Controller
         'tool_transactions' => 'Peminjaman Tool',
         'incident_reports' => 'Berita Acara',
         'stock_opnames' => 'Stock Opname',
+        'tool_stock_requests' => 'Approval Stok Tool',
         
         // Produksi
         'productions' => 'Laporan Produksi Harian',
@@ -60,9 +63,11 @@ class RoleController extends Controller
         'pm_schedules' => 'Jadwal PM (Schedule)',
         'pra_work_orders' => 'Pra-Work Order (PWO)',
         'work_orders' => 'Work Order (WO)',
+        'work_orders_kanban' => 'Kanban Board (WO)',
         'plan_budgets' => 'RAB / Budget Plan',
         'jwos' => 'Job Work Order (JWO)',
         'fars' => 'Form Analisa Rusak (FAR)',
+        'wo_comments' => 'Diskusi Work Order',
     ];
 
     private $actions = ['view', 'create', 'edit', 'delete'];
@@ -95,6 +100,12 @@ class RoleController extends Controller
             $role->syncPermissions($request->permissions);
         }
 
+        activity('role_access')
+            ->causedBy(auth()->user())
+            ->performedOn($role)
+            ->withProperties(['permissions' => $request->permissions ?? []])
+            ->log('Role dan matriks hak akses dibuat');
+
         return redirect()->route('roles.index')->with('success', 'Role berhasil ditambahkan.');
     }
 
@@ -122,6 +133,12 @@ class RoleController extends Controller
         // Sync permissions
         $permissions = $request->permissions ?? [];
         $role->syncPermissions($permissions);
+
+        activity('role_access')
+            ->causedBy(auth()->user())
+            ->performedOn($role)
+            ->withProperties(['permissions' => $permissions])
+            ->log('Matriks hak akses role diperbarui');
 
         return redirect()->route('roles.index')->with('success', 'Role berhasil diperbarui.');
     }

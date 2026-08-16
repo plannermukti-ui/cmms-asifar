@@ -20,7 +20,14 @@ class PmTemplate extends Model
 
     use HasFactory, BelongsToSite;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'unit_model_id',
+        'site_id',
+        'name',
+        'interval_type',
+        'interval_value',
+        'opr_hrs_per_day',
+    ];
 
     public function site()
     {

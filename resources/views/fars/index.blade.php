@@ -13,10 +13,12 @@
                 </h2>
             </div>
             <div class="col-auto ms-auto d-print-none">
+                @can('create_fars')
                 <a href="{{ route('fars.create') }}" class="btn btn-primary d-none d-sm-inline-block">
                     <svg class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
                     Buat Laporan Baru
                 </a>
+                @endcan
             </div>
         </div>
     </div>
@@ -82,12 +84,16 @@
                             <td>
                                 <div class="btn-list flex-nowrap justify-content-end">
                                     <a href="{{ route('fars.show', $far) }}" class="btn btn-sm btn-outline-info">Detail</a>
+                                    @can('edit_fars')
                                     <a href="{{ route('fars.edit', $far) }}" class="btn btn-sm btn-outline-warning">Edit</a>
+                                    @endcan
+                                    @can('delete_fars')
                                     <form action="{{ route('fars.destroy', $far) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus FAR ini?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
                                     </form>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

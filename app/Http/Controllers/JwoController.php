@@ -16,6 +16,10 @@ class JwoController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('permission:view_jwos')->only(['index', 'show']);
+        $this->middleware('permission:create_jwos')->only(['create', 'store']);
+        $this->middleware('permission:edit_jwos')->only(['edit', 'update']);
+        $this->middleware('permission:delete_jwos')->only(['destroy']);
     }
 
     public function index(Request $request)
@@ -70,7 +74,7 @@ class JwoController extends Controller
             'work_order_id' => 'nullable|exists:work_orders,id',
             'unit_id' => 'nullable|exists:master_units,id',
             'component_group_id' => 'nullable|exists:component_groups,id',
-            'part_id' => 'required|exists:parts,id',
+            'part_id' => 'nullable|exists:parts,id',
             'problem_description' => 'required|string',
             'request_action' => 'required|string',
             'date_expected' => 'nullable|date',
@@ -120,7 +124,7 @@ class JwoController extends Controller
             'work_order_id' => 'nullable|exists:work_orders,id',
             'unit_id' => 'nullable|exists:master_units,id',
             'component_group_id' => 'nullable|exists:component_groups,id',
-            'part_id' => 'required|exists:parts,id',
+            'part_id' => 'nullable|exists:parts,id',
             'problem_description' => 'required|string',
             'request_action' => 'required|string',
             'date_expected' => 'nullable|date',

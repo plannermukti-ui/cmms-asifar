@@ -288,6 +288,44 @@
   </div>
 </div>
 
+{{-- ================================================================== --}}
+{{-- ROW 3: TREN DURASI SUMMARY --}}
+{{-- ================================================================== --}}
+<div class="row row-cards mb-4">
+  <div class="col-lg-6">
+    <div class="card stat-card-modern h-100">
+      <div class="card-header py-2 px-3 d-flex align-items-center justify-content-between">
+        <h3 class="card-title text-warning m-0 d-flex align-items-center" style="font-size: 0.95rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-warning" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M9 8m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M15 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /></svg>
+          Tren Ringkasan Durasi & Waktu Tanggap (4 Minggu Terakhir)
+        </h3>
+        <span class="badge bg-warning-lt" style="font-size:0.7rem;">Average per Minggu</span>
+      </div>
+      <div class="card-body p-3">
+        <div style="position: relative; height: 250px; width: 100%;">
+          <canvas id="chartDurationTrend"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card stat-card-modern h-100">
+      <div class="card-header py-2 px-3 d-flex align-items-center justify-content-between">
+        <h3 class="card-title text-success m-0 d-flex align-items-center" style="font-size: 0.95rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-success" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M9 8m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M15 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /></svg>
+          Plan Achievement Trend (6 Bulan Terakhir)
+        </h3>
+        <span class="badge bg-success-lt" style="font-size:0.7rem;">Achievement Plan</span>
+      </div>
+      <div class="card-body p-3">
+        <div style="position: relative; height: 250px; width: 100%;">
+          <canvas id="chartPlanAchievement"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 {{-- ================================================================== --}}
@@ -610,6 +648,143 @@
       }
     }
   });
+
+  // 4. Duration Summary Trend Chart (4 Weeks)
+  const durationCanvas = document.getElementById('chartDurationTrend');
+  if (durationCanvas) {
+    const durationCtx = durationCanvas.getContext('2d');
+    new Chart(durationCtx, {
+      type: 'line',
+      data: {
+        labels: @json($chartData['durationTrendLabels']),
+        datasets: [
+          {
+            label: 'Respontime (Avg Hrs)',
+            data: @json($chartData['durationTrendRespon'] ?? []),
+            borderColor: '#38bdf8',
+            backgroundColor: '#38bdf8',
+            borderWidth: 2.5,
+            pointBackgroundColor: '#38bdf8',
+            pointBorderColor: isDark ? '#1e293b' : '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            tension: 0.3
+          },
+          {
+            label: 'Total Durasi Subtask (Avg Hrs)',
+            data: @json($chartData['durationTrendSubtask'] ?? []),
+            borderColor: '#f59e0b',
+            backgroundColor: '#f59e0b',
+            borderWidth: 2.5,
+            pointBackgroundColor: '#f59e0b',
+            pointBorderColor: isDark ? '#1e293b' : '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            tension: 0.3
+          },
+          {
+            label: 'No Action (Avg Hrs)',
+            data: @json($chartData['durationTrendNoAction'] ?? []),
+            borderColor: '#ef4444',
+            backgroundColor: '#ef4444',
+            borderWidth: 2.5,
+            pointBackgroundColor: '#ef4444',
+            pointBorderColor: isDark ? '#1e293b' : '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            tension: 0.3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { 
+            display: true, 
+            position: 'top',
+            labels: { color: lblColor, font: { size: 11 }, usePointStyle: true, boxWidth: 8 }
+          },
+          tooltip: {
+            backgroundColor: isDark ? '#0f172a' : '#ffffff',
+            titleColor: isDark ? '#ffffff' : '#0f172a',
+            bodyColor: isDark ? '#ffffff' : '#0f172a',
+            borderColor: 'rgba(245,158,11,0.3)',
+            borderWidth: 1,
+            padding: 8
+          }
+        },
+        scales: {
+          y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: lblColor, font: { size: 11 } } },
+          x: { grid: { display: false }, ticks: { color: lblColor, font: { size: 11 } } }
+        }
+      }
+    });
+  }
+
+  // 5. Plan Achievement Trend Chart (Last 6 Months)
+  const planAchievementCanvas = document.getElementById('chartPlanAchievement');
+  if (planAchievementCanvas) {
+    const planCtx = planAchievementCanvas.getContext('2d');
+    new Chart(planCtx, {
+      type: 'bar',
+      data: {
+        labels: @json($chartData['planTrendLabels']),
+        datasets: [
+          {
+            label: 'Completed (Actual)',
+            data: @json($chartData['planTrendCompleted'] ?? []),
+            backgroundColor: '#22c55e',
+            borderRadius: 4,
+          },
+          {
+            label: 'In Progress (Masih Plan)',
+            data: @json($chartData['planTrendInProgress'] ?? []),
+            backgroundColor: '#38bdf8',
+            borderRadius: 4,
+          },
+          {
+            label: 'Cancel (Plan Gagal)',
+            data: @json($chartData['planTrendCancel'] ?? []),
+            backgroundColor: '#ef4444',
+            borderRadius: 4,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { 
+            display: true, 
+            position: 'top',
+            labels: { color: lblColor, font: { size: 11 }, usePointStyle: true, boxWidth: 8 }
+          },
+          tooltip: {
+            backgroundColor: isDark ? '#0f172a' : '#ffffff',
+            titleColor: isDark ? '#ffffff' : '#0f172a',
+            bodyColor: isDark ? '#ffffff' : '#0f172a',
+            borderColor: 'rgba(34,197,94,0.3)',
+            borderWidth: 1,
+            padding: 8
+          }
+        },
+        scales: {
+          y: { 
+            stacked: true,
+            beginAtZero: true, 
+            grid: { color: gridColor }, 
+            ticks: { color: lblColor, font: { size: 11 }, stepSize: 1 } 
+          },
+          x: { 
+            stacked: true,
+            grid: { display: false }, 
+            ticks: { color: lblColor, font: { size: 11 } } 
+          }
+        }
+      }
+    });
+  }
 </script>
 @endpush
 

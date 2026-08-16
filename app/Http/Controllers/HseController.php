@@ -75,6 +75,73 @@ class HseController extends Controller
         }
     }
 
+    public function editJsa(HseJsa $jsa)
+    {
+        $workOrder = $jsa->workOrder;
+        return response()->json([
+            'id' => $jsa->id,
+            'notes' => $jsa->notes,
+            'status' => $jsa->status,
+            'document_scan' => $jsa->document_scan ? \Storage::disk('public')->url($jsa->document_scan) : null,
+            'steps' => $jsa->steps->map(fn($step) => [
+                'id' => $step->id,
+                'job_step' => $step->job_step,
+                'potential_hazard' => $step->potential_hazard,
+                'control_measure' => $step->control_measure,
+            ]),
+        ]);
+    }
+
+    public function updateJsa(Request $request, HseJsa $jsa)
+    {
+        $request->validate([
+            'notes' => 'nullable|string',
+            'document_scan' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'steps' => 'required_without:document_scan|array',
+            'steps.*.job_step' => 'required_with:steps|string',
+            'steps.*.potential_hazard' => 'required_with:steps|string',
+            'steps.*.control_measure' => 'required_with:steps|string',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $documentPath = $jsa->document_scan;
+            if ($request->hasFile('document_scan')) {
+                // Delete old file if exists
+                if ($jsa->document_scan && \Storage::disk('public')->exists($jsa->document_scan)) {
+                    \Storage::disk('public')->delete($jsa->document_scan);
+                }
+                $documentPath = $request->file('document_scan')->store('jsa_scans', 'public');
+            }
+
+            $jsa->update([
+                'notes' => $request->notes,
+                'document_scan' => $documentPath,
+            ]);
+
+            // Delete old steps and recreate
+            $jsa->steps()->delete();
+            if ($request->has('steps') && is_array($request->steps)) {
+                foreach ($request->steps as $step) {
+                    if (!empty($step['job_step'])) {
+                        HseJsaStep::create([
+                            'hse_jsa_id' => $jsa->id,
+                            'job_step' => $step['job_step'],
+                            'potential_hazard' => $step['potential_hazard'],
+                            'control_measure' => $step['control_measure'],
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'JSA berhasil diperbarui.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
+    }
+
     public function approveJsa(HseJsa $jsa)
     {
         $jsa->update([
@@ -87,6 +154,10 @@ class HseController extends Controller
 
     public function destroyJsa(HseJsa $jsa)
     {
+        // Delete associated file if exists
+        if ($jsa->document_scan && \Storage::disk('public')->exists($jsa->document_scan)) {
+            \Storage::disk('public')->delete($jsa->document_scan);
+        }
         $jsa->delete();
         return back()->with('success', 'JSA berhasil dihapus.');
     }
@@ -133,6 +204,49 @@ class HseController extends Controller
         return back()->with('success', 'Permit to Work berhasil dibuat.');
     }
 
+    public function editPtw(HsePtw $ptw)
+    {
+        return response()->json([
+            'id' => $ptw->id,
+            'permit_type' => $ptw->permit_type,
+            'valid_from' => $ptw->valid_from->format('Y-m-d\TH:i'),
+            'valid_to' => $ptw->valid_to->format('Y-m-d\TH:i'),
+            'notes' => $ptw->notes,
+            'status' => $ptw->status,
+            'document_scan' => $ptw->document_scan ? \Storage::disk('public')->url($ptw->document_scan) : null,
+        ]);
+    }
+
+    public function updatePtw(Request $request, HsePtw $ptw)
+    {
+        $request->validate([
+            'permit_type' => 'required|string',
+            'valid_from' => 'required|date',
+            'valid_to' => 'required|date|after_or_equal:valid_from',
+            'notes' => 'nullable|string',
+            'document_scan' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        $documentPath = $ptw->document_scan;
+        if ($request->hasFile('document_scan')) {
+            // Delete old file if exists
+            if ($ptw->document_scan && \Storage::disk('public')->exists($ptw->document_scan)) {
+                \Storage::disk('public')->delete($ptw->document_scan);
+            }
+            $documentPath = $request->file('document_scan')->store('ptw_scans', 'public');
+        }
+
+        $ptw->update([
+            'permit_type' => $request->permit_type,
+            'valid_from' => $request->valid_from,
+            'valid_to' => $request->valid_to,
+            'notes' => $request->notes,
+            'document_scan' => $documentPath,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Permit to Work berhasil diperbarui.']);
+    }
+
     public function approvePtw(HsePtw $ptw)
     {
         $ptw->update([
@@ -144,6 +258,10 @@ class HseController extends Controller
 
     public function destroyPtw(HsePtw $ptw)
     {
+        // Delete associated file if exists
+        if ($ptw->document_scan && \Storage::disk('public')->exists($ptw->document_scan)) {
+            \Storage::disk('public')->delete($ptw->document_scan);
+        }
         $ptw->delete();
         return back()->with('success', 'Permit to Work berhasil dihapus.');
     }
@@ -171,6 +289,34 @@ class HseController extends Controller
         ]);
 
         return back()->with('success', 'LOTO berhasil dipasang.');
+    }
+
+    public function editLoto(HseLoto $loto)
+    {
+        return response()->json([
+            'id' => $loto->id,
+            'isolation_point' => $loto->isolation_point,
+            'lock_number' => $loto->lock_number,
+            'tag_number' => $loto->tag_number,
+            'status' => $loto->status,
+        ]);
+    }
+
+    public function updateLoto(Request $request, HseLoto $loto)
+    {
+        $request->validate([
+            'isolation_point' => 'required|string',
+            'lock_number' => 'nullable|string',
+            'tag_number' => 'nullable|string',
+        ]);
+
+        $loto->update([
+            'isolation_point' => $request->isolation_point,
+            'lock_number' => $request->lock_number,
+            'tag_number' => $request->tag_number,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'LOTO berhasil diperbarui.']);
     }
 
     public function removeLoto(HseLoto $loto)

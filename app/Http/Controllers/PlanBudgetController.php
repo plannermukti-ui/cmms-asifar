@@ -15,6 +15,15 @@ use Carbon\Carbon;
 
 class PlanBudgetController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_plan_budgets')->only(['index', 'show']);
+        $this->middleware('permission:create_plan_budgets')->only(['create', 'store']);
+        $this->middleware('permission:edit_plan_budgets')->only(['edit', 'update']);
+        $this->middleware('permission:delete_plan_budgets')->only(['destroy']);
+    }
+
+
     public function index(Request $request)
     {
         $query = PlanBudget::with('creator')->orderBy('period', 'desc');
@@ -224,11 +233,20 @@ class PlanBudgetController extends Controller
             $bu->actual_pa = $actualPa;
 
             // 2. Calculate Actual Cost
-            // Cost is from WoSubtaskPart associated with WOs of this unit within the month.
-            // Assuming we take parts usage from WO that occurred in this month.
-            // Let's grab WOs that have `created_at` or `waktu_bd` in this month. Let's use `created_at`.
+            // Gunakan tanggal pelaksanaan WO (BD/RFU), bukan created_at. WO dapat dibuat
+            // setelah pekerjaan berlangsung, sehingga created_at akan salah periode budget.
             $monthlyWos = WorkOrder::where('master_unit_id', $unit->id)
-                ->whereBetween('created_at', [$startDate, $endDate])
+                ->where(function ($q) use ($startDate, $endDate) {
+                    $q->whereBetween('waktu_bd', [$startDate, $endDate])
+                        ->orWhereBetween('waktu_rfu', [$startDate, $endDate])
+                        ->orWhere(function ($q2) use ($startDate, $endDate) {
+                            $q2->where('waktu_bd', '<', $startDate)
+                                ->where(function ($q3) use ($endDate) {
+                                    $q3->whereNull('waktu_rfu')
+                                        ->orWhere('waktu_rfu', '>', $endDate);
+                                });
+                        });
+                })
                 ->pluck('id');
             
             $actualCost = WoSubtaskPart::whereHas('subtask.task', function($q) use ($monthlyWos) {
