@@ -105,7 +105,7 @@ class FarController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('fars.show', $far->id)->with('success', 'Failure Analysis Report berhasil dibuat.');
+            return redirect()->route('fars.show', $far)->with('success', 'Failure Analysis Report berhasil dibuat.');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
@@ -184,7 +184,7 @@ class FarController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('fars.show', $far->id)->with('success', 'Failure Analysis Report berhasil diperbarui.');
+            return redirect()->route('fars.show', $far)->with('success', 'Failure Analysis Report berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

@@ -1,66 +1,140 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
+  <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
+  <br>
+  <h1>CMMS AISFAR</h1>
+  <p><b>Enterprise Computerized Maintenance Management System untuk Industri Pertambangan & Alat Berat</b></p>
+  
+  [![PHP Version](https://img.shields.io/badge/PHP-8.1%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net/)
+  [![Laravel Version](https://img.shields.io/badge/Laravel-10.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com/)
+  [![License](https://img.shields.io/badge/License-Proprietary-blue.svg?style=for-the-badge)](#)
+</div>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+<br>
 
-## About Laravel
+## 📖 Tentang Aplikasi
+**CMMS AISFAR** adalah Sistem Manajemen Pemeliharaan Aset dan Logistik Gudang komprehensif yang dirancang khusus untuk ekosistem industri pertambangan. Platform ini bertindak sebagai *Single Source of Truth* untuk mengelola siklus hidup alat berat (Excavator, Dozer, Hauler), dari penjadwalan *Preventive Maintenance*, manajemen Work Order, pelacakan suku cadang, hingga analitik KPI keandalan unit.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Aplikasi ini mendigitalisasi seluruh proses operasional workshop yang sebelumnya berbasis kertas menjadi **100% Paperless** melalui fitur *Digital Signature* dan *Real-time Collaboration*.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## ✨ Modul Utama (Ecosystem)
 
-## Learning Laravel
+1. **🛠️ Work Order Management**
+   - Pencatatan Breakdown, Backlog, dan Service unit. Terintegrasi dengan pemotongan stok Part, dokumen HSE, dan Approval Tanda Tangan Digital 3 Tingkat.
+2. **📦 ToolRoom & Stok Part Inventory**
+   - Manajemen sirkulasi Special Service Tools (SST), Sertifikasi Kalibrasi ISO/IEC 17025 (Auto-Lockout), Hierarki *Bin Location* Gudang, dan Tata Kelola Kanibalisasi (*Part Swapping*).
+3. **🚜 Asset Intelligence (360° Unit History)**
+   - Rekam jejak lengkap *Life Cycle Cost* setiap unit alat berat, riwayat perbaikan, konsumsi part, dan histori pergerakan komponen.
+4. **📊 Analytics KPI & ISO 8601**
+   - Perhitungan MTTR (Mean Time To Repair), MTBF (Mean Time Between Failures), dan *Physical Availability* (PA) menggunakan standar kalender minggu ISO 8601.
+5. **🛡️ Safety & HSE (K3)**
+   - Integrasi langsung 3 pilar K3 di dalam Work Order: JSA (*Job Safety Analysis*), PTW (*Permit to Work*), dan LOTO (*Lockout/Tagout*).
+6. **📉 Failure Analysis Report (FAR)**
+   - Investigasi *Root Cause Analysis* (RCA) 4 pilar untuk kerusakan komponen mayor (Major Component Failure).
+7. **⏱️ Preventive Maintenance (PM)**
+   - Templat jadwal servis berkala otomatis (PS1-PS4) berdasarkan Hour Meter (HM) unit dengan *Due Date Warning* dan *1-Click Auto-Generate WO*.
+8. **💬 Live Chat & Collaboration**
+   - Fitur *Floating Chat Widget* untuk komunikasi mekanik, planner, dan supervisor secara *real-time* menggunakan Laravel Echo & WebSockets.
+9. **📈 Laporan Produksi Harian**
+   - Pencatatan ritasi *Digger* dan *Hauler* per jam, lengkap dengan material tambang (Coal, OB, Top Soil) dan delay operasional.
+10. **💼 Budget & Vendor (JWO)**
+    - Kontrol anggaran (Plan vs Actual Cost) dan pengelolaan *Job Work Order* untuk perbaikan pihak ketiga (Vendor/Outsource).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 💻 Tech Stack & Arsitektur Enterprise
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Aplikasi dibangun dengan fondasi yang tangguh untuk menjamin keamanan dan performa kelas *Enterprise*:
 
-## Laravel Sponsors
+- **Backend:** Laravel 10 (PHP 8.1+)
+- **Frontend / UI:** Blade Templating, Vanilla CSS/JS, Tabler UI Framework
+- **Database:** MySQL / PostgreSQL
+- **Security:**
+  - **Hashids (Anti-IDOR):** ID database dienkripsi di URL (contoh: ID `1` menjadi `jR3xY`) untuk mencegah *Insecure Direct Object Reference*.
+  - Perlindungan bawaan Laravel terhadap serangan XSS, CSRF, dan SQL Injection.
+- **Access Control:** Spatie RBAC (Role-Based Access Control) untuk pemisahan *Privileges* per user role.
+- **Audit Trail:** Spatie Activitylog untuk merekam seluruh riwayat aktivitas *Create/Update/Delete* data.
+- **PDF Generation:** DomPDF untuk *export* dokumen resmi ber-Kop Surat.
+- **Broadcasting:** Laravel Echo (Pusher / Soketi) untuk fitur Live Chat dan Notifikasi.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## 🚀 Panduan Instalasi (Development)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Ikuti langkah-langkah di bawah ini untuk menjalankan project secara lokal:
 
-## Contributing
+### Persyaratan Sistem
+- PHP >= 8.1
+- Composer
+- Node.js & NPM
+- MySQL / MariaDB Server
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Langkah Instalasi
 
-## Code of Conduct
+1. **Clone Repository**
+   ```bash
+   git clone https://github.com/username/cmms-aisfar.git
+   cd cmms-aisfar
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2. **Install Dependensi PHP & Node.js**
+   ```bash
+   composer install
+   npm install
+   ```
 
-## Security Vulnerabilities
+3. **Konfigurasi Environment**
+   Salin file `.env.example` menjadi `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+   Buka file `.env` dan atur koneksi database Anda:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=cmms_aisfar
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+4. **Generate Application Key & Migration**
+   Generate *app key*, jalankan migrasi database, dan *seeding* data awal (Role, Admin, Data Master):
+   ```bash
+   php artisan key:generate
+   php artisan migrate:fresh --seed
+   ```
 
-## License
+5. **Build Asset & Jalankan Server Lokal**
+   Kompilasi asset frontend dan jalankan server *development* Laravel:
+   ```bash
+   npm run dev
+   # Buka terminal baru
+   php artisan serve
+   ```
+   Aplikasi dapat diakses melalui `http://localhost:8000`.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## 👥 Pengguna / Roles
+
+Sistem mendukung *Multi-Role* yang disesuaikan dengan hierarki struktural tambang:
+- **Super Administrator:** Akses penuh ke *System Settings*, *Master Data*, dan log keamanan.
+- **Maintenance Superintendent / Planner:** Perencana jadwal PM, budget, *Approval* final dokumen.
+- **Supervisor / Foreman:** Verifikasi Work Order, penugasan pekerjaan, dan *Review* HSE di lapangan.
+- **Mechanic / Operator:** Input HM, pengerjaan WO, dan permintaan barang.
+- **Toolman / Warehouse:** Check-in/Check-out alat SST, *Issue Part*, *Stock Opname*.
+- **Engineer / Production:** Pelaporan produksi harian (*Fleet* alat angkut dan gali).
+
+---
+
+## 📚 Pusat Panduan (Guide)
+
+Aplikasi memiliki modul Panduan Interaktif terintegrasi yang dapat diakses oleh publik maupun pengguna *login* pada endpoint `/guide`. Halaman panduan ini dilengkapi dengan animasi modern, penjelasan per-modul menggunakan infografis, dan *Pop-up Modal Quick View*.
+
+---
+
+<div align="center">
+  <p>Dibuat dan dikembangkan untuk operasional <b>PT Mukti / CMMS AISFAR</b>.<br>Hak Cipta © 2026. Semua Hak Dilindungi.</p>
+</div>
