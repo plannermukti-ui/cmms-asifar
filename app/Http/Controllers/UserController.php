@@ -68,6 +68,8 @@ class UserController extends Controller
         'jwos' => 'Job Work Order (JWO)',
         'fars' => 'Form Analisa Rusak (FAR)',
         'wo_comments' => 'Diskusi Work Order',
+        'swap_components' => 'Swap Component Report',
+        'pcr' => 'Plan Component Replacement (PCR)',
     ];
 
     private $actions = ['view', 'create', 'edit', 'delete'];

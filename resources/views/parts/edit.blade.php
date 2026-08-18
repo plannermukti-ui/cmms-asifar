@@ -25,9 +25,20 @@
             </div>
             @endif
             <div class="col-md-6 mb-3">
-            <label class="form-label required">Part Number</label>
-            <input type="text" class="form-control" name="part_number" value="{{ $part->part_number }}" required>
-          </div>
+              <label class="form-label required">Part Number</label>
+              <input type="text" class="form-control" name="part_number" value="{{ $part->part_number }}" required>
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label">Unit Model Terkait</label>
+              <select name="unit_models[]" class="form-select" multiple>
+                @foreach($unitModels as $model)
+                  <option value="{{ $model->id }}" {{ $part->unitModels->contains($model->id) ? 'selected' : '' }}>
+                    {{ $model->name }}
+                  </option>
+                @endforeach
+              </select>
+              <small class="text-muted">Bisa pilih lebih dari satu (tekan Ctrl/Cmd untuk multi-select)</small>
+            </div>
           <div class="col-md-6 mb-3">
             <label class="form-label required">Part Description</label>
             <input type="text" class="form-control" name="part_description" value="{{ $part->part_description }}" required>
@@ -35,6 +46,10 @@
           <div class="col-md-4 mb-3">
             <label class="form-label">Satuan</label>
             <input type="text" class="form-control" name="satuan" value="{{ $part->satuan }}">
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Target Life (Hrs)</label>
+            <input type="number" class="form-control" name="target" value="{{ $part->target }}" min="0" step="0.01">
           </div>
           <div class="col-md-4 mb-3">
             <label class="form-label">Cost (Rp)</label>

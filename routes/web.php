@@ -148,6 +148,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Preventive Maintenance
     Route::resource('/pm-templates', \App\Http\Controllers\PmTemplateController::class);
+    Route::post('/pm-templates/bulk-copy', [\App\Http\Controllers\PmTemplateController::class, 'bulkCopy'])->name('pm-templates.bulk-copy');
+    Route::post('/pm-templates/bulk-destroy', [\App\Http\Controllers\PmTemplateController::class, 'bulkDestroy'])->name('pm-templates.bulk-destroy');
     Route::post('/pm-templates/{pmTemplate}/copy', [\App\Http\Controllers\PmTemplateController::class, 'copy'])->name('pm-templates.copy');
     Route::resource('/pm-schedules', \App\Http\Controllers\PmScheduleController::class);
     Route::post('/pm-schedules/{pmSchedule}/generate-wo', [\App\Http\Controllers\PmScheduleController::class, 'generateWorkOrder'])->name('pm-schedules.generate-wo');
@@ -198,6 +200,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Plan Budget Bulanan
     Route::resource('plan-budgets', \App\Http\Controllers\PlanBudgetController::class);
+
+    // Plan & Strategy
+    Route::prefix('plan-strategy')->name('plan-strategy.')->group(function () {
+        Route::get('/pcr', [\App\Http\Controllers\PCRController::class, 'index'])->name('pcr.index');
+        Route::post('/pcr/update-manual', [\App\Http\Controllers\PCRController::class, 'updateManual'])->name('pcr.updateManual');
+    });
 
     // Master Vendor & JWO
     Route::resource('vendors', \App\Http\Controllers\VendorController::class)->except(['create', 'show', 'edit']);

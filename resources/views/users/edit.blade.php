@@ -144,51 +144,8 @@
                 <button type="button" id="copyPermissionsButton" class="btn btn-sm btn-info">Salin Hak Akses</button>
                 <span class="small text-secondary">Hanya hak akses spesifik yang akan disalin; role user ini tidak berubah.</span>
               </div>
-              <div class="table-responsive">
-                <table class="table table-vcenter card-table table-striped">
-                  <thead>
-                    <tr>
-                      <th>Modul Aplikasi</th>
-                      @foreach($actions as $action)
-                        <th class="text-center">{{ ucfirst($action) }}</th>
-                      @endforeach
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @foreach($modules as $moduleKey => $moduleName)
-                      <tr>
-                        <td class="fw-bold">{{ $moduleName }}</td>
-                        @foreach($actions as $action)
-                          @php $permissionName = $action . '_' . $moduleKey; @endphp
-                          <td class="text-center">
-                            <label class="form-check form-switch d-flex justify-content-center m-0">
-                              <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $permissionName }}"
-                                {{ in_array($permissionName, old('permissions', $userDirectPermissions)) ? 'checked' : '' }}>
-                            </label>
-                          </td>
-                        @endforeach
-                      </tr>
-                    @endforeach
-                    <!-- Additional custom permissions -->
-                    <tr>
-                      <td class="fw-bold">Fitur Khusus</td>
-                      <td colspan="4">
-                        <div class="d-flex gap-4">
-                          <label class="form-check form-switch m-0">
-                            <input class="form-check-input" type="checkbox" name="permissions[]" value="download_backup"
-                              {{ in_array('download_backup', old('permissions', $userDirectPermissions)) ? 'checked' : '' }}>
-                            <span class="form-check-label">Download Backup</span>
-                          </label>
-                          <label class="form-check form-switch m-0">
-                            <input class="form-check-input" type="checkbox" name="permissions[]" value="send_chat"
-                              {{ in_array('send_chat', old('permissions', $userDirectPermissions)) ? 'checked' : '' }}>
-                            <span class="form-check-label">Kirim Pesan Chat</span>
-                          </label>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div class="mt-3">
+                @include('partials.permissions-matrix', ['selectedPermissions' => old('permissions', $userDirectPermissions)])
               </div>
             </div>
           </div>

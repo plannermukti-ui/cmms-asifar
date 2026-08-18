@@ -24,18 +24,76 @@
   </div>
 </div>
 
+@if(session('success'))
+<div class="alert alert-success alert-dismissible" role="alert">
+  <div class="d-flex">
+    <div>
+      <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+    </div>
+    <div>
+      {{ session('success') }}
+    </div>
+  </div>
+  <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+</div>
+@endif
+
+<div class="card mt-3">
+  <div class="card-body">
+    <form method="GET" action="{{ route('hour-meters.index') }}" class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label small fw-bold">Dari Tanggal</label>
+        <input type="date" name="start_date" class="form-control form-control-sm" value="{{ request('start_date') }}">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small fw-bold">Sampai Tanggal</label>
+        <input type="date" name="end_date" class="form-control form-control-sm" value="{{ request('end_date') }}">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label small fw-bold">Unit</label>
+        <select name="master_unit_id" class="form-select form-select-sm select2-filter">
+          <option value="">Semua Unit</option>
+          @foreach($masterUnits as $unit)
+            <option value="{{ $unit->id }}" {{ request('master_unit_id') == $unit->id ? 'selected' : '' }}>{{ $unit->nomor_unit }}</option>
+          @endforeach
+        </select>
+      </div>
+      <div class="col-md-3">
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary btn-sm flex-fill">
+            Filter
+          </button>
+          @if(request()->hasAny(['start_date', 'end_date', 'master_unit_id']))
+            <a href="{{ route('hour-meters.index') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+          @endif
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="card mt-3">
   <div class="table-responsive">
     <table class="table card-table table-vcenter text-nowrap">
       <thead>
+        @php
+            $currentSort = request('sort_by', 'date');
+            $currentOrder = request('sort_order', 'desc');
+            $nextOrder = $currentOrder === 'asc' ? 'desc' : 'asc';
+            
+            function sortIcon($col, $currentSort, $currentOrder) {
+                if ($col !== $currentSort) return '';
+                return $currentOrder === 'asc' ? '↑' : '↓';
+            }
+        @endphp
         <tr>
-          <th>Date</th>
-          <th>Unit</th>
+          <th><a href="{{ request()->fullUrlWithQuery(['sort_by' => 'date', 'sort_order' => $currentSort == 'date' ? $nextOrder : 'desc']) }}" class="text-reset">Date {{ sortIcon('date', $currentSort, $currentOrder) }}</a></th>
+          <th><a href="{{ request()->fullUrlWithQuery(['sort_by' => 'unit', 'sort_order' => $currentSort == 'unit' ? $nextOrder : 'asc']) }}" class="text-reset">Unit {{ sortIcon('unit', $currentSort, $currentOrder) }}</a></th>
           <th>Model</th>
           @if(is_null(auth()->user()->site_id))
           <th>Site</th>
           @endif
-          <th>HM</th>
+          <th><a href="{{ request()->fullUrlWithQuery(['sort_by' => 'hm', 'sort_order' => $currentSort == 'hm' ? $nextOrder : 'desc']) }}" class="text-reset">HM {{ sortIcon('hm', $currentSort, $currentOrder) }}</a></th>
           <th>Aksi</th>
         </tr>
       </thead>
@@ -126,3 +184,16 @@
   </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof $ !== 'undefined' && $.fn.select2) {
+            $('.select2-filter').select2({
+                theme: 'bootstrap-5',
+                width: '100%'
+            });
+        }
+    });
+</script>
+@endpush

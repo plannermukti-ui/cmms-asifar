@@ -27,19 +27,40 @@ class PmScheduleController extends Controller
             $query->where('pm_schedules.site_id', $request->site_id);
         }
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->whereHas('masterUnit', function($u) use ($search) {
-                    $u->where('nomor_unit', 'like', "%{$search}%");
-                })->orWhereHas('pmTemplate', function($t) use ($search) {
-                    $t->where('name', 'like', "%{$search}%");
-                });
+        if ($request->filled('unit')) {
+            $unit = $request->unit;
+            $query->whereHas('masterUnit', function($u) use ($unit) {
+                $u->where('nomor_unit', 'like', "%{$unit}%");
             });
         }
 
+        if ($request->filled('template')) {
+            $template = $request->template;
+            $query->whereHas('pmTemplate', function($t) use ($template) {
+                $t->where('name', 'like', "%{$template}%");
+            });
+        }
         if ($request->filled('status')) {
             $query->where('status_jadwal', $request->status);
+        }
+
+        if ($request->filled('last_hm')) {
+            $query->where('last_executed_value', 'like', "%{$request->last_hm}%");
+        }
+
+        if ($request->filled('last_date')) {
+            $query->whereHas('latestHistory', function($q) use ($request) {
+                $q->whereDate('executed_at', $request->last_date);
+            });
+        }
+
+        if ($request->filled('next_due_hm')) {
+            $query->where('next_due_value', 'like', "%{$request->next_due_hm}%");
+        }
+
+        if ($request->filled('next_due_date')) {
+            $query->whereDate('next_due_date', $request->next_due_date)
+                  ->orWhereDate('estimated_next_due_date', $request->next_due_date);
         }
 
         $sort = $request->get('sort', 'next_due_value');
@@ -88,7 +109,11 @@ class PmScheduleController extends Controller
         $schedules = $query->paginate(15)->appends($request->query());
         $sites = \App\Models\Site::orderBy('name')->get();
 
-        return view('pm-schedules.index', compact('schedules', 'sites'));
+        // Get distinct options for dropdown filters
+        $filterUnits = \App\Models\MasterUnit::whereIn('id', PmSchedule::select('master_unit_id'))->orderBy('nomor_unit')->get();
+        $filterTemplates = \App\Models\PmTemplate::whereIn('id', PmSchedule::select('pm_template_id'))->orderBy('name')->get();
+
+        return view('pm-schedules.index', compact('schedules', 'sites', 'filterUnits', 'filterTemplates'));
     }
 
     public function generateWorkOrder(Request $request, PmSchedule $pmSchedule)

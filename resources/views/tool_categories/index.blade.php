@@ -47,7 +47,7 @@
               <td>{{ $category->description ?? '-' }}</td>
               <td>
                 @can('edit_tool_categories')
-                <a href="{{ route('tool-categories.edit', $category) }}" class="btn btn-sm btn-primary">Edit</a>
+                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-edit-kategori-{{ $category->id }}">Edit</button>
                 @endcan
                 @can('delete_tool_categories')
                 <form action="{{ route('tool-categories.destroy', $category) }}" method="post" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus kategori ini?');">
@@ -74,6 +74,7 @@
     </div>
   </div>
 </div>
+
 <div class="modal modal-blur fade" id="modal-tambah-kategori" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -101,4 +102,36 @@
     </div>
   </div>
 </div>
+
+@foreach($categories as $category)
+<div class="modal modal-blur fade" id="modal-edit-kategori-{{ $category->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Kategori Tool: {{ $category->name }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{{ route('tool-categories.update', $category) }}" method="post">
+        @csrf
+        @method('PUT')
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label required">Nama Kategori</label>
+            <input type="text" class="form-control" name="name" value="{{ old('name', $category->name) }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Deskripsi</label>
+            <textarea class="form-control" name="description" rows="3">{{ old('description', $category->description) }}</textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn me-auto" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+@endforeach
+
 @endsection

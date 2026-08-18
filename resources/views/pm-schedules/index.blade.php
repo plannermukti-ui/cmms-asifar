@@ -19,58 +19,6 @@
   </div>
 </div>
 
-<div class="card mt-3">
-  <div class="card-body">
-    <form method="GET" action="{{ route('pm-schedules.index') }}" class="row g-2 align-items-end">
-      {{-- Hidden sort parameters so filters maintain current sorting --}}
-      @if(request('sort'))
-        <input type="hidden" name="sort" value="{{ request('sort') }}">
-      @endif
-      @if(request('direction'))
-        <input type="hidden" name="direction" value="{{ request('direction') }}">
-      @endif
-
-      <div class="col-md-3">
-        <label class="form-label small fw-bold">Cari Unit / Template</label>
-        <input type="text" class="form-control form-control-sm" name="search" value="{{ request('search') }}" placeholder="Nomor unit / template...">
-      </div>
-
-      <div class="col-md-3">
-        <label class="form-label small fw-bold">Site</label>
-        <select class="form-select form-select-sm" name="site_id">
-          <option value="">Semua Site</option>
-          @foreach($sites as $site)
-            <option value="{{ $site->id }}" {{ request('site_id') == $site->id ? 'selected' : '' }}>{{ $site->name }}</option>
-          @endforeach
-        </select>
-      </div>
-
-      <div class="col-md-2">
-        <label class="form-label small fw-bold">Status Schedule</label>
-        <select class="form-select form-select-sm" name="status">
-          <option value="">Semua Status</option>
-          <option value="Upcoming" {{ request('status') == 'Upcoming' ? 'selected' : '' }}>Upcoming</option>
-          <option value="Due" {{ request('status') == 'Due' ? 'selected' : '' }}>Due</option>
-          <option value="Overdue" {{ request('status') == 'Overdue' ? 'selected' : '' }}>Overdue</option>
-        </select>
-      </div>
-
-      <div class="col-md-4">
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-primary btn-sm flex-fill">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
-            Filter
-          </button>
-          @if(request()->hasAny(['search', 'site_id', 'status', 'sort', 'direction']))
-            <a href="{{ route('pm-schedules.index') }}" class="btn btn-outline-secondary btn-sm">
-              Reset
-            </a>
-          @endif
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
 
 @php
   $currentSort = request('sort', 'next_due_hm');
@@ -79,123 +27,200 @@
 @endphp
 
 <div class="card mt-2">
+  <form method="GET" action="{{ route('pm-schedules.index') }}" id="filter-form">
+  @if(request('sort'))
+    <input type="hidden" name="sort" value="{{ request('sort') }}">
+  @endif
+  @if(request('direction'))
+    <input type="hidden" name="direction" value="{{ request('direction') }}">
+  @endif
   <div class="table-responsive">
     <table class="table card-table table-vcenter table-hover text-nowrap">
       <thead class="table-light">
         <tr>
           {{-- Nomor Unit --}}
           <th title="Unit / Nomor Unit">
-            <a href="{{ request()->fullUrlWithQuery(['sort' => 'unit', 'direction' => $currentSort === 'unit' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none d-flex align-items-center justify-content-between">
-              <span>Nomor Unit</span>
-              <span class="ms-1">
+            <div class="d-flex align-items-center justify-content-between">
+              <a href="{{ request()->fullUrlWithQuery(['sort' => 'unit', 'direction' => $currentSort === 'unit' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none flex-grow-1">
+                <span>Nomor Unit</span>
                 @if($currentSort === 'unit')
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-primary" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>{!! $currentDir === 'asc' ? '<path d="M6 15l6 -6l6 6" />' : '<path d="M6 9l6 6l6 -6" />' !!}</svg>
-                @else
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-muted opacity-50" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 9l4 -4l4 4m-4 -4v14" /><path d="M21 15l-4 4l-4 -4m4 4v-14" /></svg>
+                  <span class="ms-1"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-primary" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>{!! $currentDir === 'asc' ? '<path d="M6 15l6 -6l6 6" />' : '<path d="M6 9l6 6l6 -6" />' !!}</svg></span>
                 @endif
-              </span>
-            </a>
+              </a>
+              <div class="dropdown ms-2">
+                <a href="#" class="text-reset text-decoration-none" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm {{ request('unit') ? 'text-primary' : 'text-muted opacity-50' }}" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 6l16 0" /><path d="M7 12l10 0" /><path d="M10 18l4 0" /></svg>
+                </a>
+                <div class="dropdown-menu p-2" style="min-width: 250px;">
+                  <div class="mb-2 small fw-bold text-muted">Filter Unit</div>
+                  <select name="unit" class="form-select form-select-sm" onchange="document.getElementById('filter-form').submit();">
+                    <option value="">Semua Unit</option>
+                    @foreach($filterUnits as $u)
+                      <option value="{{ $u->nomor_unit }}" {{ request('unit') == $u->nomor_unit ? 'selected' : '' }}>{{ $u->nomor_unit }}</option>
+                    @endforeach
+                  </select>
+                </div>
+              </div>
+            </div>
           </th>
 
           {{-- Current HM Unit --}}
           <th title="Current Hour Meter Unit">
-            <a href="{{ request()->fullUrlWithQuery(['sort' => 'current_hm', 'direction' => $currentSort === 'current_hm' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none d-flex align-items-center justify-content-between">
-              <span>Current HM Unit</span>
-              <span class="ms-1">
+            <div class="d-flex align-items-center justify-content-between">
+              <a href="{{ request()->fullUrlWithQuery(['sort' => 'current_hm', 'direction' => $currentSort === 'current_hm' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none flex-grow-1">
+                <span>Current HM Unit</span>
                 @if($currentSort === 'current_hm')
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-primary" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>{!! $currentDir === 'asc' ? '<path d="M6 15l6 -6l6 6" />' : '<path d="M6 9l6 6l6 -6" />' !!}</svg>
-                @else
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-muted opacity-50" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 9l4 -4l4 4m-4 -4v14" /><path d="M21 15l-4 4l-4 -4m4 4v-14" /></svg>
+                  <span class="ms-1"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-primary" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>{!! $currentDir === 'asc' ? '<path d="M6 15l6 -6l6 6" />' : '<path d="M6 9l6 6l6 -6" />' !!}</svg></span>
                 @endif
-              </span>
-            </a>
+              </a>
+            </div>
           </th>
 
           {{-- Template Service Terakhir --}}
           <th title="PM Template / Nama Service">
-            <a href="{{ request()->fullUrlWithQuery(['sort' => 'template', 'direction' => $currentSort === 'template' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none d-flex align-items-center justify-content-between">
-              <span>Template Service</span>
-              <span class="ms-1">
+            <div class="d-flex align-items-center justify-content-between">
+              <a href="{{ request()->fullUrlWithQuery(['sort' => 'template', 'direction' => $currentSort === 'template' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none flex-grow-1">
+                <span>Template Service</span>
                 @if($currentSort === 'template')
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-primary" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>{!! $currentDir === 'asc' ? '<path d="M6 15l6 -6l6 6" />' : '<path d="M6 9l6 6l6 -6" />' !!}</svg>
-                @else
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-muted opacity-50" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 9l4 -4l4 4m-4 -4v14" /><path d="M21 15l-4 4l-4 -4m4 4v-14" /></svg>
+                  <span class="ms-1"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-primary" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>{!! $currentDir === 'asc' ? '<path d="M6 15l6 -6l6 6" />' : '<path d="M6 9l6 6l6 -6" />' !!}</svg></span>
                 @endif
-              </span>
-            </a>
+              </a>
+              <div class="dropdown ms-2">
+                <a href="#" class="text-reset text-decoration-none" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm {{ request('template') ? 'text-primary' : 'text-muted opacity-50' }}" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 6l16 0" /><path d="M7 12l10 0" /><path d="M10 18l4 0" /></svg>
+                </a>
+                <div class="dropdown-menu p-2" style="min-width: 250px;">
+                  <div class="mb-2 small fw-bold text-muted">Filter Template</div>
+                  <select name="template" class="form-select form-select-sm" onchange="document.getElementById('filter-form').submit();">
+                    <option value="">Semua Template</option>
+                    @foreach($filterTemplates as $t)
+                      <option value="{{ $t->name }}" {{ request('template') == $t->name ? 'selected' : '' }}>{{ $t->name }}</option>
+                    @endforeach
+                  </select>
+                </div>
+              </div>
+            </div>
           </th>
 
           {{-- HM Service Terakhir --}}
           <th title="Hour Meter Service Terakhir">
-            <a href="{{ request()->fullUrlWithQuery(['sort' => 'last_hm', 'direction' => $currentSort === 'last_hm' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none d-flex align-items-center justify-content-between">
-              <span>HM Terakhir</span>
-              <span class="ms-1">
+            <div class="d-flex align-items-center justify-content-between">
+              <a href="{{ request()->fullUrlWithQuery(['sort' => 'last_hm', 'direction' => $currentSort === 'last_hm' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none flex-grow-1">
+                <span>HM Terakhir</span>
                 @if($currentSort === 'last_hm')
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-primary" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>{!! $currentDir === 'asc' ? '<path d="M6 15l6 -6l6 6" />' : '<path d="M6 9l6 6l6 -6" />' !!}</svg>
-                @else
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-muted opacity-50" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 9l4 -4l4 4m-4 -4v14" /><path d="M21 15l-4 4l-4 -4m4 4v-14" /></svg>
+                  <span class="ms-1"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-primary" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>{!! $currentDir === 'asc' ? '<path d="M6 15l6 -6l6 6" />' : '<path d="M6 9l6 6l6 -6" />' !!}</svg></span>
                 @endif
-              </span>
-            </a>
+              </a>
+              <div class="dropdown ms-2">
+                <a href="#" class="text-reset text-decoration-none" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm {{ request('last_hm') ? 'text-primary' : 'text-muted opacity-50' }}" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 6l16 0" /><path d="M7 12l10 0" /><path d="M10 18l4 0" /></svg>
+                </a>
+                <div class="dropdown-menu p-2" style="min-width: 200px;">
+                  <div class="mb-2 small fw-bold text-muted">Cari HM Terakhir</div>
+                  <input type="text" class="form-control form-control-sm" name="last_hm" value="{{ request('last_hm') }}" placeholder="Contoh: 10250..." onchange="document.getElementById('filter-form').submit();">
+                </div>
+              </div>
+            </div>
           </th>
 
           {{-- Date Service Terakhir --}}
           <th title="Tanggal Service Terakhir">
-            <a href="{{ request()->fullUrlWithQuery(['sort' => 'last_date', 'direction' => $currentSort === 'last_date' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none d-flex align-items-center justify-content-between">
-              <span>Date Terakhir</span>
-              <span class="ms-1">
+            <div class="d-flex align-items-center justify-content-between">
+              <a href="{{ request()->fullUrlWithQuery(['sort' => 'last_date', 'direction' => $currentSort === 'last_date' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none flex-grow-1">
+                <span>Date Terakhir</span>
                 @if($currentSort === 'last_date')
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-primary" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>{!! $currentDir === 'asc' ? '<path d="M6 15l6 -6l6 6" />' : '<path d="M6 9l6 6l6 -6" />' !!}</svg>
-                @else
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-muted opacity-50" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 9l4 -4l4 4m-4 -4v14" /><path d="M21 15l-4 4l-4 -4m4 4v-14" /></svg>
+                  <span class="ms-1"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-primary" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>{!! $currentDir === 'asc' ? '<path d="M6 15l6 -6l6 6" />' : '<path d="M6 9l6 6l6 -6" />' !!}</svg></span>
                 @endif
-              </span>
-            </a>
+              </a>
+              <div class="dropdown ms-2">
+                <a href="#" class="text-reset text-decoration-none" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm {{ request('last_date') ? 'text-primary' : 'text-muted opacity-50' }}" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 6l16 0" /><path d="M7 12l10 0" /><path d="M10 18l4 0" /></svg>
+                </a>
+                <div class="dropdown-menu p-2" style="min-width: 200px;">
+                  <div class="mb-2 small fw-bold text-muted">Cari Date Terakhir</div>
+                  <input type="date" class="form-control form-control-sm" name="last_date" value="{{ request('last_date') }}" onchange="document.getElementById('filter-form').submit();">
+                </div>
+              </div>
+            </div>
           </th>
 
           {{-- Next Due HM --}}
           <th title="Next Due Hour Meter">
-            <a href="{{ request()->fullUrlWithQuery(['sort' => 'next_due_hm', 'direction' => $currentSort === 'next_due_hm' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none d-flex align-items-center justify-content-between">
-              <span>Next Due HM</span>
-              <span class="ms-1">
+            <div class="d-flex align-items-center justify-content-between">
+              <a href="{{ request()->fullUrlWithQuery(['sort' => 'next_due_hm', 'direction' => $currentSort === 'next_due_hm' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none flex-grow-1">
+                <span>Next Due HM</span>
                 @if($currentSort === 'next_due_hm')
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-primary" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>{!! $currentDir === 'asc' ? '<path d="M6 15l6 -6l6 6" />' : '<path d="M6 9l6 6l6 -6" />' !!}</svg>
-                @else
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-muted opacity-50" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 9l4 -4l4 4m-4 -4v14" /><path d="M21 15l-4 4l-4 -4m4 4v-14" /></svg>
+                  <span class="ms-1"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-primary" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>{!! $currentDir === 'asc' ? '<path d="M6 15l6 -6l6 6" />' : '<path d="M6 9l6 6l6 -6" />' !!}</svg></span>
                 @endif
-              </span>
-            </a>
+              </a>
+              <div class="dropdown ms-2">
+                <a href="#" class="text-reset text-decoration-none" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm {{ request('next_due_hm') ? 'text-primary' : 'text-muted opacity-50' }}" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 6l16 0" /><path d="M7 12l10 0" /><path d="M10 18l4 0" /></svg>
+                </a>
+                <div class="dropdown-menu p-2" style="min-width: 200px;">
+                  <div class="mb-2 small fw-bold text-muted">Cari Next Due HM</div>
+                  <input type="text" class="form-control form-control-sm" name="next_due_hm" value="{{ request('next_due_hm') }}" placeholder="Contoh: 10500..." onchange="document.getElementById('filter-form').submit();">
+                </div>
+              </div>
+            </div>
           </th>
 
           {{-- Next Due Date --}}
           <th title="Next Due Date / Tanggal Service Berikutnya">
-            <a href="{{ request()->fullUrlWithQuery(['sort' => 'next_due_date', 'direction' => $currentSort === 'next_due_date' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none d-flex align-items-center justify-content-between">
-              <span>Next Due Date</span>
-              <span class="ms-1">
+            <div class="d-flex align-items-center justify-content-between">
+              <a href="{{ request()->fullUrlWithQuery(['sort' => 'next_due_date', 'direction' => $currentSort === 'next_due_date' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none flex-grow-1">
+                <span>Next Due Date</span>
                 @if($currentSort === 'next_due_date')
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-primary" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>{!! $currentDir === 'asc' ? '<path d="M6 15l6 -6l6 6" />' : '<path d="M6 9l6 6l6 -6" />' !!}</svg>
-                @else
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-muted opacity-50" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 9l4 -4l4 4m-4 -4v14" /><path d="M21 15l-4 4l-4 -4m4 4v-14" /></svg>
+                  <span class="ms-1"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-primary" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>{!! $currentDir === 'asc' ? '<path d="M6 15l6 -6l6 6" />' : '<path d="M6 9l6 6l6 -6" />' !!}</svg></span>
                 @endif
-              </span>
-            </a>
+              </a>
+              <div class="dropdown ms-2">
+                <a href="#" class="text-reset text-decoration-none" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm {{ request('next_due_date') ? 'text-primary' : 'text-muted opacity-50' }}" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 6l16 0" /><path d="M7 12l10 0" /><path d="M10 18l4 0" /></svg>
+                </a>
+                <div class="dropdown-menu p-2" style="min-width: 200px;">
+                  <div class="mb-2 small fw-bold text-muted">Cari Next Due Date</div>
+                  <input type="date" class="form-control form-control-sm" name="next_due_date" value="{{ request('next_due_date') }}" onchange="document.getElementById('filter-form').submit();">
+                </div>
+              </div>
+            </div>
           </th>
 
           {{-- Status --}}
           <th title="Status Jadwal PM">
-            <a href="{{ request()->fullUrlWithQuery(['sort' => 'status', 'direction' => $currentSort === 'status' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none d-flex align-items-center justify-content-between">
-              <span>Status</span>
-              <span class="ms-1">
+            <div class="d-flex align-items-center justify-content-between">
+              <a href="{{ request()->fullUrlWithQuery(['sort' => 'status', 'direction' => $currentSort === 'status' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none flex-grow-1">
+                <span>Status</span>
                 @if($currentSort === 'status')
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-primary" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>{!! $currentDir === 'asc' ? '<path d="M6 15l6 -6l6 6" />' : '<path d="M6 9l6 6l6 -6" />' !!}</svg>
-                @else
-                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-muted opacity-50" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 9l4 -4l4 4m-4 -4v14" /><path d="M21 15l-4 4l-4 -4m4 4v-14" /></svg>
+                  <span class="ms-1"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm text-primary" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/>{!! $currentDir === 'asc' ? '<path d="M6 15l6 -6l6 6" />' : '<path d="M6 9l6 6l6 -6" />' !!}</svg></span>
                 @endif
-              </span>
-            </a>
+              </a>
+              <div class="dropdown ms-2">
+                <a href="#" class="text-reset text-decoration-none" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm {{ request('status') ? 'text-primary' : 'text-muted opacity-50' }}" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 6l16 0" /><path d="M7 12l10 0" /><path d="M10 18l4 0" /></svg>
+                </a>
+                <div class="dropdown-menu p-2" style="min-width: 200px;">
+                  <div class="mb-2 small fw-bold text-muted">Filter Status</div>
+                  <select class="form-select form-select-sm" name="status" onchange="document.getElementById('filter-form').submit();">
+                    <option value="">Semua Status</option>
+                    <option value="Upcoming" {{ request('status') == 'Upcoming' ? 'selected' : '' }}>Upcoming</option>
+                    <option value="Due" {{ request('status') == 'Due' ? 'selected' : '' }}>Due</option>
+                    <option value="Overdue" {{ request('status') == 'Overdue' ? 'selected' : '' }}>Overdue</option>
+                  </select>
+                </div>
+              </div>
+            </div>
           </th>
 
-          <th class="text-end">Aksi</th>
+          <th class="text-end align-bottom">
+            @if(request()->hasAny(['unit', 'template', 'status', 'sort', 'direction']))
+              <a href="{{ route('pm-schedules.index') }}" class="btn btn-outline-secondary btn-sm mb-1" title="Reset Filters">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon m-0" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>
+              </a>
+            @else
+              Aksi
+            @endif
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -274,6 +299,7 @@
       </tbody>
     </table>
   </div>
+  </form>
   @if($schedules->hasPages())
   <div class="card-footer d-flex align-items-center justify-content-between">
     <div class="text-muted small">

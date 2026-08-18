@@ -52,7 +52,14 @@ class PmScheduleHistoryImport implements ToCollection, WithHeadingRow
                 if (is_numeric($dateRaw)) {
                     $executedAt = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($dateRaw)->format('Y-m-d');
                 } elseif ($dateRaw) {
-                    $executedAt = Carbon::parse($dateRaw)->format('Y-m-d');
+                    $rawDate = trim($dateRaw);
+                    if (preg_match('/^\d{2}[-\/]\d{2}[-\/]\d{2}$/', $rawDate)) {
+                        $executedAt = Carbon::createFromFormat('d-m-y', str_replace('/', '-', $rawDate))->format('Y-m-d');
+                    } elseif (preg_match('/^\d{2}[-\/]\d{2}[-\/]\d{4}$/', $rawDate)) {
+                        $executedAt = Carbon::createFromFormat('d-m-Y', str_replace('/', '-', $rawDate))->format('Y-m-d');
+                    } else {
+                        $executedAt = Carbon::parse($rawDate)->format('Y-m-d');
+                    }
                 } else {
                     $executedAt = Carbon::now()->format('Y-m-d');
                 }

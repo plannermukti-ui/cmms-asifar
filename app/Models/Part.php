@@ -22,6 +22,7 @@ class Part extends Model {
     protected $fillable = [
         'site_id',
         'part_number', 'part_description', 'satuan', 'cost', 'expenditure_type',
+        'target',
         'kategori_1_id', 'kategori_2_id', 'kategori_3_id', 'kategori_4_id',
     ];
 
@@ -43,6 +44,11 @@ class Part extends Model {
     public function kategori4()
     {
         return $this->belongsTo(PartCategory::class, 'kategori_4_id');
+    }
+
+    public function unitModels()
+    {
+        return $this->belongsToMany(UnitModel::class, 'part_unit_models', 'part_id', 'unit_model_id');
     }
 
     protected $casts = ['cost' => 'decimal:2'];

@@ -71,6 +71,7 @@ class PermissionSeeder extends Seeder
             'fars' => 'Form Analisa Rusak (FAR)',
             'wo_comments' => 'Diskusi Work Order',
             'swap_components' => 'Swap Component Report',
+            'pcr' => 'Plan Component Replacement (PCR)',
         ];
 
         // Aksi standar (CRUD)

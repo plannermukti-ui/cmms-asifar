@@ -17,10 +17,11 @@ class PartController extends Controller
 
     public function index()
     {
-        $parts = Part::orderBy('part_number')->paginate(15);
+        $parts = Part::with(['unitModels', 'kategori1', 'kategori2', 'kategori3', 'kategori4', 'site'])->orderBy('part_number')->paginate(15);
         $sites = \App\Models\Site::orderBy('name')->get();
         $categories = \App\Models\PartCategory::all()->groupBy('type');
-        return view('parts.index', compact('parts', 'sites', 'categories'));
+        $unitModels = \App\Models\UnitModel::orderBy('name')->get();
+        return view('parts.index', compact('parts', 'sites', 'categories', 'unitModels'));
     }
 
     public function store(Request $request)
@@ -32,13 +33,19 @@ class PartController extends Controller
             'satuan' => 'nullable|string|max:50',
             'cost' => 'nullable|numeric|min:0',
             'expenditure_type' => 'nullable|string|in:Capex,Opex',
+            'target' => 'nullable|numeric|min:0',
             'kategori_1_id' => 'nullable|exists:part_categories,id',
             'kategori_2_id' => 'nullable|exists:part_categories,id',
             'kategori_3_id' => 'nullable|exists:part_categories,id',
             'kategori_4_id' => 'nullable|exists:part_categories,id',
         ]);
 
-        Part::create($request->all());
+        $part = Part::create($request->all());
+
+        if ($request->has('unit_models')) {
+            $part->unitModels()->sync($request->unit_models);
+        }
+
         return redirect()->route('parts.index')->with('success', 'Part berhasil ditambahkan.');
     }
 
@@ -46,7 +53,8 @@ class PartController extends Controller
     {
         $sites = \App\Models\Site::orderBy('name')->get();
         $categories = \App\Models\PartCategory::all()->groupBy('type');
-        return view('parts.edit', compact('part', 'sites', 'categories'));
+        $unitModels = \App\Models\UnitModel::orderBy('name')->get();
+        return view('parts.edit', compact('part', 'sites', 'categories', 'unitModels'));
     }
 
     public function update(Request $request, Part $part)
@@ -58,6 +66,7 @@ class PartController extends Controller
             'satuan' => 'nullable|string|max:50',
             'cost' => 'nullable|numeric|min:0',
             'expenditure_type' => 'nullable|string|in:Capex,Opex',
+            'target' => 'nullable|numeric|min:0',
             'kategori_1_id' => 'nullable|exists:part_categories,id',
             'kategori_2_id' => 'nullable|exists:part_categories,id',
             'kategori_3_id' => 'nullable|exists:part_categories,id',
@@ -65,6 +74,13 @@ class PartController extends Controller
         ]);
 
         $part->update($request->all());
+
+        if ($request->has('unit_models')) {
+            $part->unitModels()->sync($request->unit_models);
+        } else {
+            $part->unitModels()->detach();
+        }
+
         return redirect()->route('parts.index')->with('success', 'Part berhasil diperbarui.');
     }
 

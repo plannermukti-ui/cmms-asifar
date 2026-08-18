@@ -18,7 +18,33 @@ class MechanicController extends Controller
 
     public function index()
     {
-        $mechanics = Mechanic::with('jabatan')->orderBy('nama_lengkap', 'asc')->paginate(10);
+        $mechanics = Mechanic::with(['jabatan', 'site'])->orderBy('nama_lengkap', 'asc')->paginate(10);
+        $mechIds = $mechanics->pluck('id');
+
+        // Batch load tool stocks for current page mechanics
+        $allToolsAllocated = \App\Models\ToolStock::with('tool.category')
+            ->where('location_type', 'Mechanic')
+            ->whereIn('mechanic_id', $mechIds)
+            ->get()
+            ->groupBy('mechanic_id');
+
+        // Batch load WO counts and duration
+        $allWoCounts = \App\Models\WoSubtaskManpower::whereIn('mechanic_id', $mechIds)
+            ->join('wo_subtasks', 'wo_subtask_manpower.wo_subtask_id', '=', 'wo_subtasks.id')
+            ->join('wo_tasks', 'wo_subtasks.wo_task_id', '=', 'wo_tasks.id')
+            ->selectRaw('mechanic_id, count(distinct wo_tasks.work_order_id) as total_wo, sum(wo_subtasks.duration_hours) as total_duration')
+            ->groupBy('mechanic_id')
+            ->get()
+            ->keyBy('mechanic_id');
+
+        foreach ($mechanics as $mech) {
+            $woData = $allWoCounts->get($mech->id);
+            $mech->total_wo = $woData ? $woData->total_wo : 0;
+            $mech->total_duration = $woData ? ($woData->total_duration ?? 0) : 0;
+            $mech->tools_allocated = $allToolsAllocated->get($mech->id, collect());
+            $mech->total_tools = $mech->tools_allocated->sum('quantity');
+        }
+
         $jabatans = Jabatan::all();
         $sites = \App\Models\Site::orderBy('name')->get();
         return view('mechanics.index', compact('mechanics', 'jabatans', 'sites'));

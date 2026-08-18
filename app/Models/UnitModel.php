@@ -25,4 +25,14 @@ class UnitModel extends Model
     {
         return $this->belongsTo(UnitType::class, 'unit_type_id');
     }
+
+    public function masterUnits()
+    {
+        return $this->hasMany(MasterUnit::class, 'unit_model_id');
+    }
+
+    public function parts()
+    {
+        return $this->belongsToMany(Part::class, 'part_unit_models');
+    }
 }

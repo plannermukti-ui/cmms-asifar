@@ -301,4 +301,95 @@ class PmTemplateController extends Controller
             return back()->with('error', 'Terjadi kesalahan saat menyalin template: ' . $e->getMessage());
         }
     }
+
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:pm_templates,id',
+        ]);
+
+        try {
+            PmTemplate::whereIn('id', $request->ids)->delete();
+            return redirect()->route('pm-templates.index')->with('success', count($request->ids) . ' PM Template berhasil dihapus.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menghapus template: ' . $e->getMessage());
+        }
+    }
+
+    public function bulkCopy(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:pm_templates,id',
+            'site_id' => 'nullable|exists:sites,id',
+            'unit_model_id' => 'required|exists:unit_models,id',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $templates = PmTemplate::with('tasks.subtasks.parts')->whereIn('id', $request->ids)->get();
+            $copiedCount = 0;
+
+            foreach ($templates as $pmTemplate) {
+                // Determine new name
+                $baseName = preg_replace('/ \(Copy(\s\d+)?\)$/', '', $pmTemplate->name);
+                $newName = $baseName . ' (Copy)';
+                $counter = 1;
+                while (PmTemplate::where('name', $newName)->where('site_id', $request->site_id ?? Auth::user()->site_id)->where('unit_model_id', $request->unit_model_id)->exists()) {
+                    $counter++;
+                    $newName = $baseName . " (Copy $counter)";
+                }
+
+                $newTemplate = $pmTemplate->replicate();
+                $newTemplate->site_id = $request->site_id ?? Auth::user()->site_id;
+                $newTemplate->unit_model_id = $request->unit_model_id;
+                $newTemplate->name = $newName;
+                $newTemplate->save();
+
+                // Replicate tasks, subtasks, and parts
+                foreach ($pmTemplate->tasks as $task) {
+                    $newTask = $task->replicate();
+                    $newTask->pm_template_id = $newTemplate->id;
+                    $newTask->save();
+
+                    foreach ($task->subtasks as $subtask) {
+                        $newSubtask = $subtask->replicate();
+                        $newSubtask->pm_template_task_id = $newTask->id;
+                        $newSubtask->save();
+
+                        // Replicate parts attachment
+                        foreach ($subtask->parts as $part) {
+                            $newSubtask->parts()->attach($part->id, ['quantity' => $part->pivot->quantity ?? 1]);
+                        }
+                    }
+                }
+
+                // Auto-generate schedules for existing units of this model
+                $unitsQuery = MasterUnit::where('unit_model_id', $newTemplate->unit_model_id);
+                if ($newTemplate->site_id) {
+                    $unitsQuery->where('site_id', $newTemplate->site_id);
+                }
+                $units = $unitsQuery->get();
+
+                foreach ($units as $unit) {
+                    PmSchedule::firstOrCreate([
+                        'master_unit_id' => $unit->id,
+                        'pm_template_id' => $newTemplate->id,
+                    ], [
+                        'site_id' => $unit->site_id,
+                        'next_due_value' => $newTemplate->interval_value,
+                        'status_jadwal' => 'Upcoming',
+                    ]);
+                }
+                $copiedCount++;
+            }
+
+            DB::commit();
+            return redirect()->route('pm-templates.index')->with('success', $copiedCount . ' PM Template berhasil disalin.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan saat menyalin template: ' . $e->getMessage());
+        }
+    }
 }

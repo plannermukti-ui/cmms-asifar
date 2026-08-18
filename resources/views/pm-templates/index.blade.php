@@ -46,10 +46,22 @@
 </div>
 
 <div class="card mt-2">
+  <div class="card-header d-flex justify-content-between align-items-center" id="bulk-actions-container" style="display: none !important;">
+    <span class="text-muted" id="selected-count">0 terpilih</span>
+    <div>
+      <button type="button" class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#bulkCopyModal">Copy Terpilih</button>
+      <form id="bulkDeleteForm" action="{{ route('pm-templates.bulk-destroy') }}" method="POST" class="d-inline-block" onsubmit="return confirm('Yakin ingin menghapus template yang terpilih?');">
+          @csrf
+          <div id="bulkDeleteInputs"></div>
+          <button type="submit" class="btn btn-sm btn-danger">Hapus Terpilih</button>
+      </form>
+    </div>
+  </div>
   <div class="table-responsive">
     <table class="table card-table table-vcenter text-nowrap">
       <thead class="table-light">
         <tr>
+          <th class="w-1"><input type="checkbox" class="form-check-input" id="selectAll"></th>
           <th>Site</th>
           <th>Model Unit</th>
           <th>Nama Template</th>
@@ -62,6 +74,7 @@
       <tbody>
         @forelse ($templates as $template)
         <tr>
+          <td><input type="checkbox" class="form-check-input select-row" value="{{ $template->id }}"></td>
           <td>
             @if($template->site)
                 <span class="badge bg-purple-lt">{{ $template->site->name }}</span>
@@ -94,7 +107,7 @@
         </tr>
         @empty
         <tr>
-          <td colspan="5" class="text-center text-muted py-4">Belum ada data PM Template.</td>
+          <td colspan="8" class="text-center text-muted py-4">Belum ada data PM Template.</td>
         </tr>
         @endforelse
       </tbody>
@@ -148,6 +161,45 @@
     </form>
   </div>
 </div>
+
+<div class="modal modal-blur fade" id="bulkCopyModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <form id="bulkCopyForm" action="{{ route('pm-templates.bulk-copy') }}" method="POST" class="modal-content">
+      @csrf
+      <div id="bulkCopyInputs"></div>
+      <div class="modal-header">
+        <h5 class="modal-title">Copy PM Template Terpilih</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        @if(!auth()->user()->site_id)
+        <div class="mb-3">
+          <label class="form-label required">Site (Lokasi)</label>
+          <select name="site_id" id="bulk_copy_site_id" class="form-select select2-bulk-copy" required>
+              <option value="">-- Pilih Site --</option>
+              @foreach($sites as $site)
+                  <option value="{{ $site->id }}">{{ $site->name }} ({{ $site->code }})</option>
+              @endforeach
+          </select>
+        </div>
+        @endif
+        <div class="mb-3">
+          <label class="form-label required">Model Unit</label>
+          <select name="unit_model_id" id="bulk_copy_unit_model_id" class="form-select select2-bulk-copy" required>
+              <option value="">-- Pilih Model Unit --</option>
+              @foreach($unitModels as $model)
+                  <option value="{{ $model->id }}">{{ $model->name }} ({{ $model->type->name ?? '' }})</option>
+              @endforeach
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn me-auto" data-bs-dismiss="modal">Batal</button>
+        <button type="submit" class="btn btn-primary">Copy Template</button>
+      </div>
+    </form>
+  </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -186,6 +238,64 @@
                     }
                     document.getElementById('copy_unit_model_id').value = model;
                 }
+            });
+        }
+
+        // Bulk Actions Logic
+        const selectAll = document.getElementById('selectAll');
+        const selectRows = document.querySelectorAll('.select-row');
+        const bulkContainer = document.getElementById('bulk-actions-container');
+        const selectedCountText = document.getElementById('selected-count');
+        
+        function updateBulkActions() {
+            const selected = document.querySelectorAll('.select-row:checked');
+            if (selected.length > 0) {
+                bulkContainer.style.setProperty('display', 'flex', 'important');
+                selectedCountText.textContent = selected.length + ' terpilih';
+            } else {
+                bulkContainer.style.setProperty('display', 'none', 'important');
+            }
+        }
+
+        if (selectAll) {
+            selectAll.addEventListener('change', function() {
+                selectRows.forEach(row => {
+                    row.checked = this.checked;
+                });
+                updateBulkActions();
+            });
+        }
+
+        selectRows.forEach(row => {
+            row.addEventListener('change', function() {
+                const allChecked = document.querySelectorAll('.select-row:checked').length === selectRows.length;
+                if (selectAll) selectAll.checked = allChecked;
+                updateBulkActions();
+            });
+        });
+
+        // Setup hidden inputs before submit
+        document.getElementById('bulkDeleteForm').addEventListener('submit', function() {
+            const inputs = document.getElementById('bulkDeleteInputs');
+            inputs.innerHTML = '';
+            document.querySelectorAll('.select-row:checked').forEach(row => {
+                inputs.innerHTML += `<input type="hidden" name="ids[]" value="${row.value}">`;
+            });
+        });
+
+        document.getElementById('bulkCopyForm').addEventListener('submit', function() {
+            const inputs = document.getElementById('bulkCopyInputs');
+            inputs.innerHTML = '';
+            document.querySelectorAll('.select-row:checked').forEach(row => {
+                inputs.innerHTML += `<input type="hidden" name="ids[]" value="${row.value}">`;
+            });
+        });
+
+        if (typeof $ !== 'undefined' && $.fn.select2) {
+            $('.select2-bulk-copy').select2({
+                dropdownParent: $('#bulkCopyModal'),
+                theme: 'bootstrap-5',
+                width: '100%'
             });
         }
     });

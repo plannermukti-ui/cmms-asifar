@@ -36,57 +36,12 @@
         </div>
       </div>
 
+      <div class="mt-3">
+        @include('partials.permissions-matrix', ['selectedPermissions' => old('permissions', $rolePermissions)])
+      </div>
+      
       <div class="card mt-3">
-        <div class="card-header">
-          <h3 class="card-title">Matriks Hak Akses (Permissions)</h3>
-        </div>
-        <div class="table-responsive">
-          <table class="table table-vcenter card-table table-striped">
-            <thead>
-              <tr>
-                <th>Modul Aplikasi</th>
-                @foreach($actions as $action)
-                  <th class="text-center">{{ ucfirst($action) }}</th>
-                @endforeach
-              </tr>
-            </thead>
-            <tbody>
-              @foreach($modules as $moduleKey => $moduleName)
-                <tr>
-                  <td class="fw-bold">{{ $moduleName }}</td>
-                  @foreach($actions as $action)
-                    @php $permissionName = $action . '_' . $moduleKey; @endphp
-                    <td class="text-center">
-                      <label class="form-check form-switch d-flex justify-content-center m-0">
-                        <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $permissionName }}"
-                          {{ in_array($permissionName, old('permissions', $rolePermissions)) ? 'checked' : '' }}>
-                      </label>
-                    </td>
-                  @endforeach
-                </tr>
-              @endforeach
-              <!-- Additional custom permissions -->
-              <tr>
-                <td class="fw-bold">Fitur Khusus</td>
-                <td colspan="4">
-                  <div class="d-flex gap-4">
-                    <label class="form-check form-switch m-0">
-                      <input class="form-check-input" type="checkbox" name="permissions[]" value="download_backup"
-                        {{ in_array('download_backup', old('permissions', $rolePermissions)) ? 'checked' : '' }}>
-                      <span class="form-check-label">Download Backup</span>
-                    </label>
-                    <label class="form-check form-switch m-0">
-                      <input class="form-check-input" type="checkbox" name="permissions[]" value="send_chat"
-                        {{ in_array('send_chat', old('permissions', $rolePermissions)) ? 'checked' : '' }}>
-                      <span class="form-check-label">Kirim Pesan Chat</span>
-                    </label>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="card-footer text-end">
+        <div class="card-body text-end">
           <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
         </div>
       </div>

@@ -56,7 +56,7 @@
                     <td><strong>{{ number_format(($stock->tool->price ?? 0) * $stock->quantity, 0, ',', '.') }}</strong></td>
                     <td>
                         @can('edit_tool_stocks')
-                        <a href="{{ route('tool-stocks.edit', $stock) }}" class="btn btn-sm btn-primary">Edit Qty</a>
+                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-edit-qty-{{ $stock->id }}">Edit Qty</button>
                         @endcan
                     </td>
                 </tr>
@@ -209,4 +209,45 @@
         rowIndex++;
     });
 </script>
+
+@foreach($stocks as $stock)
+<div class="modal modal-blur fade" id="modal-edit-qty-{{ $stock->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Kuantitas Stok Tool</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{{ route('tool-stocks.update', $stock) }}" method="post">
+        @csrf
+        @method('PUT')
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label text-muted">Nama Tool</label>
+            <div class="form-control-plaintext fw-bold">{{ $stock->tool->name ?? '-' }}</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-muted">Lokasi</label>
+            <div class="form-control-plaintext">
+              <span class="badge {{ $stock->location_type == 'ToolRoom' ? 'bg-primary' : 'bg-indigo' }} me-1">
+                {{ $stock->location_type }}
+              </span>
+              {{ $stock->location_type == 'Mechanic' ? '('.($stock->mechanic->nama_lengkap ?? '-').')' : '' }}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label required">Kuantitas Terkini</label>
+            <input type="number" class="form-control" name="quantity" min="0" required value="{{ $stock->quantity }}">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn me-auto" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary">Update Stok</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+@endforeach
+
 @endsection
