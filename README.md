@@ -11,57 +11,70 @@
 <br>
 
 ## 📖 Tentang Aplikasi
-**CMMS AISFAR** adalah Sistem Manajemen Pemeliharaan Aset dan Logistik Gudang komprehensif yang dirancang khusus untuk ekosistem industri pertambangan. Platform ini bertindak sebagai *Single Source of Truth* untuk mengelola siklus hidup alat berat (Excavator, Dozer, Hauler), dari penjadwalan *Preventive Maintenance*, manajemen Work Order, pelacakan suku cadang, hingga analitik KPI keandalan unit.
+**CMMS AISFAR** adalah Sistem Manajemen Pemeliharaan Aset dan Logistik Terpadu yang dirancang khusus untuk ekosistem industri pertambangan dan alat berat. Platform ini bertindak sebagai *Single Source of Truth* untuk mengelola seluruh siklus hidup armada tambang (Excavator, Dozer, Hauler, Grader, Support Unit) mulai dari pelaporan kerusakan (Pra-WO), eksekusi Work Order digital, manajemen perkakas (ToolRoom), perencanaan anggaran & penggantian komponen (PCR & PM), hingga analitik KPI keandalan unit.
 
-Aplikasi ini mendigitalisasi seluruh proses operasional workshop yang sebelumnya berbasis kertas menjadi **100% Paperless** melalui fitur *Digital Signature* dan *Real-time Collaboration*.
+Aplikasi ini mendigitalisasi operasional workshop menjadi **100% Paperless** didukung fitur *Digital Signature*, *Real-time Collaboration*, serta kontrol keamanan akses tingkat tinggi.
 
 ---
 
 ## ✨ Modul Utama (Ecosystem)
 
-1. **🛠️ Work Order Management**
-   - Pencatatan Breakdown, Backlog, dan Service unit. Terintegrasi dengan pemotongan stok Part, dokumen HSE, dan Approval Tanda Tangan Digital 3 Tingkat.
-2. **📦 ToolRoom & Stok Part Inventory**
-   - Manajemen sirkulasi Special Service Tools (SST), Sertifikasi Kalibrasi ISO/IEC 17025 (Auto-Lockout), Hierarki *Bin Location* Gudang, dan Tata Kelola Kanibalisasi (*Part Swapping*).
-3. **🚜 Asset Intelligence (360° Unit History)**
-   - Rekam jejak lengkap *Life Cycle Cost* setiap unit alat berat, riwayat perbaikan, konsumsi part, dan histori pergerakan komponen.
-4. **📊 Analytics KPI & ISO 8601**
-   - Perhitungan MTTR (Mean Time To Repair), MTBF (Mean Time Between Failures), dan *Physical Availability* (PA) menggunakan standar kalender minggu ISO 8601.
-5. **🛡️ Safety & HSE (K3)**
-   - Integrasi langsung 3 pilar K3 di dalam Work Order: JSA (*Job Safety Analysis*), PTW (*Permit to Work*), dan LOTO (*Lockout/Tagout*).
-6. **📉 Failure Analysis Report (FAR)**
-   - Investigasi *Root Cause Analysis* (RCA) 4 pilar untuk kerusakan komponen mayor (Major Component Failure).
-7. **⏱️ Preventive Maintenance (PM)**
-   - Templat jadwal servis berkala otomatis (PS1-PS4) berdasarkan Hour Meter (HM) unit dengan *Due Date Warning* dan *1-Click Auto-Generate WO*.
-8. **💬 Live Chat & Collaboration**
-   - Fitur *Floating Chat Widget* untuk komunikasi mekanik, planner, dan supervisor secara *real-time* menggunakan Laravel Echo & WebSockets.
-9. **📈 Laporan Produksi Harian**
-   - Pencatatan ritasi *Digger* dan *Hauler* per jam, lengkap dengan material tambang (Coal, OB, Top Soil) dan delay operasional.
-10. **💼 Budget & Vendor (JWO)**
-    - Kontrol anggaran (Plan vs Actual Cost) dan pengelolaan *Job Work Order* untuk perbaikan pihak ketiga (Vendor/Outsource).
+### 1. 🚜 Maintenance & Operasional (Lapangan)
+- **Laporan Kerusakan (Pra-WO):** Pintu masuk pelaporan kerusakan unit dari lapangan untuk di-generate langsung menjadi Work Order.
+- **Work Order Management:** Pencatatan breakdown, backlog, dan servis unit. Terintegrasi dengan pemotongan stok Part, dokumen HSE, timeline durasi mekanik, dan Approval Tanda Tangan Digital.
+- **Kanban Board:** Visualisasi alur status pengerjaan unit (*Open, In Progress, Waiting Part, Completed*).
+- **Hour Meter (HM):** Pencatatan dan import berkala jam kerja unit yang menjadi basis perhitungan otomatis jadwal PM dan estimasi PCR.
+- **Job Work Order (JWO):** Pengelolaan pekerjaan fabrikasi dan servis yang dikerjakan oleh pihak ketiga (Vendor/Outsource).
+- **Laporan Produksi Harian:** Pencatatan ritasi *Digger* dan *Hauler* per jam lengkap dengan jenis material tambang (Coal, OB, Top Soil) serta delay operasional.
+
+### 2. 🔄 Planning & Reliability (Keandalan & Perencanaan)
+- **Plan Component Replacement (PCR):** Modul estimasi dan jadwal penggantian komponen utama berdasarkan *Target Life (Hrs)*, *Current HM*, *Plan SMU*, dan *Daily Operating Hours*, lengkap dengan riwayat *Last Change Out* dan *Part Swapping*.
+- **Preventive Maintenance (PM):** Template checklist servis berkala (PS1-PS4) terintegrasi jadwal otomatis berbasis Hour Meter (HM) dengan notifikasi *Due Date* dan *1-Click Auto-Generate WO*.
+- **Plan Budget Bulanan (RAB):** Kontrol anggaran pemeliharaan (RAB vs Realisasi Biaya) per site dan per unit.
+- **Failure Analysis Report (FAR):** Investigasi investigatif 4 pilar *Root Cause Analysis* (RCA) untuk kegagalan komponen mayor.
+- **Swap Component Report:** Rekam jejak mutasi, kanibalisasi, dan perpindahan komponen antar-unit alat berat.
+
+### 3. 🧰 ToolRoom & Workshop
+- **Peminjaman Tool:** Sirkulasi check-in dan check-out perkakas kerja mekanik.
+- **Approval Stok Tool:** Alur pengajuan dan persetujuan penambahan stok perkakas.
+- **Berita Acara (B.A):** Laporan resmi kejadian kerusakan atau kehilangan alat kerja.
+- **Stock Opname:** Audit fisik periodik dan penyesuaian inventaris perkakas.
+
+### 4. 📈 KPI & Reporting
+- **Report Breakdown & Downtime:** Analitik downtime unit, frekuensi kerusakan, serta klasifikasi breakdown.
+- **KPI Master Data:** Kalkulasi metrik ketersediaan unit (*Physical Availability / PA*), MTTR (*Mean Time To Repair*), dan MTBF (*Mean Time Between Failures*) berstandar ISO 8601.
+
+### 5. ⚙️ Master Data Terpusat
+- **Master Unit (Asset):** Populasi alat berat, Model Unit, dan Tipe Unit.
+- **Master Part & Komponen:** Katalog suku cadang terintegrasi multi-model unit (TomSelect) dan target jam operasional.
+- **Master Vendor & Bengkel:** Database rekanan jasa servis dan fabrikasi luar.
+- **Master Mekanik:** Data kepegawaian mekanik dengan pop-up riwayat lengkap kinerja & inventaris tool.
+- **Master Tool & Kategori:** Database perkakas, spesifikasi, dan kuantitas stok.
+
+### 6. 🔐 Administrator, Keamanan & Hak Akses
+- **Manajemen User & Multi-Site:** Pengaturan pengguna berbasis lokasi tambang (Site).
+- **Matriks Hak Akses (Categorized Permissions):** Manajemen perizinan Role dan User yang dikelompokkan secara rapi per kategori modul dengan tombol *quick-toggle* instan.
+- **Approval Matrix & Digital Signatures:** Matriks persetujuan berjenjang untuk dokumen resmi.
+- **Log Aktivitas & Backup DB:** Audit trail komprehensif seluruh transaksi dan fitur pencadangan database.
+- **Pesan Instan (Live Chat):** Media koordinasi internal antar-pengguna secara *real-time*.
 
 ---
 
 ## 💻 Tech Stack & Arsitektur Enterprise
 
-Aplikasi dibangun dengan fondasi yang tangguh untuk menjamin keamanan dan performa kelas *Enterprise*:
-
 - **Backend:** Laravel 10 (PHP 8.1+)
-- **Frontend / UI:** Blade Templating, Vanilla CSS/JS, Tabler UI Framework
+- **Frontend / UI:** Blade Templating, Vanilla CSS/JS, Tabler UI Framework, TomSelect
 - **Database:** MySQL / PostgreSQL
-- **Security:**
-  - **Hashids (Anti-IDOR):** ID database dienkripsi di URL (contoh: ID `1` menjadi `jR3xY`) untuk mencegah *Insecure Direct Object Reference*.
-  - Perlindungan bawaan Laravel terhadap serangan XSS, CSRF, dan SQL Injection.
-- **Access Control:** Spatie RBAC (Role-Based Access Control) untuk pemisahan *Privileges* per user role.
-- **Audit Trail:** Spatie Activitylog untuk merekam seluruh riwayat aktivitas *Create/Update/Delete* data.
-- **PDF Generation:** DomPDF untuk *export* dokumen resmi ber-Kop Surat.
-- **Broadcasting:** Laravel Echo (Pusher / Soketi) untuk fitur Live Chat dan Notifikasi.
+- **Security & Authorization:**
+  - **Spatie Laravel-Permission:** Role-Based Access Control (RBAC) dengan granular permission per modul dan aksi.
+  - **Hashids (Anti-IDOR):** Enkripsi parameter ID pada URL sensitif untuk perlindungan keamanan data.
+  - **Spatie Activitylog:** Perekaman audit trail aktivitas pengguna secara otomatis.
+- **Document Engine:** DomPDF untuk *export* laporan A4 ber-Kop Surat resmi.
+- **Real-Time Engine:** Laravel WebSockets & Echo untuk fitur Live Chat dan Notifikasi.
 
 ---
 
 ## 🚀 Panduan Instalasi (Development)
-
-Ikuti langkah-langkah di bawah ini untuk menjalankan project secara lokal:
 
 ### Persyaratan Sistem
 - PHP >= 8.1
@@ -73,8 +86,8 @@ Ikuti langkah-langkah di bawah ini untuk menjalankan project secara lokal:
 
 1. **Clone Repository**
    ```bash
-   git clone https://github.com/username/cmms-aisfar.git
-   cd cmms-aisfar
+   git clone https://github.com/plannermukti-ui/cmms-asifar.git
+   cd cmms-asifar
    ```
 
 2. **Install Dependensi PHP & Node.js**
@@ -88,7 +101,7 @@ Ikuti langkah-langkah di bawah ini untuk menjalankan project secara lokal:
    ```bash
    cp .env.example .env
    ```
-   Buka file `.env` dan atur koneksi database Anda:
+   Atur konfigurasi database pada file `.env`:
    ```env
    DB_CONNECTION=mysql
    DB_HOST=127.0.0.1
@@ -99,14 +112,12 @@ Ikuti langkah-langkah di bawah ini untuk menjalankan project secara lokal:
    ```
 
 4. **Generate Application Key & Migration**
-   Generate *app key*, jalankan migrasi database, dan *seeding* data awal (Role, Admin, Data Master):
    ```bash
    php artisan key:generate
-   php artisan migrate:fresh --seed
+   php artisan migrate --seed
    ```
 
-5. **Build Asset & Jalankan Server Lokal**
-   Kompilasi asset frontend dan jalankan server *development* Laravel:
+5. **Jalankan Aplikasi**
    ```bash
    npm run dev
    # Buka terminal baru
@@ -116,60 +127,39 @@ Ikuti langkah-langkah di bawah ini untuk menjalankan project secara lokal:
 
 ---
 
-## 👥 Pengguna / Roles
+## 👥 Struktur Peran (User Roles)
 
-Sistem mendukung *Multi-Role* yang disesuaikan dengan hierarki struktural tambang:
-- **Super Administrator:** Akses penuh ke *System Settings*, *Master Data*, dan log keamanan.
-- **Maintenance Superintendent / Planner:** Perencana jadwal PM, budget, *Approval* final dokumen.
-- **Supervisor / Foreman:** Verifikasi Work Order, penugasan pekerjaan, dan *Review* HSE di lapangan.
-- **Mechanic / Operator:** Input HM, pengerjaan WO, dan permintaan barang.
-- **Toolman / Warehouse:** Check-in/Check-out alat SST, *Issue Part*, *Stock Opname*.
-- **Engineer / Production:** Pelaporan produksi harian (*Fleet* alat angkut dan gali).
+Sistem mendukung *Multi-Role* yang disesuaikan dengan struktur operasional tambang:
+- **Super Administrator:** Akses penuh konfigurasi sistem, hak akses, master data, dan log audit.
+- **Maintenance Superintendent / Planner:** Manajemen jadwal PM, evaluasi PCR, budget RAB, dan approval akhir.
+- **Supervisor / Foreman:** Verifikasi Work Order, penugasan teknisi, dan review dokumen keselamatan kerja (HSE).
+- **Mechanic:** Pengerjaan tugas Work Order, input jam kerja, dan peminjaman perkakas kerja.
+- **Toolman / Warehouse:** Pengelolaan sirkulasi tool, permohonan stok, dan stock opname.
+- **Engineer / Production:** Pemantauan data produksi armada tambang harian.
 
 ---
 
 ## 📸 Antarmuka Aplikasi (Screenshots)
 
-### 1. Halaman Login
-Antarmuka gerbang masuk yang dirancang modern dengan ilustrasi maskot interaktif. Dilengkapi dengan pintasan menuju pusat panduan (*Guide*) bagi pengguna baru untuk memahami fitur ekosistem sebelum masuk ke dalam sistem.
-
-![Halaman Login](public/img/screenshots/login.png)
-
-### 2. Dashboard Eksekutif
-Pusat kendali utama yang menyajikan ringkasan metrik operasional secara *real-time*. Menampilkan tren Work Order (WO) aktif, unit yang mengalami *breakdown*, grafik distribusi status, hingga pencapaian *Plant Achievement* untuk memudahkan pengambilan keputusan strategis.
-
+### 1. Dashboard Eksekutif
+Pusat kendali utama yang menyajikan metrik operasional *real-time*, tren status Work Order, unit breakdown, dan ketersediaan armada.
 ![Dashboard Eksekutif](public/img/screenshots/dashboard.png)
 
-### 3. Modul Pesan Instan (Live Chat)
-Ruang kolaborasi terpadu yang terintegrasi di seluruh aplikasi. Memungkinkan mekanik, supervisor, dan *planner* untuk berkomunikasi langsung tanpa aplikasi pihak ketiga, berbagi tautan *Work Order*, serta mendiskusikan penanganan unit dengan cepat dan tepat.
+### 2. Plan Component Replacement (PCR)
+Matriks estimasi waktu penggantian suku cadang utama berbasis target life, current HM, dan riwayat pergantian sebelumnya.
 
-![Pesan Instan](public/img/screenshots/chat.png)
-
-### 4. Form Pembuatan Work Order
-Formulir digital komprehensif untuk pencatatan kerusakan atau pemeliharaan unit. Dilengkapi dengan pemisahan *tab* pintar (Identitas WO, Identitas Unit, Waktu Breakdown, dan Klasifikasi) serta sistem penugasan *Subtask*, kebutuhan suku cadang, dan *manpower* secara rinci.
-
-![Form Work Order](public/img/screenshots/work_order.png)
-
-### 5. Detail & Laporan Work Order (Execution Sheet)
-Halaman rincian eksekusi yang merangkum seluruh aktivitas pemeliharaan secara terstruktur. Tersedia fungsi ekspor *Report* (PDF A4), pembagian tautan instan, hingga formulir persetujuan Dokumen Keselamatan Kerja (HSE) seperti JSA, PTW, dan LOTO di satu tempat terpusat.
-
+### 3. Detail & Laporan Work Order (Execution Sheet)
+Halaman rincian eksekusi pemeliharaan lengkap dengan pembagian subtask, kebutuhan part, dan integrasi dokumen keselamatan K3 (JSA, PTW, LOTO).
 ![Detail Work Order](public/img/screenshots/detail_wo.png)
 
-### 6. Rekonsiliasi Durasi & Timeline Progress
-Visualisasi grafik garis waktu otomatis dari setiap *task* dan *subtask* pekerjaan yang dilakukan oleh mekanik. Memudahkan *supervisor* untuk melacak keseimbangan *Response Time*, total durasi perbaikan, serta menyoroti potensi hambatan (*No Action*) secara visual.
-
-![Timeline Work Order](public/img/screenshots/detail_wo_2.png)
-
-### 7. Bio Data & Riwayat Asset Unit
-Pusat informasi (360° View) komprehensif untuk setiap aset alat berat. Menampilkan spesifikasi teknis, total akumulasi biaya *maintenance*, hingga riwayat historis seluruh siklus Work Order, dokumen FAR, dan catatan produksi tambang pada unit tersebut.
-
-![Bio Data Unit](public/img/screenshots/unit.png)
+### 4. Matriks Hak Akses Terkategori
+Manajemen hak akses granular per kategori modul yang memudahkan administrator mengontrol perizinan pengguna secara presisi.
 
 ---
 
 ## 📚 Pusat Panduan (Guide)
 
-Aplikasi memiliki modul Panduan Interaktif terintegrasi yang dapat diakses oleh publik maupun pengguna *login* pada endpoint `/guide`. Halaman panduan ini dilengkapi dengan animasi modern, penjelasan per-modul menggunakan infografis, dan *Pop-up Modal Quick View*.
+Aplikasi dilengkapi modul Panduan Interaktif yang dapat diakses pada rute `/guide` lengkap dengan infografis, animasi modern, dan petunjuk penggunaan sistem.
 
 ---
 
