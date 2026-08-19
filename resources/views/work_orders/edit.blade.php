@@ -552,8 +552,29 @@ function addToolRow(taskIdx, subtaskIdx, txId) {
 
 // Load existing tasks
 document.addEventListener('DOMContentLoaded', function() {
-    const existingTasks = @json($existingTasks);
-    existingTasks.forEach(t => addTask(t));
+    const oldTasks = @json(old('tasks'));
+    let tasksToLoad = [];
+    
+    if (oldTasks && Object.keys(oldTasks).length > 0) {
+        // If old tasks exist (from validation error), convert from object/array to array
+        tasksToLoad = Array.isArray(oldTasks) ? oldTasks : Object.values(oldTasks);
+        
+        // Ensure subtasks inside oldTasks are arrays too
+        tasksToLoad.forEach(t => {
+            if (t.subtasks && !Array.isArray(t.subtasks)) {
+                t.subtasks = Object.values(t.subtasks);
+            }
+            if (t.subtasks) {
+                t.subtasks.forEach(s => {
+                    if (s.parts && !Array.isArray(s.parts)) s.parts = Object.values(s.parts);
+                });
+            }
+        });
+    } else {
+        tasksToLoad = @json($existingTasks);
+    }
+    
+    tasksToLoad.forEach(t => addTask(t));
 });
 </script>
 @endpush

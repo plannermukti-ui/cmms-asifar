@@ -412,7 +412,7 @@ const unitOptions = `<option value="">-- Pilih Unit --</option>@foreach($units a
 const toolTxOptions = `<option value="">-- Pilih Transaksi --</option>@foreach($toolTransactions as $tx)<option value="{{ $tx->id }}">{{ $tx->tool->name ?? '' }} → {{ $tx->mechanic->nama_lengkap ?? '' }} ({{ $tx->tanggal_pinjam }})</option>@endforeach`;
 const statusOptions = `<option value="Open">Open</option><option value="Inprogress">Inprogress</option><option value="Completed">Completed</option><option value="Cancel">Cancel</option><option value="Backlog">Backlog</option>`;
 
-function addTask() {
+function addTask(data = null) {
     const ti = taskIndex++;
     const container = document.getElementById('tasks-container');
     const div = document.createElement('div');
@@ -434,7 +434,7 @@ function addTask() {
             <div class="col-lg-5">
                 <div class="h-100 p-2 rounded bg-white border">
                     <label class="form-label required small fw-semibold text-muted">Deskripsi Problem</label>
-                    <textarea class="form-control form-control-sm bg-white" name="tasks[${ti}][problem]" rows="2" placeholder="Uraikan problem/gejala..." required></textarea>
+                    <textarea class="form-control form-control-sm bg-white" name="tasks[${ti}][problem]" rows="2" placeholder="Uraikan problem/gejala..." required>${data?.problem || ''}</textarea>
                     <div class="row g-2 mt-1">
                         <div class="col-12">
                             <label class="form-label small fw-semibold text-muted">Component Group</label>
@@ -445,12 +445,12 @@ function addTask() {
                         </div>
                         <div class="col-6">
                             <label class="form-label small fw-semibold text-muted">Date Problem</label>
-                            <input type="datetime-local" class="form-control form-control-sm bg-white" name="tasks[${ti}][date_problem]">
+                            <input type="datetime-local" class="form-control form-control-sm bg-white" name="tasks[${ti}][date_problem]" value="${data?.date_problem || ''}">
                             <div class="invalid-feedback d-block mt-1" data-field="date_problem"></div>
                         </div>
                         <div class="col-6">
                             <label class="form-label small fw-semibold text-muted">Status Task</label>
-                            <select name="tasks[${ti}][status]" class="form-select form-select-sm bg-white">${statusOptions}</select>
+                            <select name="tasks[${ti}][status]" class="form-select form-select-sm bg-white" id="task-status-${ti}">${statusOptions}</select>
                         </div>
                     </div>
                 </div>
@@ -470,7 +470,10 @@ function addTask() {
         </div>
     `;
     container.appendChild(div);
+    if (data?.component_group_id) div.querySelector(`#task-cg-${ti}`).value = data.component_group_id;
+    if (data?.status) div.querySelector(`#task-status-${ti}`).value = data.status;
     bindTaskDateProblemField(div);
+    return ti;
 }
 
 function bindTaskDateProblemField(taskEl) {
@@ -539,7 +542,7 @@ function bindSubtaskDateFields(subtaskEl) {
     showDateError();
 }
 
-function addSubtask(taskIdx) {
+function addSubtask(taskIdx, data = null) {
     if (!subtaskCounters[taskIdx]) subtaskCounters[taskIdx] = 0;
     const si = subtaskCounters[taskIdx]++;
     const container = document.getElementById('subtasks-container-' + taskIdx);
@@ -554,26 +557,26 @@ function addSubtask(taskIdx) {
         <div class="row g-1 mb-1 align-items-end" style="display:flex; flex-wrap:wrap; gap:0.35rem;">
             <div style="flex:1 1 220px; min-width:220px;">
                 <label class="form-label required small fw-semibold text-muted mb-1">Action / Tindakan</label>
-                <textarea class="form-control form-control-sm py-1" name="tasks[${taskIdx}][subtasks][${si}][action]" rows="1" placeholder="Uraian perbaikan..." required></textarea>
+                <textarea class="form-control form-control-sm py-1" name="tasks[${taskIdx}][subtasks][${si}][action]" rows="1" placeholder="Uraian perbaikan..." required>${data?.action || ''}</textarea>
             </div>
             <div style="flex:1 1 140px; min-width:140px;">
                 <label class="form-label small fw-semibold text-muted mb-1">Date Action</label>
-                <input type="datetime-local" class="form-control form-control-sm py-1" name="tasks[${taskIdx}][subtasks][${si}][date_action]">
+                <input type="datetime-local" class="form-control form-control-sm py-1" name="tasks[${taskIdx}][subtasks][${si}][date_action]" value="${data?.date_action || ''}">
                 <div class="invalid-feedback d-block mt-1" data-field="date_action"></div>
             </div>
             <div style="flex:1 1 140px; min-width:140px;">
                 <label class="form-label small fw-semibold text-muted mb-1">Date Finish</label>
-                <input type="datetime-local" class="form-control form-control-sm py-1" name="tasks[${taskIdx}][subtasks][${si}][date_finish]">
+                <input type="datetime-local" class="form-control form-control-sm py-1" name="tasks[${taskIdx}][subtasks][${si}][date_finish]" value="${data?.date_finish || ''}">
             </div>
             <div style="flex:0 0 90px; min-width:90px;">
                 <label class="form-label small fw-semibold text-muted mb-1">Durasi</label>
-                <input type="number" step="0.01" class="form-control form-control-sm py-1" name="tasks[${taskIdx}][subtasks][${si}][duration_hours]" readonly>
+                <input type="number" step="0.01" class="form-control form-control-sm py-1" name="tasks[${taskIdx}][subtasks][${si}][duration_hours]" value="${data?.duration_hours || ''}" readonly>
             </div>
         </div>
         <div class="row g-1 mb-1 align-items-end" style="display:flex; flex-wrap:wrap; gap:0.35rem;">
             <div style="flex:1 1 220px; min-width:220px;">
                 <label class="form-label small fw-semibold text-muted mb-1">Tipe Breakdown</label>
-                <select name="tasks[${taskIdx}][subtasks][${si}][breakdown_type_id]" class="form-select form-select-sm py-1">
+                <select name="tasks[${taskIdx}][subtasks][${si}][breakdown_type_id]" id="subtask-bt-${taskIdx}-${si}" class="form-select form-select-sm py-1">
                     <option value="">-- Pilih --</option>
                     @foreach($breakdownTypes as $bt)
                         <option value="{{ $bt->id }}">{{ $bt->code ? $bt->code . ' - ' : '' }}{{ $bt->name }}</option>
@@ -582,7 +585,7 @@ function addSubtask(taskIdx) {
             </div>
             <div style="flex:1 1 220px; min-width:220px;">
                 <label class="form-label small fw-semibold text-muted mb-1">Status</label>
-                <select name="tasks[${taskIdx}][subtasks][${si}][status]" class="form-select form-select-sm py-1">${statusOptions}</select>
+                <select name="tasks[${taskIdx}][subtasks][${si}][status]" id="subtask-st-${taskIdx}-${si}" class="form-select form-select-sm py-1">${statusOptions}</select>
             </div>
         </div>
         <div class="row g-3 mt-1">
@@ -619,10 +622,14 @@ function addSubtask(taskIdx) {
         </div>
     `;
     container.appendChild(div);
+    if (data?.breakdown_type_id) div.querySelector(`#subtask-bt-${taskIdx}-${si}`).value = data.breakdown_type_id;
+    if (data?.status) div.querySelector(`#subtask-st-${taskIdx}-${si}`).value = data.status;
+    bindSubtaskDateFields(div);
+    return si;
 }
 
 let mpCounters = {};
-function addManpower(taskIdx, subtaskIdx) {
+function addManpower(taskIdx, subtaskIdx, mechanicId = '') {
     const key = taskIdx + '-' + subtaskIdx;
     if (!mpCounters[key]) mpCounters[key] = 0;
     const mi = mpCounters[key]++;
@@ -630,12 +637,13 @@ function addManpower(taskIdx, subtaskIdx) {
     const row = document.createElement('div');
     row.className = 'd-flex gap-1 mb-1 align-items-center';
     row.innerHTML = `
-        <select name="tasks[${taskIdx}][subtasks][${subtaskIdx}][manpower_ids][]" class="form-select form-select-sm">
+        <select name="tasks[${taskIdx}][subtasks][${subtaskIdx}][manpower_ids][]" class="form-select form-select-sm" id="mp-${taskIdx}-${subtaskIdx}-${mi}">
             <option value="">-- Pilih Mekanik --</option>${mechanicOptions}
         </select>
         <button type="button" class="btn btn-sm btn-outline-danger p-1" onclick="this.parentElement.remove()">✕</button>
     `;
     container.appendChild(row);
+    if (mechanicId) row.querySelector(`#mp-${taskIdx}-${subtaskIdx}-${mi}`).value = mechanicId;
 }
 
 let partCounters = {};
@@ -748,7 +756,7 @@ function togglePartStatusFields(id) {
 }
 
 let toolCounters = {};
-function addToolRow(taskIdx, subtaskIdx) {
+function addToolRow(taskIdx, subtaskIdx, toolTxId = '') {
     const key = taskIdx + '-' + subtaskIdx;
     if (!toolCounters[key]) toolCounters[key] = 0;
     const ti = toolCounters[key]++;
@@ -756,24 +764,66 @@ function addToolRow(taskIdx, subtaskIdx) {
     const row = document.createElement('div');
     row.className = 'd-flex gap-1 mb-1 align-items-center';
     row.innerHTML = `
-        <select name="tasks[${taskIdx}][subtasks][${subtaskIdx}][tool_transaction_ids][]" class="form-select form-select-sm">${toolTxOptions}</select>
+        <select name="tasks[${taskIdx}][subtasks][${subtaskIdx}][tool_transaction_ids][]" class="form-select form-select-sm" id="tool-${taskIdx}-${subtaskIdx}-${ti}">${toolTxOptions}</select>
         <button type="button" class="btn btn-sm btn-outline-danger p-1" onclick="this.parentElement.remove()">✕</button>
     `;
     container.appendChild(row);
+    if (toolTxId) row.querySelector(`#tool-${taskIdx}-${subtaskIdx}-${ti}`).value = toolTxId;
 }
 
-@if(isset($praWorkOrder))
 window.addEventListener('DOMContentLoaded', function() {
-    addTask();
-    const firstTaskDesc = document.querySelector('textarea[name="tasks[0][problem]"]');
-    if (firstTaskDesc) {
-        firstTaskDesc.value = `{!! addslashes($praWorkOrder->problem) !!}`;
+    const oldTasksData = @json(old('tasks'));
+    let oldTasks = [];
+    
+    if (oldTasksData && Object.keys(oldTasksData).length > 0) {
+        oldTasks = Array.isArray(oldTasksData) ? oldTasksData : Object.values(oldTasksData);
+        
+        oldTasks.forEach(t => {
+            if (t.subtasks && !Array.isArray(t.subtasks)) {
+                t.subtasks = Object.values(t.subtasks);
+            }
+            if (t.subtasks) {
+                t.subtasks.forEach(s => {
+                    if (s.parts && !Array.isArray(s.parts)) s.parts = Object.values(s.parts);
+                });
+            }
+        });
+        
+        oldTasks.forEach((taskData, tIdx) => {
+            const newTIdx = addTask(taskData);
+            if (taskData.subtasks && taskData.subtasks.length > 0) {
+                taskData.subtasks.forEach((subtaskData, sIdx) => {
+                    const newSIdx = addSubtask(newTIdx, subtaskData);
+                    
+                    if (subtaskData.manpower_ids) {
+                        subtaskData.manpower_ids.forEach(mpId => {
+                            if (mpId) addManpower(newTIdx, newSIdx, mpId);
+                        });
+                    }
+                    if (subtaskData.parts) {
+                        subtaskData.parts.forEach(partData => {
+                            if (partData.part_id) addPartRow(newTIdx, newSIdx, partData);
+                        });
+                    }
+                    if (subtaskData.tool_transaction_ids) {
+                        subtaskData.tool_transaction_ids.forEach(toolId => {
+                            if (toolId) addToolRow(newTIdx, newSIdx, toolId);
+                        });
+                    }
+                });
+            }
+        });
+    } else {
+        @if(isset($praWorkOrder))
+            addTask();
+            const firstTaskDesc = document.querySelector('textarea[name="tasks[0][problem]"]');
+            if (firstTaskDesc) {
+                firstTaskDesc.value = @js($praWorkOrder->problem);
+            }
+        @else
+            addTask();
+        @endif
     }
 });
-@else
-window.addEventListener('DOMContentLoaded', function() {
-    addTask();
-});
-@endif
 </script>
 @endpush

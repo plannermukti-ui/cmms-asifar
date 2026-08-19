@@ -18,9 +18,17 @@ class PCRController extends Controller
 
     public function index(Request $request)
     {
-        // Get all units that have a model which has parts
-        $units = MasterUnit::with(['model.parts', 'latestHourMeter'])
-            ->whereHas('model.parts')
+        // Get all units that have a model which has Major Component parts
+        $units = MasterUnit::with(['model.parts' => function ($query) {
+                $query->whereHas('kategori4', function ($q) {
+                    $q->where('name', 'Major Component');
+                });
+            }, 'latestHourMeter'])
+            ->whereHas('model.parts', function ($query) {
+                $query->whereHas('kategori4', function ($q) {
+                    $q->where('name', 'Major Component');
+                });
+            })
             ->orderBy('nomor_unit')
             ->get();
             
@@ -103,7 +111,9 @@ class PCRController extends Controller
 
         $filterUnits = $units->pluck('nomor_unit')->unique()->sort();
         $filterModels = $units->map->model->pluck('name')->unique()->sort();
-        $filterComponents = Part::has('unitModels')->pluck('part_description')->unique()->sort();
+        $filterComponents = Part::whereHas('kategori4', function ($q) {
+            $q->where('name', 'Major Component');
+        })->has('unitModels')->pluck('part_description')->unique()->sort();
 
         // Filters
         if ($request->filled('unit_no')) {

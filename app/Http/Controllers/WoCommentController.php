@@ -72,7 +72,7 @@ class WoCommentController extends Controller
         $request->validate([
             'body' => 'required|string|max:1000',
             'parent_id' => 'nullable|exists:wo_comments,id',
-            'attachment' => 'nullable|file|max:10240' // 10MB max overall
+            'attachment' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,pdf,doc,docx,xls,xlsx,csv,txt,zip|max:10240' // 10MB max overall
         ]);
 
         $attachmentPath = null;

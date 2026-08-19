@@ -3,52 +3,6 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/dev-migrate', function () {
-    \Illuminate\Support\Facades\Artisan::call('cache:clear');
-    \Illuminate\Support\Facades\Artisan::call('config:clear');
-    
-    // Force column addition directly
-    $msg = [];
-    if (!\Illuminate\Support\Facades\Schema::hasColumn('pm_schedule_histories', 'hm_service')) {
-        \Illuminate\Support\Facades\Schema::table('pm_schedule_histories', function (\Illuminate\Database\Schema\Blueprint $table) {
-            $table->decimal('hm_service', 10, 1)->nullable()->after('pm_schedule_id');
-        });
-        $msg[] = "Column 'hm_service' successfully added to pm_schedule_histories.";
-    }
-
-    if (!\Illuminate\Support\Facades\Schema::hasColumn('wo_subtask_parts', 'part_status')) {
-        \Illuminate\Support\Facades\Schema::table('wo_subtask_parts', function (\Illuminate\Database\Schema\Blueprint $table) {
-            $table->string('part_status')->default('Replace');
-            $table->string('mol_pr')->nullable();
-            $table->string('order_status')->nullable();
-            $table->string('swap_type')->nullable();
-            $table->foreignId('swap_unit_id')->nullable()->constrained('master_units')->nullOnDelete();
-            $table->string('swap_status')->nullable();
-            $table->text('swap_remarks')->nullable();
-        });
-        $msg[] = "Columns added to wo_subtask_parts.";
-    }
-
-    return implode("<br>", $msg) . "<br>Done. " . \Illuminate\Support\Facades\Artisan::output();
-});
-
-Route::get('/dev-dump-excel', function () {
-    try {
-        $path = base_path('DMBD 13 Agustus 2026 (HW).xlsx');
-        if (!file_exists($path)) {
-            return "File not found: " . $path;
-        }
-        $data = \Maatwebsite\Excel\Facades\Excel::toArray(new class implements \Maatwebsite\Excel\Concerns\ToArray {
-            public function array(array $array) { return $array; }
-        }, $path);
-        
-        // Output as pre-formatted json or just text
-        return "<pre>" . json_encode($data, JSON_PRETTY_PRINT) . "</pre>";
-    } catch (\Exception $e) {
-        return "Error: " . $e->getMessage();
-    }
-});
-
 Route::get('/', function () {
     return redirect()->route('login');
 });
@@ -115,8 +69,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/chat/messages/{userId}', [\App\Http\Controllers\ChatController::class, 'getMessages'])->name('chat.messages');
     Route::post('/chat/send', [\App\Http\Controllers\ChatController::class, 'send'])->name('chat.send');
     Route::get('/chat/unread-count', [\App\Http\Controllers\ChatController::class, 'unreadCount'])->name('chat.unread-count');
-    Route::get('/chat/search-document', [\App\Http\Controllers\ChatController::class, 'searchDocument'])->name('chat.search-document');
-    Route::delete('/chat/clear/{userId}', [\App\Http\Controllers\ChatController::class, 'clearChat'])->name('chat.clear');
+    // Notulen Meeting & Continuous Action Items Tracker
+    Route::get('/meetings/get-open-action-items', [\App\Http\Controllers\MeetingController::class, 'getOpenActionItems'])->name('meetings.get-open-action-items');
+    Route::post('/meetings/action-items/{item}/update', [\App\Http\Controllers\MeetingController::class, 'updateActionItem'])->name('meetings.update-action-item');
+    Route::get('/meetings/{meeting}/export-pdf', [\App\Http\Controllers\MeetingController::class, 'exportPdf'])->name('meetings.export-pdf');
+    Route::resource('/meetings', \App\Http\Controllers\MeetingController::class);
+
     // Administrasi ToolRoom
     Route::resource('/mechanics', \App\Http\Controllers\MechanicController::class);
     Route::resource('/tool-categories', \App\Http\Controllers\ToolCategoryController::class);

@@ -287,8 +287,28 @@
         @yield('content')
       </div>
     </div>
+    <!-- Top Progress Bar -->
+    <div id="industrialTopProgress" style="position: fixed; top: 0; left: 0; width: 0%; height: 3.5px; background: linear-gradient(90deg, #f59e0b, #ea580c, #f59e0b); background-size: 200% 100%; z-index: 100000; box-shadow: 0 0 12px rgba(245, 158, 11, 0.9); transition: width 0.25s ease-out, opacity 0.3s ease; opacity: 0; pointer-events: none;"></div>
+
     <!-- Libs JS -->
     <!-- Tabler Core -->
     <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta19/dist/js/tabler.min.js" defer></script>
+    <script>
+      document.addEventListener('submit', function(e) {
+        const form = e.target;
+        if (!form) return;
+        const bar = document.getElementById('industrialTopProgress');
+        if (bar) {
+          bar.style.opacity = '1';
+          bar.style.width = '70%';
+        }
+        const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('input[type="submit"]');
+        if (submitBtn && !submitBtn.disabled) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Memproses...';
+          form.submit();
+        }
+      });
+    </script>
   </body>
 </html>

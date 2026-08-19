@@ -72,6 +72,7 @@ class PermissionSeeder extends Seeder
             'wo_comments' => 'Diskusi Work Order',
             'swap_components' => 'Swap Component Report',
             'pcr' => 'Plan Component Replacement (PCR)',
+            'meetings' => 'Notulen Rapat & Tindak Lanjut',
         ];
 
         // Aksi standar (CRUD)

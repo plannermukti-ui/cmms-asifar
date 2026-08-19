@@ -241,6 +241,160 @@
       [data-bs-theme="dark"] .modal-footer {
         border-top: 1px solid rgba(245, 158, 11, 0.2) !important;
       }
+
+      /* =========================================================
+         COOL INDUSTRIAL CRUD LOADING SYSTEM & MICRO-INTERACTIONS
+         ========================================================= */
+      /* Top High-Tech Progress Bar */
+      #industrialTopProgress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 3.5px;
+        background: linear-gradient(90deg, #f59e0b, #ea580c, #f59e0b);
+        background-size: 200% 100%;
+        z-index: 100000;
+        box-shadow: 0 0 12px rgba(245, 158, 11, 0.9), 0 0 6px rgba(234, 88, 12, 0.7);
+        transition: width 0.25s ease-out, opacity 0.3s ease;
+        opacity: 0;
+        pointer-events: none;
+      }
+      #industrialTopProgress.active {
+        opacity: 1;
+        animation: industrialProgressShimmer 1.5s linear infinite;
+      }
+      @keyframes industrialProgressShimmer {
+        0% { background-position: 100% 0; }
+        100% { background-position: -100% 0; }
+      }
+
+      /* Global Glassmorphism CRUD Loader Overlay */
+      #globalCrudLoader {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(15, 23, 42, 0.82);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+      }
+      #globalCrudLoader.show {
+        opacity: 1;
+        visibility: visible;
+      }
+      
+      .industrial-loader-card {
+        background: #1e293b;
+        border: 1px solid rgba(245, 158, 11, 0.4);
+        border-radius: 18px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 30px rgba(245, 158, 11, 0.2);
+        padding: 2.25rem 2rem;
+        max-width: 390px;
+        width: 90%;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        transform: scale(0.92);
+        transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      #globalCrudLoader.show .industrial-loader-card {
+        transform: scale(1);
+      }
+      .industrial-loader-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: repeating-linear-gradient(
+          -45deg,
+          #f59e0b,
+          #f59e0b 12px,
+          #0f172a 12px,
+          #0f172a 24px
+        );
+      }
+
+      /* Animated Heavy Gear Container */
+      .industrial-gear-wrapper {
+        position: relative;
+        width: 90px;
+        height: 90px;
+        margin: 0 auto 1.5rem auto;
+      }
+      .gear-primary {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 62px;
+        height: 62px;
+        color: #f59e0b;
+        animation: spinGearClockwise 4.5s linear infinite;
+        filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.5));
+      }
+      .gear-secondary {
+        position: absolute;
+        bottom: 4px;
+        right: 4px;
+        width: 44px;
+        height: 44px;
+        color: #ea580c;
+        animation: spinGearCounter 3s linear infinite;
+        filter: drop-shadow(0 0 6px rgba(234, 88, 12, 0.5));
+      }
+      .gear-pulse-ring {
+        position: absolute;
+        inset: -6px;
+        border-radius: 50%;
+        border: 2px dashed rgba(245, 158, 11, 0.3);
+        animation: spinPulseRing 9s linear infinite;
+      }
+      @keyframes spinGearClockwise {
+        100% { transform: rotate(360deg); }
+      }
+      @keyframes spinGearCounter {
+        100% { transform: rotate(-360deg); }
+      }
+      @keyframes spinPulseRing {
+        100% { transform: rotate(360deg); }
+      }
+
+      /* Loader Sub-dots animation */
+      .loader-dots {
+        display: inline-flex;
+        gap: 5px;
+        justify-content: center;
+        align-items: center;
+      }
+      .loader-dots span {
+        width: 7px;
+        height: 7px;
+        background-color: #f59e0b;
+        border-radius: 50%;
+        animation: loaderDotPulse 1.2s infinite ease-in-out both;
+        box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+      }
+      .loader-dots span:nth-child(1) { animation-delay: -0.32s; }
+      .loader-dots span:nth-child(2) { animation-delay: -0.16s; }
+      .loader-dots span:nth-child(3) { animation-delay: 0s; }
+      @keyframes loaderDotPulse {
+        0%, 80%, 100% { transform: scale(0.3); opacity: 0.3; }
+        40% { transform: scale(1.15); opacity: 1; }
+      }
+
+      /* Button active loading micro-animation */
+      .btn.is-submitting {
+        position: relative !important;
+        pointer-events: none !important;
+        opacity: 0.85 !important;
+      }
     </style>
     @stack('styles')
   </head>
@@ -361,6 +515,35 @@
       </div>
     </div>
 
+    <!-- GLOBAL TABLER UI CONFIRMATION POPUP MODAL -->
+    <div class="modal modal-blur fade" id="globalTablerConfirmModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000;" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content shadow-lg border-0">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <div class="modal-status bg-warning" id="globalTablerConfirmStatus"></div>
+          <div class="modal-body text-center py-4">
+            <div class="avatar avatar-lg bg-warning-lt text-warning mb-3 rounded-circle mx-auto" id="globalTablerConfirmIcon">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-alert-triangle" width="36" height="36" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v4" /><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" /><path d="M12 16h.01" /></svg>
+            </div>
+            <h3 class="fw-bold mb-2 text-dark" id="globalTablerConfirmTitle">Konfirmasi Tindakan</h3>
+            <div class="text-muted small" id="globalTablerConfirmMessage">Apakah Anda yakin ingin melanjutkan tindakan ini?</div>
+          </div>
+          <div class="modal-footer bg-light py-2">
+            <div class="w-100">
+              <div class="row g-2">
+                <div class="col">
+                  <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal" id="globalTablerConfirmBtnCancel">Batal</button>
+                </div>
+                <div class="col">
+                  <button type="button" class="btn btn-warning w-100 fw-bold text-dark" id="globalTablerConfirmBtnOk">Lanjutkan</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
       window.showTablerErrorModal = function(title, messages) {
         const titleEl = document.getElementById('globalTablerErrorTitle');
@@ -389,6 +572,205 @@
         }
       };
 
+      window.showTablerConfirm = function(options) {
+        const title = options.title || 'Konfirmasi Tindakan';
+        const message = options.message || 'Apakah Anda yakin ingin melanjutkan tindakan ini?';
+        const confirmText = options.confirmText || 'Lanjutkan';
+        const cancelText = options.cancelText || 'Batal';
+        const type = options.type || 'warning'; // warning, danger, primary
+        const onConfirm = options.onConfirm || function() {};
+        const onCancel = options.onCancel || function() {};
+
+        const titleEl = document.getElementById('globalTablerConfirmTitle');
+        const msgEl = document.getElementById('globalTablerConfirmMessage');
+        const okBtn = document.getElementById('globalTablerConfirmBtnOk');
+        const cancelBtn = document.getElementById('globalTablerConfirmBtnCancel');
+        const statusEl = document.getElementById('globalTablerConfirmStatus');
+        const iconEl = document.getElementById('globalTablerConfirmIcon');
+
+        if (titleEl) titleEl.innerText = title;
+        if (msgEl) msgEl.innerHTML = message;
+        if (okBtn) okBtn.innerText = confirmText;
+        if (cancelBtn) cancelBtn.innerText = cancelText;
+
+        if (type === 'danger') {
+            if (statusEl) statusEl.className = 'modal-status bg-danger';
+            if (iconEl) iconEl.className = 'avatar avatar-lg bg-danger-lt text-danger mb-3 rounded-circle mx-auto';
+            if (okBtn) okBtn.className = 'btn btn-danger w-100 fw-bold';
+        } else if (type === 'primary') {
+            if (statusEl) statusEl.className = 'modal-status bg-primary';
+            if (iconEl) iconEl.className = 'avatar avatar-lg bg-primary-lt text-primary mb-3 rounded-circle mx-auto';
+            if (okBtn) okBtn.className = 'btn btn-primary w-100 fw-bold';
+        } else {
+            if (statusEl) statusEl.className = 'modal-status bg-warning';
+            if (iconEl) iconEl.className = 'avatar avatar-lg bg-warning-lt text-warning mb-3 rounded-circle mx-auto';
+            if (okBtn) okBtn.className = 'btn btn-warning w-100 fw-bold text-dark';
+        }
+
+        const modalEl = document.getElementById('globalTablerConfirmModal');
+        if (modalEl) {
+          const bsModal = new bootstrap.Modal(modalEl);
+
+          const handleOk = function() {
+            okBtn.removeEventListener('click', handleOk);
+            bsModal.hide();
+            window.showCrudLoader('Menjalankan Tindakan...', 'Mohon tunggu sementara sistem memproses konfirmasi Anda.', 'CONFIRMED ACTION');
+            onConfirm();
+          };
+          okBtn.addEventListener('click', handleOk, { once: true });
+
+          modalEl.addEventListener('hidden.bs.modal', function() {
+            okBtn.removeEventListener('click', handleOk);
+          }, { once: true });
+
+          bsModal.show();
+        }
+      };
+
+      // =========================================================
+      // GLOBAL INDUSTRIAL LOADER & CRUD ACTION INTERCEPTORS
+      // =========================================================
+      let topProgressTimer = null;
+      window.startTopProgress = function() {
+        const bar = document.getElementById('industrialTopProgress');
+        if (!bar) return;
+        clearInterval(topProgressTimer);
+        bar.classList.add('active');
+        bar.style.width = '20%';
+        bar.style.opacity = '1';
+        let currentWidth = 20;
+        topProgressTimer = setInterval(() => {
+          if (currentWidth < 85) {
+            currentWidth += Math.random() * 15;
+            bar.style.width = currentWidth + '%';
+          }
+        }, 300);
+      };
+
+      window.finishTopProgress = function() {
+        const bar = document.getElementById('industrialTopProgress');
+        if (!bar) return;
+        clearInterval(topProgressTimer);
+        bar.style.width = '100%';
+        setTimeout(() => {
+          bar.style.opacity = '0';
+          setTimeout(() => {
+            bar.classList.remove('active');
+            bar.style.width = '0%';
+          }, 300);
+        }, 200);
+      };
+
+      window.showCrudLoader = function(title, subtext, badge) {
+        const loader = document.getElementById('globalCrudLoader');
+        const titleEl = document.getElementById('globalCrudLoaderTitle');
+        const subtextEl = document.getElementById('globalCrudLoaderSubtext');
+        const badgeEl = document.getElementById('globalCrudLoaderBadge');
+
+        if (titleEl) titleEl.innerText = title || 'Memproses Data...';
+        if (subtextEl) subtextEl.innerText = subtext || 'Mohon tunggu, sistem sedang memproses transaksi Anda.';
+        if (badgeEl) badgeEl.innerText = badge || 'PROCESSING TRANSACTION';
+
+        if (loader) loader.classList.add('show');
+        window.startTopProgress();
+      };
+
+      window.hideCrudLoader = function() {
+        const loader = document.getElementById('globalCrudLoader');
+        if (loader) loader.classList.remove('show');
+        window.finishTopProgress();
+
+        // Restore any disabled submitting buttons
+        document.querySelectorAll('.btn.is-submitting').forEach(btn => {
+          btn.classList.remove('is-submitting');
+          if (btn.dataset.origHtml) {
+            btn.innerHTML = btn.dataset.origHtml;
+          }
+        });
+      };
+
+      // Reset loader if page is loaded from bfcache (Back/Forward Cache)
+      window.addEventListener('pageshow', function(e) {
+        if (e.persisted) {
+          window.hideCrudLoader();
+        }
+      });
+
+      // Hook form submissions globally
+      document.addEventListener('submit', function(e) {
+        const form = e.target;
+        if (!form || form.hasAttribute('data-no-loader')) return;
+
+        const method = (form.getAttribute('method') || 'GET').toUpperCase();
+        const hasMethodOverride = form.querySelector('input[name="_method"]');
+        const effectiveMethod = hasMethodOverride ? hasMethodOverride.value.toUpperCase() : method;
+
+        let title = 'Menyimpan Data...';
+        let subtext = 'Sistem sedang memproses data transaksi Anda.';
+        let badge = 'SAVING DATA';
+
+        const action = (form.getAttribute('action') || '').toLowerCase();
+        const isDelete = effectiveMethod === 'DELETE' || action.includes('destroy') || action.includes('delete') || action.includes('cancel') || action.includes('reject');
+        const isUpload = form.querySelector('input[type="file"]') !== null || (form.getAttribute('enctype') || '').includes('multipart');
+        const isUpdate = effectiveMethod === 'PUT' || effectiveMethod === 'PATCH' || action.includes('update') || action.includes('edit');
+        const isExportOrGen = action.includes('export') || action.includes('generate') || action.includes('download');
+
+        if (isDelete) {
+          title = 'Menghapus Data...';
+          subtext = 'Sistem sedang menghapus data terkait dari database.';
+          badge = 'DELETING RECORD';
+        } else if (isUpload) {
+          title = 'Mengunggah & Memproses Berkas...';
+          subtext = 'Mohon tunggu sementara berkas Anda diunggah dan diverifikasi.';
+          badge = 'UPLOADING FILE';
+        } else if (isExportOrGen) {
+          title = 'Menyiapkan Dokumen...';
+          subtext = 'Sistem sedang menyusun dan mengunduh data dokumen Anda.';
+          badge = 'GENERATING FILE';
+        } else if (isUpdate) {
+          title = 'Menyimpan Perubahan...';
+          subtext = 'Memperbarui data pada sistem.';
+          badge = 'UPDATING DATA';
+        } else if (effectiveMethod === 'POST') {
+          title = 'Menyimpan Data Baru...';
+          subtext = 'Menyimpan catatan transaksi ke sistem.';
+          badge = 'CREATING RECORD';
+        } else {
+          title = 'Memuat Data...';
+          subtext = 'Sistem sedang menyiapkan data untuk Anda.';
+          badge = 'FETCHING DATA';
+        }
+
+        // Apply button spinner
+        const submitBtn = form.querySelector('button[type="submit"]:focus') || form.querySelector('button[type="submit"]') || form.querySelector('input[type="submit"]');
+        if (submitBtn && !submitBtn.classList.contains('is-submitting')) {
+          submitBtn.classList.add('is-submitting');
+          submitBtn.dataset.origHtml = submitBtn.innerHTML;
+          submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1.5" role="status" aria-hidden="true"></span> ' + (isDelete ? 'Menghapus...' : (isUpload ? 'Mengunggah...' : 'Memproses...'));
+        }
+
+        window.showCrudLoader(title, subtext, badge);
+      });
+
+      // Hook AJAX / Fetch globally to run top progress bar
+      (function() {
+        const originalFetch = window.fetch;
+        if (originalFetch) {
+          window.fetch = function() {
+            window.startTopProgress();
+            return originalFetch.apply(this, arguments)
+              .then(response => {
+                window.finishTopProgress();
+                return response;
+              })
+              .catch(error => {
+                window.finishTopProgress();
+                throw error;
+              });
+          };
+        }
+      })();
+
       document.addEventListener("DOMContentLoaded", function() {
         @if($errors->any())
           const formErrors = [
@@ -404,6 +786,42 @@
         @endif
       });
     </script>
+
+    <!-- INDUSTRIAL TOP PROGRESS BAR -->
+    <div id="industrialTopProgress"></div>
+
+    <!-- GLOBAL INDUSTRIAL CRUD LOADER OVERLAY -->
+    <div id="globalCrudLoader" role="status" aria-live="polite">
+      <div class="industrial-loader-card">
+        <div class="industrial-gear-wrapper">
+          <div class="gear-pulse-ring"></div>
+          <!-- Primary Gear -->
+          <svg class="gear-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" />
+            <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+          </svg>
+          <!-- Secondary Gear -->
+          <svg class="gear-secondary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" />
+            <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+          </svg>
+        </div>
+
+        <div class="badge bg-warning-lt text-warning fw-bold px-2.5 py-1 mb-2 text-uppercase font-monospace" style="font-size: 0.7rem; letter-spacing: 1px;" id="globalCrudLoaderBadge">
+          PROCESSING TRANSACTION
+        </div>
+        <h4 class="fw-bold text-white mb-1" id="globalCrudLoaderTitle">Memproses Data...</h4>
+        <p class="text-secondary small mb-3" id="globalCrudLoaderSubtext">Mohon tunggu, sistem sedang memproses transaksi Anda.</p>
+        
+        <div class="loader-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
 
     @yield('scripts')
   </body>
