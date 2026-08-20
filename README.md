@@ -6,7 +6,8 @@
   
   [![PHP Version](https://img.shields.io/badge/PHP-8.1%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net/)
   [![Laravel Version](https://img.shields.io/badge/Laravel-10.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com/)
-  [![Theme](https://img.shields.io/badge/Theme-Industrial%20Heavy%20Equipment-F59E0B?style=for-the-badge&logo=caterpillar&logoColor=black)](#)
+  [![Three.js](https://img.shields.io/badge/3D%20Visualizer-WebGL%20%2F%20Three.js-000000?style=for-the-badge&logo=three.js&logoColor=white)](#)
+  [![Theme](https://img.shields.io/badge/Theme-Dynamic%20Accent%20Industrial-F59E0B?style=for-the-badge&logo=caterpillar&logoColor=black)](#)
   [![Security](https://img.shields.io/badge/Security-Hardened%20Enterprise-059669?style=for-the-badge&logo=shield&logoColor=white)](#)
   [![License](https://img.shields.io/badge/License-Proprietary-blue.svg?style=for-the-badge)](#)
 </div>
@@ -14,9 +15,9 @@
 <br>
 
 ## 📖 Tentang Aplikasi
-**CMMS AISFAR** adalah Sistem Manajemen Pemeliharaan Aset dan Logistik Terpadu yang dirancang khusus untuk ekosistem industri pertambangan dan alat berat. Platform ini bertindak sebagai *Single Source of Truth* untuk mengelola seluruh siklus hidup armada tambang (Excavator, Dozer, Hauler, Grader, Support Unit) mulai dari pelaporan kerusakan (Pra-WO), eksekusi Work Order digital, notulen rapat operasional & *action items tracker*, manajemen perkakas (ToolRoom), perencanaan anggaran & penggantian komponen (PCR & PM), hingga analitik KPI keandalan unit.
+**CMMS AISFAR** adalah Sistem Manajemen Pemeliharaan Aset dan Logistik Terpadu yang dirancang khusus untuk ekosistem industri pertambangan dan alat berat. Platform ini bertindak sebagai *Single Source of Truth* untuk mengelola seluruh siklus hidup armada tambang (Excavator, Dozer, Hauler, Grader, Support Unit) mulai dari pelaporan kerusakan (Pra-WO), eksekusi Work Order digital, notulen rapat operasional & *action items tracker*, manajemen perkakas (ToolRoom), perencanaan anggaran & penggantian komponen (PCR & PM), visualisasi skema database 3D interaktif, hingga analitik KPI keandalan unit.
 
-Aplikasi ini mendigitalisasi operasional workshop menjadi **100% Paperless** didukung fitur *Digital Signature*, *Real-time Collaboration*, visual *Industrial Theme*, serta kontrol keamanan akses tingkat enterprise.
+Aplikasi ini mendigitalisasi operasional workshop menjadi **100% Paperless** didukung fitur *Digital Signature*, *Real-time Live Chat & Collaboration*, visualisasi 3D WebGL, *Theme Accent Color Picker*, serta kontrol keamanan akses tingkat enterprise.
 
 ---
 
@@ -34,53 +35,72 @@ Aplikasi ini mendigitalisasi operasional workshop menjadi **100% Paperless** did
 - **Plan Component Replacement (PCR):** Modul estimasi dan jadwal penggantian komponen utama berdasarkan *Target Life (Hrs)*, *Current HM*, *Plan SMU*, dan *Daily Operating Hours*, lengkap dengan riwayat *Last Change Out* dan *Part Swapping*.
 - **Preventive Maintenance (PM):** Template checklist servis berkala (PS1-PS4) terintegrasi jadwal otomatis berbasis Hour Meter (HM) dengan notifikasi *Due Date* dan *1-Click Auto-Generate WO*.
 - **Plan Budget Bulanan (RAB):** Kontrol anggaran pemeliharaan (RAB vs Realisasi Biaya) per site dan per unit.
-- **Failure Analysis Report (FAR):** Investigasi investigatif 4 pilar *Root Cause Analysis* (RCA) untuk kegagalan komponen mayor.
+- **Failure Analysis Report (FAR):** Investigasi 4 pilar *Root Cause Analysis* (RCA) untuk kegagalan komponen mayor.
 - **Swap Component Report:** Rekam jejak mutasi, kanibalisasi, dan perpindahan komponen antar-unit alat berat.
 
-### 3. 📋 Notulen Rapat & Action Items Tracker
+### 3. 🌐 3D Interactive Database Relation Visualizer (WebGL / Three.js)
+- **3D Universe Graph:** Visualisasi 3D seluruh tabel database dan relasinya menggunakan WebGL (3D Force Graph & Three.js).
+- **Pengelompokan 9 Modul Domain:** Mengelompokkan tabel ke dalam domain spesifik (Work Orders, Asset Fleet, Parts, ToolRoom, HSE, Production, Meetings, Auth, System) dengan warna *glowing emissive* unik per modul.
+- **Animasi Aliran Partikel Relasi:** Garis koneksi melengkung dengan partikel bercahaya yang mengalir dinamis (*directional particle flow*).
+- **Interaksi Kamera Sinematik:** Rotasi 360°, zoom in/out, pan, serta *fly-to-target* otomatis saat tabel diklik.
+- **Sliding Glassmorphism Inspector:** Panel laci samping untuk memeriksa struktur kolom (PK/FK/Tipe Data), relasi terhubung yang dapat diklik, dan pratinjau sampel data tabel secara instan.
+- **Toolbar Kontrol Canggih:** Live search tabel/kolom dengan autocomplete, filter chip modul, layout switcher (*3D Galaxy, 3D Spherical Orbit, 2D Flat*), auto-rotate, dan ekspor screenshot resolusi tinggi (PNG).
+
+### 4. 💬 Real-Time Live Chat & Messenger Widget (Bebas Refresh)
+- **Dua Mode Messenger:** Halaman Penuh (`/chat`) dan **Floating Messenger Widget** di pojok kanan bawah yang aktif di seluruh halaman sistem.
+- **Pembaruan Otomatis (No Refresh):** Pesan masuk terupdate otomatis secara background (polling 3 detik) dengan *flicker-free DOM rendering*.
+- **Audio Chime Notification:** Notifikasi suara sintetis lembut (*Web Audio API*) yang berbunyi otomatis saat ada pesan baru masuk dari rekan kerja.
+- **Live Contact Badge & Tab Title:** Indikator badge merah unread pada daftar kontak diperbarui real-time dan judul tab browser otomatis menampilkan `(1) Pesan Baru - CMMS Aisfar`.
+- **Fitur Operasional Lapangan:** Template pesan cepat operasional (*WO Selesai, Breakdown Urgent, Sparepart Ready*), pencarian & lampiran kartu dokumen Work Order / JWO interaktif, serta emoji picker lengkap.
+
+### 5. 📋 Notulen Rapat & Action Items Tracker
 - **Notulen Rapat Digital:** Pencatatan notulen rapat workshop/operasional (Agenda, Hasil Pembahasan, Daftar Peserta Hadir, dan Penanggung Jawab).
 - **Continuous Action Items Tracker:** Pelacakan tindak lanjut keputusan rapat secara berkesinambungan lintas pertemuan dengan status progres (*Open, In Progress, Waiting Part, Closed*) dan tanggal tenggat (*Due Date*).
 - **Export PDF Resmi:** Cetak laporan notulen rapat format A4 berstandar korporat lengkap dengan tanda tangan pimpinan rapat.
 
-### 4. 🧰 ToolRoom & Workshop
+### 6. 🧰 ToolRoom & Workshop
 - **Peminjaman Perkakas (Tool Loan):** Sirkulasi check-in dan check-out perkakas kerja mekanik.
 - **Approval Stok Tool:** Alur pengajuan dan persetujuan penambahan inventaris perkakas baru.
 - **Berita Acara (B.A) Insiden:** Laporan resmi kejadian kerusakan atau kehilangan alat kerja beserta unggahan dokumen hasil investigasi.
 - **Stock Opname:** Audit fisik periodik dan penyesuaian inventaris perkakas dengan verifikasi tanda tangan digital.
 
-### 5. 📈 KPI & Reporting
+### 7. 📈 KPI & Reporting
 - **Report Breakdown & Downtime:** Analitik downtime unit, frekuensi kerusakan, serta klasifikasi breakdown.
 - **KPI Master Data:** Kalkulasi metrik ketersediaan unit (*Physical Availability / PA*), MTTR (*Mean Time To Repair*), dan MTBF (*Mean Time Between Failures*) berstandar industri alat berat.
 
-### 6. ⚙️ Master Data Terpusat
+### 8. ⚙️ Master Data Terpusat
 - **Master Unit (Asset):** Populasi alat berat, Model Unit, Tipe Unit, dan pembagian Site operasional.
 - **Master Part & Komponen:** Katalog suku cadang terintegrasi multi-model unit (TomSelect) dan target jam kerja.
 - **Master Vendor & Bengkel:** Database rekanan jasa servis dan fabrikasi luar.
 - **Master Mekanik:** Data kepegawaian mekanik dengan pop-up riwayat lengkap kinerja & inventaris tool.
 - **Master Tool & Kategori:** Database perkakas, spesifikasi, dan kuantitas stok.
 
-### 7. 🔐 Administrator, Keamanan & Hak Akses
+### 9. 🔐 Administrator, Keamanan & Hak Akses
 - **Manajemen User & Multi-Site:** Pengaturan pengguna berbasis hak akses dan lokasi tambang (Site).
 - **Matriks Hak Akses (Categorized Permissions):** Manajemen perizinan Role dan User yang dikelompokkan secara rapi per kategori modul dengan tombol *quick-toggle* instan.
 - **Approval Matrix & Digital Signatures:** Matriks persetujuan berjenjang untuk dokumen operasional.
 - **Log Aktivitas & Audit Trail:** Perekaman audit trail komprehensif atas seluruh transaksi pengguna secara otomatis.
 - **Backup Database Terintegrasi:** Fitur pencadangan instan seluruh database MySQL ke format file `.sql` aman.
-- **Pesan Instan (Live Chat):** Media koordinasi internal antar-pengguna secara *real-time*.
 
 ---
 
-## 🎨 UI/UX: Heavy Equipment Industrial Theme & Cool CRUD Loader
+## 🎨 UI/UX & Tema: Heavy Equipment Industrial Theme
 
-- **Industrial Dark Mode Aesthetics:** Palet warna gelap bernuansa *slate* dan aksen *hazard amber* (`#f59e0b` / `#ea580c`) khas alat berat pertambangan.
+- **🎨 Theme Accent Color Picker (Kustomisasi Warna Aksen Dinamis):**
+  - Pemilih warna aksen terintegrasi di header atas dengan tombol palet dan indikator titik menyala (*glowing dot*).
+  - **6 Pilihan Preset Warna Alat Berat:**
+    - 🟡 **CAT Mining Amber** *(Default Emas Caterpillar)*
+    - 🔵 **Komatsu Cyber Cyan** *(Electric Cyan Modern)*
+    - 🟢 **Hitachi Emerald** *(Hijau Forest)*
+    - 🔴 **Safety Flame Orange** *(Oranye Keselamatan Tambang)*
+    - 🔵 **Liebherr Sapphire Blue** *(Biru Laut Elegan)*
+    - 🟣 **Neon Amethyst Purple** *(Ungu Futuristik)*
+  - Perubahan seketika pada seluruh elemen UI (tombol, glowing border, card header, nav active, hazard stripe) tanpa reload (*instant zero-reload*) dan tersimpan di `localStorage` (*zero-flicker on load*).
+- **📌 Sticky Glassmorphism Header:** Header atas tetap melayang di posisi atas layar saat di-scroll dengan efek blur kaca dan border bayangan industri.
 - **High-Tech Top Progress Bar:** Progress bar berkecepatan tinggi dengan efek shimmer neon di bagian atas layar pada setiap aksi pengguna dan navigasi halaman.
 - **Glassmorphism Industrial CRUD Loader:**
   - Animasi roda gigi mesin (*industrial rotating heavy gears*) berputar presisi dengan cincin hidrolik berdenyut (*pulse ring*).
-  - Deteksi konteks operasi CRUD otomatis:
-    - Simpan Data Baru (`CREATING RECORD`)
-    - Simpan Perubahan Data (`UPDATING DATA`)
-    - Hapus Data Sistem (`DELETING RECORD`)
-    - Unggah & Verifikasi Berkas (`UPLOADING FILE`)
-    - Generate & Unduh Dokumen (`GENERATING FILE`)
+  - Deteksi konteks operasi CRUD otomatis: *Creating Record, Updating Data, Deleting Record, Uploading File, Generating File*.
 - **Micro-Animations & Anti-Double-Submit:** Tombol form otomatis bertransformasi menjadi *spinner* aktif dan status *disabled* saat diklik untuk mencegah duplikasi data transaksi.
 
 ---
@@ -92,7 +112,7 @@ Aplikasi telah melalui audit dan penguatan keamanan sistem berlapis:
 - **Proteksi SQL Injection (SQLi):** 100% menggunakan Eloquent ORM & Query Builder dengan *prepared statements* dan *parameter binding*.
 - **Proteksi Cross-Site Scripting (XSS):** Blade auto-escaping `{{ ... }}` dan sanitasi javascript helper `@js(...)`.
 - **Proteksi Web Shell & Insecure Uploads:** Whitelist ekstensi berkas ketat (`mimes:jpeg,png,jpg,webp,pdf,docx,xlsx,zip`).
-- **Pembersihan Berkas Sensitif:** Tidak ada berkas debug publik yang terekspos (`dev-db.php` / `dev-migrate.php`).
+- **Pembersihan Berkas & Artefak:** Repository bersih dari berkas debug publik dan script sementara.
 
 ---
 
@@ -100,6 +120,7 @@ Aplikasi telah melalui audit dan penguatan keamanan sistem berlapis:
 
 - **Backend:** Laravel 10 (PHP 8.1+)
 - **Frontend / UI:** Blade Templating, Vanilla CSS/JS, Tabler UI Core (v1.0), TomSelect, VirtualSelect, SweetAlert2
+- **3D Engine:** Three.js, 3D-Force-Graph (WebGL)
 - **Chart & Analytics:** Chart.js, ApexCharts
 - **Database:** MySQL / MariaDB / PostgreSQL
 - **Security & Authorization:**

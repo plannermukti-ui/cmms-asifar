@@ -297,12 +297,47 @@ document.addEventListener("DOMContentLoaded", function() {
     return str;
   }
 
+  let lastWidgetMessagesJson = '';
+  let lastWidgetMsgIds = new Set();
+  let isFirstWidgetLoad = true;
+
   function loadWidgetMessages() {
     if (!widgetSelectedUserId) return;
     fetch(`/chat/messages/${widgetSelectedUserId}`)
       .then(r => r.json())
       .then(messages => {
+        const currentJson = JSON.stringify(messages.map(m => ({ id: m.id, read: m.read_at !== null })));
+
+        if (!isFirstWidgetLoad) {
+          const hasNewIncoming = messages.some(m => m.sender_id != WIDGET_AUTH_ID && !lastWidgetMsgIds.has(m.id));
+          if (hasNewIncoming) {
+            try {
+              const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+              const osc = audioCtx.createOscillator();
+              const gain = audioCtx.createGain();
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+              osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.08);
+              gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+              osc.connect(gain);
+              gain.connect(audioCtx.destination);
+              osc.start();
+              osc.stop(audioCtx.currentTime + 0.3);
+            } catch (e) {}
+          }
+        }
+        lastWidgetMsgIds = new Set(messages.map(m => m.id));
+
+        if (currentJson === lastWidgetMessagesJson && !isFirstWidgetLoad) {
+          return;
+        }
+        lastWidgetMessagesJson = currentJson;
+        isFirstWidgetLoad = false;
+
         const container = document.getElementById('widgetMessages');
+        const isAtBottom = (container.scrollHeight - container.clientHeight <= container.scrollTop + 50);
+
         container.innerHTML = '';
 
         messages.forEach(msg => {
@@ -322,7 +357,9 @@ document.addEventListener("DOMContentLoaded", function() {
           container.appendChild(bubble);
         });
 
-        container.scrollTop = container.scrollHeight;
+        if (isAtBottom || container.children.length <= 5) {
+          container.scrollTop = container.scrollHeight;
+        }
       });
   }
 

@@ -363,6 +363,28 @@ function formatMessageBody(raw, isMine) {
   return str;
 }
 
+// Synthetic Web Audio Notification Chime
+function playChatNotificationSound() {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+    osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.08); // A5
+    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.3);
+  } catch (e) {}
+}
+
+let lastMessagesJson = '';
+let lastMessageIds = new Set();
+let isFirstLoad = true;
+
 function loadMessages() {
   if (!selectedUserId) return;
   fetch(`/chat/messages/${selectedUserId}`, {
@@ -370,15 +392,35 @@ function loadMessages() {
   })
   .then(r => r.json())
   .then(messages => {
+    const currentJson = JSON.stringify(messages.map(m => ({ id: m.id, read: m.read_at !== null })));
+    
+    // Check if new incoming message arrived from partner
+    if (!isFirstLoad) {
+      const hasNewIncoming = messages.some(m => m.sender_id != AUTH_ID && !lastMessageIds.has(m.id));
+      if (hasNewIncoming) {
+        playChatNotificationSound();
+      }
+    }
+    
+    // Update tracked IDs
+    lastMessageIds = new Set(messages.map(m => m.id));
+
+    // If no changes in messages or read status, skip DOM rewrite to prevent flicker
+    if (currentJson === lastMessagesJson && !isFirstLoad) {
+      return;
+    }
+    lastMessagesJson = currentJson;
+    isFirstLoad = false;
+
     const container = document.getElementById('chatMessages');
-    const isAtBottom = (container.scrollHeight - container.clientHeight <= container.scrollTop + 50);
+    const isAtBottom = (container.scrollHeight - container.clientHeight <= container.scrollTop + 60);
 
     container.innerHTML = '';
     messages.forEach(function(msg) {
       const isMine = msg.sender_id == AUTH_ID;
       const isRead = msg.read_at !== null;
       const tickIcon = isMine 
-        ? (isRead ? '<span class="text-info ms-1 fw-bold" style="font-size: 11px;">✓✓</span>' : '<span class="text-white-50 ms-1" style="font-size: 11px;">✓</span>') 
+        ? (isRead ? '<span class="text-info ms-1 fw-bold" style="font-size: 11px;" title="Dibaca">✓✓</span>' : '<span class="text-white-50 ms-1" style="font-size: 11px;" title="Terkirim">✓</span>') 
         : '';
       
       const formattedBody = formatMessageBody(msg.body, isMine);
@@ -397,12 +439,53 @@ function loadMessages() {
       container.appendChild(bubble);
     });
 
-    // Jangan paksa scroll jika pengguna sedang membaca pesan lama.
-    if (isAtBottom || messages.length === 0) {
+    // Auto-scroll to bottom if user was near bottom or on initial load
+    if (isAtBottom || container.children.length <= 5) {
       container.scrollTop = container.scrollHeight;
     }
   });
 }
+
+// Live Contact List Updater
+function updateContactList() {
+  fetch('/chat/users', {
+    headers: {'X-Requested-With': 'XMLHttpRequest'}
+  })
+  .then(r => r.json())
+  .then(users => {
+    let totalUnread = 0;
+    users.forEach(user => {
+      totalUnread += user.unread_count || 0;
+      const badge = document.getElementById(`unread-badge-${user.id}`);
+      if (badge) {
+        if (user.unread_count > 0 && user.id != selectedUserId) {
+          badge.textContent = user.unread_count;
+          badge.style.display = 'inline-block';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    });
+
+    // Update browser tab title
+    if (totalUnread > 0) {
+      document.title = `(${totalUnread}) Pesan Baru - CMMS Aisfar`;
+    } else {
+      document.title = 'Live Chat - CMMS Aisfar';
+    }
+  });
+}
+
+// Global background updater every 4 seconds
+setInterval(updateContactList, 4000);
+
+// Sync immediately when tab is focused
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'visible') {
+    if (selectedUserId) loadMessages();
+    updateContactList();
+  }
+});
 
 // Handle Insert Emoji
 document.addEventListener('click', function(e) {

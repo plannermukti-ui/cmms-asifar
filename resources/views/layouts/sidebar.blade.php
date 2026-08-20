@@ -315,7 +315,6 @@
         <!-- ======================================================== -->
         <!-- CATEGORY 6: MASTER DATA                                  -->
         <!-- ======================================================== -->
-        @if(auth()->user()->can('view_master_units') || auth()->user()->can('view_unit_types') || auth()->user()->can('view_unit_models') || auth()->user()->can('view_parts') || auth()->user()->can('view_vendors') || auth()->user()->can('view_mechanics') || auth()->user()->can('view_tools') || auth()->user()->can('view_tool_categories') || auth()->user()->can('view_tool_stocks'))
         <li class="nav-item text-muted text-uppercase fw-bold px-3 pt-3 pb-1" style="font-size: 0.65rem; letter-spacing: 0.08em; opacity: 0.5;">
           Master Data
         </li>
@@ -419,7 +418,17 @@
           </div>
         </li>
         @endif
-        @endif
+
+        {{-- Relasi Database 3D --}}
+        <li class="nav-item">
+          <a class="nav-link rounded-2 mx-2 mb-1 px-2.5 {{ request()->routeIs('database-relations.*') ? 'active bg-primary-lt font-weight-bold' : '' }}" href="{{ route('database-relations.index') }}">
+            <span class="nav-link-icon me-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon text-cyan" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" /><path d="M12 12l8 -4.5" /><path d="M12 12l0 9" /><path d="M12 12l-8 -4.5" /><path d="M16 5.25l-8 4.5" /></svg>
+            </span>
+            <span class="nav-link-title">Relasi Database 3D</span>
+            <span class="badge bg-cyan-lt text-cyan ms-auto pill" style="font-size: 0.65rem;">3D</span>
+          </a>
+        </li>
 
 
         <!-- ======================================================== -->

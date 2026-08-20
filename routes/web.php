@@ -28,6 +28,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Master Data
     Route::get('/master-data', [\App\Http\Controllers\MasterDataController::class, 'index'])->name('master-data.index');
     Route::get('/kpi-master-data/export', [\App\Http\Controllers\KpiController::class, 'exportMasterData'])->name('kpi.master-data.export');
+    Route::get('/database-relations', [\App\Http\Controllers\DatabaseRelationController::class, 'index'])->name('database-relations.index');
+    Route::get('/database-relations/data', [\App\Http\Controllers\DatabaseRelationController::class, 'getSchemaData'])->name('database-relations.data');
+    Route::get('/database-relations/sample/{table}', [\App\Http\Controllers\DatabaseRelationController::class, 'getTableSample'])->name('database-relations.sample');
     Route::resource('/departments', \App\Http\Controllers\DepartmentController::class);
     Route::resource('/jabatans', \App\Http\Controllers\JabatanController::class);
     Route::resource('/roles', \App\Http\Controllers\RoleController::class);
