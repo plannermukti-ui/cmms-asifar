@@ -71,6 +71,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/chat/users', [\App\Http\Controllers\ChatController::class, 'getUsers'])->name('chat.users');
     Route::get('/chat/messages/{userId}', [\App\Http\Controllers\ChatController::class, 'getMessages'])->name('chat.messages');
     Route::post('/chat/send', [\App\Http\Controllers\ChatController::class, 'send'])->name('chat.send');
+    Route::delete('/chat/clear/{userId}', [\App\Http\Controllers\ChatController::class, 'clearChat'])->name('chat.clear');
     Route::get('/chat/unread-count', [\App\Http\Controllers\ChatController::class, 'unreadCount'])->name('chat.unread-count');
     // Notulen Meeting & Continuous Action Items Tracker
     Route::get('/meetings/get-open-action-items', [\App\Http\Controllers\MeetingController::class, 'getOpenActionItems'])->name('meetings.get-open-action-items');

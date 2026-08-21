@@ -15,7 +15,7 @@ class ChatController extends Controller
         // Require specific permissions for chat
         $this->middleware('permission:view_chat')->only(['index', 'getUsers', 'getMessages', 'unreadCount', 'searchDocument']);
         $this->middleware('permission:send_chat')->only(['send']);
-        $this->middleware('permission:delete_chat')->only(['clearChat']);
+        // 'clearChat' now doesn't require a special permission because it's limited to the user's own chat history
     }
 
     public function index()
