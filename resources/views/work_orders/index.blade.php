@@ -49,48 +49,217 @@
 @endif
 
 <!-- Filter -->
-<div class="card mt-3">
-  <div class="card-body">
-    <form method="GET" class="row g-2 align-items-end">
-      <div class="col-md-2">
-        <label class="form-label">Cari No WO / Unit</label>
-        <input type="text" class="form-control form-control-sm" name="search" value="{{ request('search') }}" placeholder="WO-...">
+<style>
+  /* ── Filter Card & Unified Inputs ── */
+  .filter-card {
+    border: 1px solid rgba(98, 105, 118, 0.16);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    border-radius: 8px;
+    background: #ffffff;
+  }
+  .filter-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 18px;
+    white-space: nowrap;
+  }
+  .filter-control {
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    font-size: 0.82rem !important;
+    border-radius: 6px !important;
+    border: 1px solid #cbd5e1 !important;
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    padding: 0.35rem 0.65rem !important;
+    box-sizing: border-box !important;
+    transition: all 0.15s ease-in-out;
+  }
+  .filter-control:focus {
+    border-color: #206bc4 !important;
+    box-shadow: 0 0 0 3px rgba(32, 107, 196, 0.12) !important;
+    outline: none !important;
+  }
+  
+  /* Unified Virtual Select (.excel-filter) */
+  .filter-card .vscomp-wrapper {
+    width: 100% !important;
+    font-family: inherit !important;
+  }
+  .filter-card .vscomp-ele {
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    padding: 0 8px !important;
+    border-radius: 6px !important;
+    border: 1px solid #cbd5e1 !important;
+    background-color: #ffffff !important;
+    font-size: 0.82rem !important;
+    display: flex !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+    transition: all 0.15s ease-in-out !important;
+  }
+  .filter-card .vscomp-ele:hover {
+    border-color: #94a3b8 !important;
+  }
+  .filter-card .vscomp-wrapper.focused .vscomp-ele {
+    border-color: #206bc4 !important;
+    box-shadow: 0 0 0 3px rgba(32, 107, 196, 0.12) !important;
+  }
+  .filter-card .vscomp-placeholder {
+    font-size: 0.82rem !important;
+    color: #94a3b8 !important;
+  }
+  .filter-card .vscomp-value {
+    font-size: 0.82rem !important;
+    color: #1e293b !important;
+    font-weight: 500 !important;
+  }
+  .filter-card .vscomp-arrow {
+    right: 8px !important;
+  }
+  .filter-card .vscomp-arrow::after {
+    border-width: 1.5px 0 0 1.5px !important;
+    width: 6px !important;
+    height: 6px !important;
+    border-color: #64748b !important;
+  }
+  
+  /* Filter Action Buttons */
+  .filter-btn {
+    height: 36px !important;
+    min-height: 36px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
+    padding: 0 12px !important;
+    box-sizing: border-box !important;
+  }
+  .filter-btn-icon {
+    height: 36px !important;
+    width: 36px !important;
+    min-height: 36px !important;
+    min-width: 36px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Dark mode support */
+  [data-bs-theme="dark"] .filter-card {
+    background: #182234;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  [data-bs-theme="dark"] .filter-label {
+    color: #94a3b8;
+  }
+  [data-bs-theme="dark"] .filter-control {
+    background-color: #1d273b !important;
+    border-color: #2c3b52 !important;
+    color: #e2e8f0 !important;
+  }
+  [data-bs-theme="dark"] .filter-card .vscomp-ele {
+    background-color: #1d273b !important;
+    border-color: #2c3b52 !important;
+  }
+  [data-bs-theme="dark"] .filter-card .vscomp-value {
+    color: #e2e8f0 !important;
+  }
+  [data-bs-theme="dark"] .filter-card .vscomp-placeholder {
+    color: #64748b !important;
+  }
+</style>
+
+<div class="card filter-card mt-3">
+  <div class="card-body p-3">
+    <form method="GET" class="row g-2 align-items-start">
+      <!-- Search -->
+      <div class="col-12 col-sm-6 col-lg-2">
+        <label class="filter-label">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+          No WO / Unit
+        </label>
+        <input type="text" class="form-control filter-control" name="search" value="{{ request('search') }}" placeholder="Cari WO / Unit...">
       </div>
-      <div class="col-md-2">
-        <label class="form-label">Status</label>
-        <select class="form-select form-select-sm excel-filter" name="status_wo[]" multiple data-placeholder="Semua Status">
+
+      <!-- Status -->
+      <div class="col-12 col-sm-6 col-lg-2">
+        <label class="filter-label">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-adjustments-horizontal" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="14" cy="6" r="2"/><line x1="4" y1="6" x2="12" y2="6"/><line x1="16" y1="6" x2="20" y2="6"/><circle cx="8" cy="12" r="2"/><line x1="4" y1="12" x2="6" y2="12"/><line x1="10" y1="12" x2="20" y2="12"/><circle cx="17" cy="18" r="2"/><line x1="4" y1="18" x2="15" y2="18"/><line x1="19" y1="18" x2="20" y2="18"/></svg>
+          Status WO
+        </label>
+        <select class="form-select excel-filter" name="status_wo[]" multiple data-placeholder="Semua Status">
           @foreach(['Open','Inprogress','Completed','Cancel','Backlog'] as $s)
             <option value="{{ $s }}" {{ in_array($s, (array)request('status_wo', [])) ? 'selected' : '' }}>{{ $s }}</option>
           @endforeach
         </select>
       </div>
-      <div class="col-md-2">
-        <label class="form-label">Tipe</label>
-        <select class="form-select form-select-sm excel-filter" name="tipe_wo[]" multiple data-placeholder="Semua Tipe">
-          <option value="BD" {{ in_array('BD', (array)request('tipe_wo', [])) ? 'selected' : '' }}>BD</option>
+
+      <!-- Tipe -->
+      <div class="col-12 col-sm-6 col-lg-2">
+        <label class="filter-label">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-category" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 4h6v6h-6z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6h-6z"/><circle cx="17" cy="17" r="3"/></svg>
+          Tipe WO
+        </label>
+        <select class="form-select excel-filter" name="tipe_wo[]" multiple data-placeholder="Semua Tipe">
+          <option value="BD" {{ in_array('BD', (array)request('tipe_wo', [])) ? 'selected' : '' }}>BD (Breakdown)</option>
           <option value="Plan" {{ in_array('Plan', (array)request('tipe_wo', [])) ? 'selected' : '' }}>Plan</option>
         </select>
       </div>
-      <div class="col-md-2">
-        <label class="form-label">Site</label>
-        <select class="form-select form-select-sm excel-filter" name="site_id[]" multiple data-placeholder="Semua Site">
+
+      <!-- Site -->
+      <div class="col-12 col-sm-6 col-lg-2">
+        <label class="filter-label">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-map-pin" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="11" r="3"/><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/></svg>
+          Site Lokasi
+        </label>
+        <select class="form-select excel-filter" name="site_id[]" multiple data-placeholder="Semua Site">
           @foreach($sites as $site)
             <option value="{{ $site->id }}" {{ in_array($site->id, (array)request('site_id', [])) ? 'selected' : '' }}>{{ $site->name }}</option>
           @endforeach
         </select>
       </div>
-      <div class="col-md-2">
-        <label class="form-label">Dari Tanggal</label>
-        <input type="date" class="form-control form-control-sm" name="date_from" value="{{ request('date_from') }}">
+
+      <!-- Dari Tanggal -->
+      <div class="col-12 col-sm-6 col-lg-2">
+        <label class="filter-label">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><rect x="4" y="5" width="16" height="16" rx="2"/><line x1="16" y1="3" x2="16" y2="7"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="4" y1="11" x2="20" y2="11"/></svg>
+          Dari Tanggal
+        </label>
+        <input type="date" class="form-control filter-control" name="date_from" value="{{ request('date_from') }}">
       </div>
-      <div class="col-md-2">
-        <div class="d-flex gap-2">
-          <button type="submit" class="btn btn-primary btn-sm flex-grow-1">Filter</button>
-          <a href="{{ route('work-orders.index') }}" class="btn btn-secondary btn-sm" data-bs-toggle="tooltip" title="Clear Filter">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x m-0" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+
+      <!-- Actions -->
+      <div class="col-12 col-sm-6 col-lg-2">
+        <label class="filter-label text-muted d-none d-lg-flex align-items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-bolt" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="13 3 13 10 19 10 11 21 11 14 5 14 13 3"/></svg>
+          Aksi
+        </label>
+        <div class="d-flex gap-1">
+          <button type="submit" class="btn btn-primary filter-btn flex-grow-1 shadow-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-filter me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 4h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v7l-6 2v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.344v-2.228z"/></svg>
+            Filter
+          </button>
+          <a href="{{ route('work-orders.index') }}" class="btn btn-outline-secondary filter-btn-icon shadow-none" data-bs-toggle="tooltip" title="Reset Filter">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-rotate m-0" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M19.95 11a8 8 0 1 0 -.5 4m.5 5v-5h-5"/></svg>
           </a>
-          <button type="submit" formaction="{{ route('work-orders.export') }}" class="btn btn-success btn-sm" data-bs-toggle="tooltip" title="Download Excel">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-spreadsheet m-0" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M8 11h8v7h-8z" /><path d="M8 15h8" /><path d="M11 11v7" /></svg>
+          <button type="submit" formaction="{{ route('work-orders.export') }}" class="btn btn-outline-success filter-btn-icon shadow-none" data-bs-toggle="tooltip" title="Export Excel">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-spreadsheet m-0" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M8 11h8v7h-8z"/><path d="M8 15h8"/><path d="M11 11v7"/></svg>
           </button>
         </div>
       </div>
@@ -106,9 +275,24 @@
   }
 </style>
 
+<style>
+.wo-group-header {
+  background: linear-gradient(90deg, var(--group-color, #f0f0f0) 0%, rgba(255,255,255,0.05) 100%);
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.15s;
+}
+.wo-group-header:hover { opacity: 0.85; }
+.wo-group-header td { padding: 0.45rem 0.75rem !important; border-bottom: 2px solid rgba(0,0,0,0.08); }
+.wo-group-chevron { transition: transform 0.25s ease; display: inline-block; }
+.wo-group-collapsed .wo-group-chevron { transform: rotate(-90deg); }
+.wo-group-row { transition: opacity 0.2s; }
+.status-completed-section td { background-color: rgba(42, 167, 110, 0.06); }
+</style>
+
 <div class="card mt-2">
   <div class="table-responsive">
-    <table class="table card-table table-vcenter text-nowrap">
+    <table class="table card-table table-vcenter text-nowrap" id="wo-grouped-table">
       <thead>
         <tr>
           <th>No WO</th>
@@ -122,39 +306,82 @@
         </tr>
       </thead>
       <tbody>
-        @forelse($workOrders as $wo)
-        <tr>
-          <td class="fw-bold">{{ $wo->no_wo }}</td>
-          <td>
-            @php
-              $badgeColor = match($wo->status_wo) {
-                'Open' => 'bg-blue', 'Inprogress' => 'bg-yellow', 'Completed' => 'bg-green',
-                'Cancel' => 'bg-red', 'Backlog' => 'bg-purple', default => 'bg-secondary'
-              };
-            @endphp
-            <span class="badge {{ $badgeColor }}">{{ $wo->status_wo }}</span>
-          </td>
-          <td>{{ $wo->unit->model->name ?? '-' }}</td>
-          <td>{{ $wo->unit->nomor_unit ?? '-' }}</td>
-          <td>{{ $wo->site->name ?? ($wo->unit->siteRelation->name ?? ($wo->unit->site->name ?? '-')) }}</td>
-          <td>{{ $wo->waktu_bd ? \Carbon\Carbon::parse($wo->waktu_bd)->format('d M Y H:i') : '-' }}</td>
-          <td>{{ $wo->durasi_hrs ?? '-' }}</td>
-          <td>
-            <a href="{{ route('work-orders.show', $wo) }}" class="btn btn-sm btn-info">Detail</a>
-            @can('edit_work_orders')
-            <a href="{{ route('work-orders.edit', $wo) }}" class="btn btn-sm btn-primary">Edit</a>
-            @endcan
-            @can('delete_work_orders')
-            <form action="{{ route('work-orders.destroy', $wo) }}" method="post" class="d-inline" onsubmit="return confirm('Hapus WO ini beserta seluruh data terkait?');">
-              @csrf @method('DELETE')
-              <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
-            </form>
-            @endcan
-          </td>
-        </tr>
-        @empty
-        <tr><td colspan="8" class="text-center">Belum ada data Work Order.</td></tr>
-        @endforelse
+        @php
+          $statusOrder = ['Open', 'Inprogress', 'Backlog', 'Cancel', 'Completed'];
+          $grouped = $workOrders->getCollection()->groupBy('status_wo');
+          // bg = background hex, fg = foreground/text hex
+          $statusConfig = [
+            'Open'       => ['bg' => '#206bc4', 'fg' => '#ffffff', 'icon' => '🔵', 'label' => 'Open'],
+            'Inprogress' => ['bg' => '#f6a500', 'fg' => '#3d2a00', 'icon' => '🟡', 'label' => 'Inprogress'],
+            'Backlog'    => ['bg' => '#7263d5', 'fg' => '#ffffff', 'icon' => '🟣', 'label' => 'Backlog'],
+            'Cancel'     => ['bg' => '#d63939', 'fg' => '#ffffff', 'icon' => '🔴', 'label' => 'Cancel'],
+            'Completed'  => ['bg' => '#2fb344', 'fg' => '#ffffff', 'icon' => '🟢', 'label' => 'Completed'],
+          ];
+          $hasAny = $workOrders->isNotEmpty();
+        @endphp
+
+        @if(!$hasAny)
+          <tr><td colspan="8" class="text-center text-muted py-4">Belum ada data Work Order.</td></tr>
+        @else
+          @foreach($statusOrder as $statusKey)
+            @if($grouped->has($statusKey))
+              @php
+                $items   = $grouped->get($statusKey);
+                $cfg     = $statusConfig[$statusKey] ?? ['bg'=>'#666666','fg'=>'#ffffff','icon'=>'⚪','label'=>$statusKey];
+                $groupId = 'wo-group-' . strtolower($statusKey);
+              @endphp
+              {{-- Group Header Row --}}
+              <tr class="wo-group-header {{ $statusKey === 'Completed' ? 'wo-completed-header' : '' }}"
+                  style="--group-color: {{ $cfg['bg'] }}1a;"
+                  onclick="toggleWoGroup('{{ $groupId }}')"
+                  id="{{ $groupId }}-header">
+                <td colspan="8">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="wo-group-chevron text-muted">▼</span>
+                    <span class="badge fs-6 fw-bold"
+                          style="background-color:{{ $cfg['bg'] }}; color:{{ $cfg['fg'] }}; border:1px solid {{ $cfg['bg'] }};"
+                    >{{ $cfg['icon'] }} {{ $cfg['label'] }}</span>
+                    <span class="badge bg-secondary-lt text-secondary">{{ $items->count() }} WO</span>
+                    @if($statusKey === 'Completed')
+                      <span class="badge bg-green-lt text-green ms-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-circle-check me-1" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2l4 -4"/></svg>
+                        Selesai
+                      </span>
+                    @endif
+                  </div>
+                </td>
+              </tr>
+              {{-- Group Rows --}}
+              @foreach($items as $wo)
+              <tr class="wo-group-row {{ $statusKey === 'Completed' ? 'status-completed-section' : '' }}" data-group="{{ $groupId }}">
+                <td class="fw-bold">{{ $wo->no_wo }}</td>
+                <td>
+                  <span class="badge fw-semibold"
+                        style="background-color:{{ $cfg['bg'] }}; color:{{ $cfg['fg'] }};"
+                  >{{ $cfg['label'] }}</span>
+                </td>
+                <td>{{ $wo->unit->model->name ?? '-' }}</td>
+                <td>{{ $wo->unit->nomor_unit ?? '-' }}</td>
+                <td>{{ $wo->site->name ?? ($wo->unit->siteRelation->name ?? ($wo->unit->site->name ?? '-')) }}</td>
+                <td>{{ $wo->waktu_bd ? \Carbon\Carbon::parse($wo->waktu_bd)->format('d M Y H:i') : '-' }}</td>
+                <td>{{ $wo->durasi_hrs ?? '-' }}</td>
+                <td>
+                  <a href="{{ route('work-orders.show', $wo) }}" class="btn btn-sm btn-info">Detail</a>
+                  @can('edit_work_orders')
+                  <a href="{{ route('work-orders.edit', $wo) }}" class="btn btn-sm btn-primary">Edit</a>
+                  @endcan
+                  @can('delete_work_orders')
+                  <form action="{{ route('work-orders.destroy', $wo) }}" method="post" class="d-inline" onsubmit="return confirm('Hapus WO ini beserta seluruh data terkait?');">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                  </form>
+                  @endcan
+                </td>
+              </tr>
+              @endforeach
+            @endif
+          @endforeach
+        @endif
       </tbody>
     </table>
   </div>
@@ -162,6 +389,29 @@
   <div class="card-footer">{{ $workOrders->links('pagination::bootstrap-5') }}</div>
   @endif
 </div>
+
+<script>
+function toggleWoGroup(groupId) {
+  const header = document.getElementById(groupId + '-header');
+  const rows = document.querySelectorAll('[data-group="' + groupId + '"]');
+  const chevron = header ? header.querySelector('.wo-group-chevron') : null;
+
+  const isCollapsed = header && header.classList.contains('wo-group-collapsed');
+
+  rows.forEach(function(row) {
+    row.style.display = isCollapsed ? '' : 'none';
+  });
+
+  if (header) {
+    header.classList.toggle('wo-group-collapsed', !isCollapsed);
+  }
+}
+
+// Auto-collapse "Completed" group on load
+document.addEventListener('DOMContentLoaded', function () {
+  toggleWoGroup('wo-group-completed');
+});
+</script>
 
 <!-- Modal Download DMBD -->
 <div class="modal modal-blur fade" id="modal-download-dmbd" tabindex="-1" role="dialog" aria-hidden="true">

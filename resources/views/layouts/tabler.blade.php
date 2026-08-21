@@ -872,6 +872,21 @@
         const form = e.target;
         if (!form || form.hasAttribute('data-no-loader')) return;
 
+        // Skip chat widget, live chat, discussion forms, and async widgets
+        if (
+          form.id === 'widgetChatForm' || 
+          form.id === 'chatForm' || 
+          form.id === 'woDiscussionForm' || 
+          form.classList.contains('form-reply') || 
+          form.closest('#chatWidgetContainer') || 
+          form.closest('.chat-shell')
+        ) {
+          return;
+        }
+
+        // If another listener already handled this via AJAX e.preventDefault()
+        if (e.defaultPrevented) return;
+
         const method = (form.getAttribute('method') || 'GET').toUpperCase();
         const hasMethodOverride = form.querySelector('input[name="_method"]');
         const effectiveMethod = hasMethodOverride ? hasMethodOverride.value.toUpperCase() : method;

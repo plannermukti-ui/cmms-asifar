@@ -23,7 +23,8 @@ class ChatController extends Controller
         $authId = Auth::id();
         $users = User::where('id', '!=', $authId)
             ->where('status', 'active')
-            ->select('id', 'nama_lengkap', 'email', 'avatar')
+            ->with('site:id,name,code')
+            ->select('id', 'nama_lengkap', 'email', 'avatar', 'site_id')
             ->get()
             ->map(function ($user) use ($authId) {
                 $user->unread_count = Message::where('sender_id', $user->id)
@@ -31,13 +32,16 @@ class ChatController extends Controller
                     ->whereNull('read_at')
                     ->count();
                 $user->avatar_url = $user->avatar_url;
+                $user->site_name = $user->site ? ($user->site->name . ($user->site->code ? ' (' . $user->site->code . ')' : '')) : 'Head Office / Superadmin';
+                $user->site_code = $user->site ? ($user->site->code ?? $user->site->name) : 'HO';
                 return $user;
             });
             
-        // Urutkan user berdasarkan chat terbaru jika memungkinkan, tapi untuk sekarang urutkan by unread_count saja
+        // Kelompokkan per Site, dengan unread_count terbanyak diutamakan
+        $groupedUsers = $users->groupBy('site_name');
         $users = $users->sortByDesc('unread_count')->values();
         
-        return view('chat.index', compact('users'));
+        return view('chat.index', compact('users', 'groupedUsers'));
     }
 
     public function getUsers()
@@ -45,7 +49,8 @@ class ChatController extends Controller
         $authId = Auth::id();
         $users = User::where('id', '!=', $authId)
             ->where('status', 'active')
-            ->select('id', 'nama_lengkap', 'email', 'avatar')
+            ->with('site:id,name,code')
+            ->select('id', 'nama_lengkap', 'email', 'avatar', 'site_id')
             ->get()
             ->map(function ($user) use ($authId) {
                 $user->unread_count = Message::where('sender_id', $user->id)
@@ -53,6 +58,8 @@ class ChatController extends Controller
                     ->whereNull('read_at')
                     ->count();
                 $user->avatar_url = $user->avatar_url;
+                $user->site_name = $user->site ? ($user->site->name . ($user->site->code ? ' (' . $user->site->code . ')' : '')) : 'Head Office / Superadmin';
+                $user->site_code = $user->site ? ($user->site->code ?? $user->site->name) : 'HO';
                 return $user;
             })->sortByDesc('unread_count')->values();
 
@@ -68,7 +75,7 @@ class ChatController extends Controller
                 $q->where('sender_id', $userId)->where('receiver_id', $authId);
             })
             ->orderBy('created_at', 'asc')
-            ->with('sender:id,nama_lengkap,avatar')
+            ->with('sender:id,nama_lengkap,avatar,site_id', 'sender.site:id,name,code')
             ->get()
             ->map(function ($msg) {
                 if ($msg->sender) {
@@ -90,22 +97,57 @@ class ChatController extends Controller
     {
         $request->validate([
             'receiver_id' => 'required|exists:users,id',
-            'body'        => 'required|string|max:2000',
+            'body'        => 'nullable|string|max:5000',
+            'file'        => 'nullable|file|max:20480|mimes:jpg,jpeg,png,gif,webp,svg,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar,txt,csv',
+            'attachment'  => 'nullable|file|max:20480|mimes:jpg,jpeg,png,gif,webp,svg,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar,txt,csv',
         ]);
+
+        if (empty($request->body) && !$request->hasFile('file') && !$request->hasFile('attachment')) {
+            return response()->json(['message' => 'Pesan atau lampiran berkas wajib diisi.'], 422);
+        }
+
+        $uploadedFile = $request->file('file') ?? $request->file('attachment');
+        $attachmentPath = null;
+        $attachmentName = null;
+        $attachmentType = null;
+        $attachmentSize = null;
+
+        if ($uploadedFile) {
+            $attachmentName = $uploadedFile->getClientOriginalName();
+            $attachmentSize = $uploadedFile->getSize();
+            $mime = $uploadedFile->getMimeType();
+            $ext = strtolower($uploadedFile->getClientOriginalExtension());
+
+            if (str_starts_with($mime, 'image/') || in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'])) {
+                $attachmentType = 'image';
+            } else {
+                $attachmentType = 'document';
+            }
+
+            $attachmentPath = $uploadedFile->store('chat_attachments', 'public');
+        }
 
         $message = Message::create([
-            'sender_id'   => Auth::id(),
-            'receiver_id' => $request->receiver_id,
-            'body'        => $request->body,
+            'sender_id'       => Auth::id(),
+            'receiver_id'     => $request->receiver_id,
+            'body'            => $request->body ?? '',
+            'attachment_path' => $attachmentPath,
+            'attachment_name' => $attachmentName,
+            'attachment_type' => $attachmentType,
+            'attachment_size' => $attachmentSize,
         ]);
 
-        $message->load('sender:id,nama_lengkap,avatar');
+        $message->load('sender:id,nama_lengkap,avatar,site_id', 'sender.site:id,name,code');
         if ($message->sender) {
             $message->sender->avatar_url = $message->sender->avatar_url;
         }
 
-        // Broadcast via Reverb
-        broadcast(new MessageSent($message))->toOthers();
+        // Broadcast via Reverb if available
+        try {
+            broadcast(new MessageSent($message))->toOthers();
+        } catch (\Throwable $e) {
+            // broadcast fallback silently
+        }
 
         return response()->json($message);
     }

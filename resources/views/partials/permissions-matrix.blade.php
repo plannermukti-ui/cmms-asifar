@@ -92,8 +92,68 @@
   ];
 @endphp
 
-<div class="card border-0 shadow-sm">
-  <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+<style>
+  /* ── Permissions Matrix Dark/Light Mode Styling ── */
+  .perm-matrix-card {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .perm-cat-header {
+    background-color: #f8fafc !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+    color: var(--tblr-body-color, #1e293b) !important;
+  }
+  .perm-cat-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  .perm-module-name {
+    color: #1e293b !important;
+    font-weight: 600;
+    font-size: 0.86rem;
+  }
+  .perm-module-key {
+    color: #64748b !important;
+    font-size: 0.75rem;
+  }
+  .permission-row {
+    transition: background-color 0.15s ease;
+  }
+  .permission-row:hover {
+    background-color: rgba(32, 107, 196, 0.03) !important;
+  }
+
+  /* Dark Theme Overrides */
+  [data-bs-theme="dark"] .perm-cat-header {
+    background-color: #1a2332 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+  [data-bs-theme="dark"] .perm-cat-title {
+    color: #f1f5f9 !important;
+  }
+  [data-bs-theme="dark"] .perm-module-name {
+    color: #f8fafc !important;
+  }
+  [data-bs-theme="dark"] .perm-module-key {
+    color: #94a3b8 !important;
+  }
+  [data-bs-theme="dark"] .permission-row:hover {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+  }
+  [data-bs-theme="dark"] #permissions-matrix-table td,
+  [data-bs-theme="dark"] #permissions-matrix-table th {
+    border-color: rgba(255, 255, 255, 0.07) !important;
+  }
+  [data-bs-theme="dark"] .perm-extra-label {
+    color: #f1f5f9 !important;
+  }
+</style>
+
+<div class="card perm-matrix-card border shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center py-3">
     <div>
       <h3 class="card-title fw-bold m-0">Matriks Hak Akses (Permissions)</h3>
       <div class="text-muted small mt-1">Atur perizinan akses secara spesifik per kategori modul aplikasi.</div>
@@ -112,12 +172,12 @@
 
   <div class="table-responsive">
     <table class="table table-vcenter card-table table-hover table-bordered m-0" id="permissions-matrix-table">
-      <thead class="table-light text-center">
+      <thead class="text-center">
         <tr>
-          <th style="min-width: 250px; text-align: left;">Modul Aplikasi</th>
+          <th style="min-width: 250px; text-align: left;" class="py-2.5">Modul Aplikasi</th>
           @foreach($actions as $action)
-            <th style="width: 120px;" class="text-center">
-              <span class="badge bg-blue-lt text-uppercase px-2 py-1">{{ ucfirst($action) }}</span>
+            <th style="width: 120px;" class="text-center py-2.5">
+              <span class="badge bg-blue-lt text-uppercase px-2 py-1 fw-bold">{{ ucfirst($action) }}</span>
             </th>
           @endforeach
         </tr>
@@ -126,12 +186,12 @@
         @foreach($categorizedModules as $catName => $catData)
           @php $catSlug = \Illuminate\Support\Str::slug($catName); @endphp
           {{-- Category Header Row --}}
-          <tr class="table-active bg-light text-dark fw-bold border-top border-bottom">
+          <tr class="perm-cat-header fw-bold">
             <td colspan="{{ count($actions) + 1 }}" class="py-2.5 px-3">
               <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-2">
                   {!! $catData['icon'] !!}
-                  <span class="fs-4">{{ $catName }}</span>
+                  <span class="perm-cat-title">{{ $catName }}</span>
                   <span class="badge bg-secondary-lt pill ms-1">{{ count($catData['modules']) }} Modul</span>
                 </div>
                 <div>
@@ -146,15 +206,15 @@
           {{-- Category Rows --}}
           @foreach($catData['modules'] as $moduleKey => $moduleName)
             <tr class="permission-row cat-row-{{ $catSlug }}">
-              <td class="ps-4">
+              <td class="ps-4 py-2">
                 <div class="d-flex align-items-center justify-content-between">
-                  <span class="fw-semibold text-dark">{{ $moduleName }}</span>
-                  <span class="text-muted small font-monospace opacity-50">{{ $moduleKey }}</span>
+                  <span class="perm-module-name">{{ $moduleName }}</span>
+                  <span class="perm-module-key font-monospace">{{ $moduleKey }}</span>
                 </div>
               </td>
               @foreach($actions as $action)
                 @php $permissionName = $action . '_' . $moduleKey; @endphp
-                <td class="text-center align-middle">
+                <td class="text-center align-middle py-2">
                   <label class="form-check form-switch d-inline-flex justify-content-center m-0">
                     <input class="form-check-input perm-checkbox perm-cat-{{ $catSlug }} perm-action-{{ $action }}" 
                            type="checkbox" 
@@ -169,34 +229,34 @@
         @endforeach
 
         {{-- Fitur & Aksi Khusus --}}
-        <tr class="table-active bg-light text-dark fw-bold border-top border-bottom">
+        <tr class="perm-cat-header fw-bold">
           <td colspan="{{ count($actions) + 1 }}" class="py-2.5 px-3">
             <div class="d-flex align-items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="icon text-azure" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 9v4" /><path d="M12 16v.01" /></svg>
-              <span class="fs-4">Fitur Khusus & Tambahan</span>
+              <span class="perm-cat-title">Fitur Khusus & Tambahan</span>
             </div>
           </td>
         </tr>
-        <tr>
-          <td class="ps-4 fw-semibold">Izin Tambahan</td>
+        <tr class="permission-row">
+          <td class="ps-4 fw-semibold perm-module-name">Izin Tambahan</td>
           <td colspan="{{ count($actions) }}">
             <div class="d-flex flex-wrap gap-4 py-1">
               <label class="form-check form-switch m-0 d-flex align-items-center">
                 <input class="form-check-input perm-checkbox me-2" type="checkbox" name="permissions[]" value="download_backup"
                   {{ in_array('download_backup', $selectedPermissions) ? 'checked' : '' }}>
-                <span class="form-check-label fw-semibold">Download Backup Database</span>
+                <span class="form-check-label fw-semibold perm-extra-label">Download Backup Database</span>
               </label>
 
               <label class="form-check form-switch m-0 d-flex align-items-center">
                 <input class="form-check-input perm-checkbox me-2" type="checkbox" name="permissions[]" value="send_chat"
                   {{ in_array('send_chat', $selectedPermissions) ? 'checked' : '' }}>
-                <span class="form-check-label fw-semibold">Kirim Pesan Instan (Live Chat)</span>
+                <span class="form-check-label fw-semibold perm-extra-label">Kirim Pesan Instan (Live Chat)</span>
               </label>
 
               <label class="form-check form-switch m-0 d-flex align-items-center">
                 <input class="form-check-input perm-checkbox me-2" type="checkbox" name="permissions[]" value="export_kpi"
                   {{ in_array('export_kpi', $selectedPermissions) ? 'checked' : '' }}>
-                <span class="form-check-label fw-semibold">Export Laporan KPI</span>
+                <span class="form-check-label fw-semibold perm-extra-label">Export Laporan KPI</span>
               </label>
             </div>
           </td>

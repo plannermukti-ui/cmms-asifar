@@ -185,6 +185,18 @@ Aplikasi telah melalui audit dan penguatan keamanan sistem berlapis:
 
 ---
 
+### 🔑 Akun Default (Default Login Credentials)
+
+Setelah menjalankan `php artisan migrate --seed` atau `php artisan db:seed`, sistem otomatis menyediakan akun **Super Administrator** default:
+
+| Role | Email Login | Password Default | Akses |
+| :--- | :--- | :--- | :--- |
+| **Super Admin** | `admin@cmms-aisfar.com` | `password` | **Full Access** (Seluruh Modul & Menu) |
+
+> 💡 *Catatan: Setelah berhasil login pertama kali, sangat disarankan untuk memperbarui kata sandi melalui menu Profil / Pengaturan Akun.*
+
+---
+
 ## 👥 Struktur Peran Pengguna (User Roles)
 
 Sistem mendukung *Multi-Role* yang disesuaikan dengan struktur operasional industri pertambangan:

@@ -945,7 +945,7 @@
           @endif
           <h4 class="card-title m-0">Buat Topik / Pernyataan Baru</h4>
         </div>
-        <form id="woDiscussionForm">
+        <form id="woDiscussionForm" data-no-loader>
           <textarea id="woDiscussionInput" class="form-control mb-2 bg-light border-0" placeholder="Bagikan pembaruan atau pernyataan terkait Work Order ini..." rows="2" style="resize:none;" required></textarea>
           
           <div id="woDiscussionAttachmentPreview" class="mb-2 d-none p-2 border rounded bg-white small d-flex justify-content-between align-items-center">
