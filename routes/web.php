@@ -178,5 +178,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Laporan Produksi (Fleet Production)
     Route::resource('productions', \App\Http\Controllers\ProductionController::class);
+
+    // Notifications Management
+    Route::get('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'read'])->name('notifications.read');
+    Route::delete('/notifications/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
+    Route::post('/notifications/clear-all', [\App\Http\Controllers\NotificationController::class, 'clearAll'])->name('notifications.clear-all');
 });
 require __DIR__.'/auth.php';

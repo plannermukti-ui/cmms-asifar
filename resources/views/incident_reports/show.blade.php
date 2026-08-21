@@ -3,6 +3,14 @@
 @section('title', 'Cetak Berita Acara - CMMS')
 
 @section('content')
+<style>
+  [data-bs-theme="dark"] .table-bordered,
+  [data-bs-theme="dark"] .table-bordered th,
+  [data-bs-theme="dark"] .table-bordered td {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+</style>
+
 <div class="page-header d-print-none">
   <div class="row align-items-center">
     <div class="col">

@@ -321,33 +321,13 @@
 
         {{-- Master Unit --}}
         @if(auth()->user()->can('view_master_units') || auth()->user()->can('view_unit_types') || auth()->user()->can('view_unit_models'))
-        @php
-            $isUnitActive = request()->is('master-units*', 'unit-types*', 'unit-models*');
-        @endphp
-        <li class="nav-item dropdown {{ $isUnitActive ? 'active' : '' }}">
-          <a class="nav-link dropdown-toggle rounded-2 mx-2 mb-1 px-2.5 {{ $isUnitActive ? 'active bg-primary-lt font-weight-bold' : '' }}" href="#navbar-unit" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="{{ $isUnitActive ? 'true' : 'false' }}">
+        <li class="nav-item">
+          <a class="nav-link rounded-2 mx-2 mb-1 px-2.5 {{ request()->is('master-units*', 'unit-types*', 'unit-models*') ? 'active bg-primary-lt font-weight-bold' : '' }}" href="{{ route('master-units.index') }}">
             <span class="nav-link-icon me-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="icon text-teal" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M5 17h-2v-6l2 -5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0h-6m-6 -6h15m-6 0v-5" /></svg>
             </span>
             <span class="nav-link-title">Master Unit</span>
           </a>
-          <div class="dropdown-menu {{ $isUnitActive ? 'show' : '' }}">
-            @can('view_master_units')
-            <a class="dropdown-item py-1.5 {{ request()->is('master-units*') ? 'active font-weight-bold' : '' }}" href="{{ route('master-units.index') }}">
-              Populasi Asset (Unit)
-            </a>
-            @endcan
-            @can('view_unit_types')
-            <a class="dropdown-item py-1.5 {{ request()->is('unit-types*') ? 'active font-weight-bold' : '' }}" href="{{ route('unit-types.index') }}">
-              Master Tipe Unit
-            </a>
-            @endcan
-            @can('view_unit_models')
-            <a class="dropdown-item py-1.5 {{ request()->is('unit-models*') ? 'active font-weight-bold' : '' }}" href="{{ route('unit-models.index') }}">
-              Master Model Unit
-            </a>
-            @endcan
-          </div>
         </li>
         @endif
 

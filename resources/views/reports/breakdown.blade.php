@@ -1,10 +1,79 @@
-[file name]: breakdown.blade.php
 @extends('layouts.tabler')
 
 @section('title', 'Report Breakdown - CMMS Aisfar')
 
 @push('styles')
 <style>
+  /* ── Filter Card & Unified Inputs ── */
+  .filter-card {
+    border: 1px solid rgba(98, 105, 118, 0.16);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    border-radius: 8px;
+    background: #ffffff;
+  }
+  .filter-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 18px;
+    white-space: nowrap;
+  }
+  .filter-control {
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    font-size: 0.82rem !important;
+    border-radius: 6px !important;
+    border: 1px solid #cbd5e1 !important;
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    padding: 0.35rem 0.65rem !important;
+    box-sizing: border-box !important;
+    transition: all 0.15s ease-in-out;
+  }
+  .filter-btn {
+    height: 36px !important;
+    min-height: 36px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
+    padding: 0 12px !important;
+    box-sizing: border-box !important;
+  }
+  .filter-btn-icon {
+    height: 36px !important;
+    width: 36px !important;
+    min-height: 36px !important;
+    min-width: 36px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+  [data-bs-theme="dark"] .filter-card {
+    background: #182234 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  [data-bs-theme="dark"] .filter-label {
+    color: #94a3b8 !important;
+  }
+  [data-bs-theme="dark"] .filter-control {
+    background-color: #1d273b !important;
+    border-color: #2c3b52 !important;
+    color: #e2e8f0 !important;
+  }
+
   /* ── Page & Filter ─────────────────────────────────── */
   .report-filter-card {
     border-radius: 12px;
@@ -16,14 +85,9 @@
     border: 1px solid rgba(32,107,196,.12);
     background: linear-gradient(135deg, #f8fbff 0%, #eef4ff 100%);
   }
-  .filter-label {
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .5px;
-    color: #64748b;
-    margin-bottom: 4px;
-    display: block;
+  [data-bs-theme="dark"] .report-intro-card {
+    background: linear-gradient(135deg, #182234 0%, #131c2c 100%) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
   }
 
   /* ── Report Card ────────────────────────────────────── */
@@ -692,14 +756,17 @@
 ════════════════════════════════════════════════════════ -->
 <div class="page-header d-print-none mb-3">
   <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-
+    <div>
+      <h2 class="page-title">Laporan Breakdown Unit</h2>
+      <div class="text-muted small mt-1">Analisa breakdown, Pareto, MTBF, MTTR, dan KPI operasional.</div>
+    </div>
     <div class="d-flex flex-wrap gap-2">
       <button type="button" class="btn btn-success btn-sm" onclick="window.print();">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24h24H0z" fill="none"/><path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2"/><path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4"/><path d="M7 13m0 2a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2"/><path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4"/><path d="M7 13m0 2a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2z"/></svg>
         PDF
       </button>
       <button type="button" class="btn btn-primary btn-sm" onclick="downloadWordReport();">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24h24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M8 13h2"/><path d="M12 13h2"/><path d="M8 17h2"/><path d="M12 17h2"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M8 13h2"/><path d="M12 13h2"/><path d="M8 17h2"/><path d="M12 17h2"/></svg>
         Word
       </button>
       <a href="{{ route('reports.breakdown') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
@@ -756,8 +823,8 @@
   </div>
 </div>
 
-<div class="card report-filter-card mb-3" style="z-index: 50; position: relative;">
-  <div class="card-body py-3">
+<div class="card filter-card mb-3" style="z-index: 50; position: relative;">
+  <div class="card-body p-2.5">
     <form method="GET" action="{{ route('reports.breakdown') }}" id="global-filter-form">
       <input type="hidden" name="_generate" value="1">
 
@@ -765,10 +832,10 @@
         {{-- Site --}}
         <div class="col-md-2 col-sm-6">
           <label class="filter-label">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-xs me-1" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-xs" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z" /></svg>
             Site
           </label>
-          <select name="site_id" class="form-select form-select-sm">
+          <select name="site_id" class="form-select filter-control">
             <option value="">Semua Site</option>
             @foreach($sites as $site)
               <option value="{{ $site->id }}" {{ $siteId == $site->id ? 'selected' : '' }}>{{ $site->name }}</option>
@@ -779,49 +846,43 @@
         {{-- Tipe Unit (global reference) --}}
         <div class="col-md-2 col-sm-6">
           <label class="filter-label">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-xs me-1" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 4h6v6h-6z" /><path d="M14 4h6v6h-6z" /><path d="M4 14h6v6h-6z" /><path d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-xs" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 4h6v6h-6z" /><path d="M14 4h6v6h-6z" /><path d="M4 14h6v6h-6z" /><path d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /></svg>
             Tipe Unit
           </label>
-          <select id="global-unit-type-select" name="unit_type_id[]" class="form-select form-select-sm" multiple size="4" aria-label="Pilih tipe unit default">
+          <select id="global-unit-type-select" name="unit_type_id[]" class="form-select filter-control" multiple size="4" aria-label="Pilih tipe unit default">
             <option value="">Semua Tipe</option>
             @foreach($unitTypes as $ut)
               <option value="{{ $ut->id }}" {{ in_array($ut->id, $globalUnitTypeIds) ? 'selected' : '' }}>{{ $ut->name }}</option>
             @endforeach
           </select>
-
         </div>
 
         {{-- ISO Week --}}
         <div class="col-md-2 col-sm-6">
           <label class="filter-label">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-xs me-1" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" /><path d="M16 3l0 4" /><path d="M8 3l0 4" /><path d="M4 11l16 0" /><path d="M8 15h2v2h-2z" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-xs" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 5m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" /><path d="M16 3l0 4" /><path d="M8 3l0 4" /><path d="M4 11l16 0" /><path d="M8 15h2v2h-2z" /></svg>
             Week
           </label>
-          <input type="week" id="week_selector" class="form-control form-control-sm" title="Pilih minggu ISO">
+          <input type="week" id="week_selector" class="form-control filter-control" title="Pilih minggu ISO">
         </div>
 
         {{-- Range Date --}}
         <div class="col-md-3 col-sm-6">
           <label class="filter-label">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-xs me-1" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-xs" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /></svg>
             Range Date BD
           </label>
-          <div class="input-icon input-icon-sm">
-            <input type="text" name="date_range" id="datepicker-range" class="form-control form-control-sm" placeholder="YYYY-MM-DD - YYYY-MM-DD" value="{{ $currentDateRange }}">
-            <span class="input-icon-addon">
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M11 15h1" /><path d="M12 15v3" /></svg>
-            </span>
-          </div>
+          <input type="text" name="date_range" id="datepicker-range" class="form-control filter-control" placeholder="YYYY-MM-DD - YYYY-MM-DD" value="{{ $currentDateRange }}">
         </div>
 
         {{-- Buttons --}}
         <div class="col-md-3 col-sm-12">
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary btn-sm flex-grow-1 shadow-sm fw-bold">
+            <button type="submit" class="btn btn-primary filter-btn flex-grow-1 shadow-sm">
               <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 4h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v7l-6 2v-8.5l-4.414 -4.414a2 2 0 0 1 -.586 -1.414v-2.172z" /></svg>
-              Set Filter Utama
+              Set Filter
             </button>
-            <a href="{{ route('reports.breakdown') }}" class="btn btn-outline-secondary btn-sm" title="Reset Filter">
+            <a href="{{ route('reports.breakdown') }}" class="btn btn-outline-secondary filter-btn-icon" title="Reset Filter">
               <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm m-0" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>
             </a>
           </div>

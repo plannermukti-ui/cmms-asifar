@@ -55,6 +55,29 @@
     opacity: 0.4;
     background-color: #cbd5e1 !important;
   }
+
+  /* ── Dark Mode Harmonization ── */
+  [data-bs-theme="dark"] .kanban-column {
+    background-color: #131c2c !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  [data-bs-theme="dark"] .kanban-column.sortable-ghost-target {
+    background-color: #1c2738 !important;
+  }
+  [data-bs-theme="dark"] .kanban-card {
+    background: #182234 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #f1f5f9 !important;
+  }
+  [data-bs-theme="dark"] .kanban-card .p-1.5.rounded.border {
+    background: #131c2c !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  [data-bs-theme="dark"] .badge-site-tag {
+    background: #1e293b !important;
+    color: #94a3b8 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
 </style>
 
 <div class="page-header d-print-none">
@@ -163,7 +186,7 @@
               <span class="badge {{ $wo->tipe_wo == 'BD' ? 'bg-danger-lt text-danger' : 'bg-info-lt text-info' }} px-1.5 py-0.5 small">
                 {{ $wo->tipe_wo }}
               </span>
-              <span class="badge bg-light text-dark border">{{ $wo->unit->site->code ?? '-' }}</span>
+              <span class="badge badge-site-tag border">{{ $wo->unit->site->code ?? '-' }}</span>
             </div>
           </div>
 

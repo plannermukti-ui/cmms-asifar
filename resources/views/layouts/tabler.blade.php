@@ -1028,6 +1028,19 @@
           window.showTablerErrorModal("Perhatian / Kendala Operasi", "{{ addslashes(session('error')) }}");
         @endif
       });
+
+      // === GLOBAL PRINT THEME HANDLER ===
+      // Ensure all modules automatically switch to light mode when printing
+      window.addEventListener("beforeprint", function() {
+        document.body.setAttribute('data-theme-before-print', document.body.getAttribute('data-bs-theme') || 'light');
+        document.body.setAttribute('data-bs-theme', 'light');
+      });
+      window.addEventListener("afterprint", function() {
+        const originalTheme = document.body.getAttribute('data-theme-before-print');
+        if (originalTheme) {
+            document.body.setAttribute('data-bs-theme', originalTheme);
+        }
+      });
     </script>
 
     <!-- INDUSTRIAL TOP PROGRESS BAR -->

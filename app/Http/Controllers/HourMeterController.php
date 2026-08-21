@@ -44,7 +44,7 @@ class HourMeterController extends Controller
         }
 
         $hourMeters = $query->paginate(15)->withQueryString();
-        $masterUnits = \App\Models\MasterUnit::orderBy('nomor_unit')->get();
+        $masterUnits = \App\Models\MasterUnit::with(['model', 'siteRelation'])->orderBy('nomor_unit')->get();
 
         return view('hour-meters.index', compact('hourMeters', 'masterUnits'));
     }

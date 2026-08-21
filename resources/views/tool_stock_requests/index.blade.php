@@ -58,7 +58,7 @@
                         @endif
                     </td>
                     <td>
-                        <a href="{{ route('tool-stock-requests.show', $req) }}" class="btn btn-sm btn-info">Lihat Detail</a>
+                        <a href="{{ route('tool-stock-requests.show', $req) }}" class="btn btn-sm btn-outline-info">Lihat Detail</a>
                     </td>
                 </tr>
                 @empty

@@ -56,7 +56,7 @@
                     </td>
                     <td>
                         <div class="btn-list flex-nowrap">
-                            <a href="{{ route('stock-opnames.show', $opname) }}" class="btn btn-sm btn-info">Detail / Print</a>
+                            <a href="{{ route('stock-opnames.show', $opname) }}" class="btn btn-sm btn-outline-info">Detail / Print</a>
                             
                             @if($opname->status == 'Pending Approval')
                                 @if(!$opname->signed_document)
@@ -75,8 +75,6 @@
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-danger">Reject</button>
                                         </form>
-                                    @else
-                                        <button class="btn btn-sm btn-secondary disabled" title="Menunggu upload dokumen">Menunggu Dokumen</button>
                                     @endif
                                 @endif
                             @endif
@@ -87,9 +85,9 @@
 
                             @can('delete_stock_opnames')
                             <form action="{{ route('stock-opnames.destroy', $opname) }}" method="post" class="d-inline" onsubmit="return confirm('Yakin menghapus data stock opname ini?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
                             </form>
                             @endcan
                         </div>

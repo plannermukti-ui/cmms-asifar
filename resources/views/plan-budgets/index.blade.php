@@ -3,6 +3,25 @@
 @section('title', 'Plan Budget Bulanan - CMMS Aisfar')
 
 @section('content')
+<style>
+  [data-bs-theme="dark"] .table thead th {
+    background-color: #131c2c !important;
+    color: #cbd5e1 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  [data-bs-theme="dark"] .table td {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  [data-bs-theme="dark"] .modal-content {
+    background-color: #182234 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  [data-bs-theme="dark"] .modal-header,
+  [data-bs-theme="dark"] .modal-footer {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+</style>
+
 <div class="page-header d-print-none">
   <div class="row align-items-center">
     <div class="col">

@@ -3,6 +3,42 @@
 @section('title', 'Peminjaman Tool - CMMS')
 
 @section('content')
+<style>
+  [data-bs-theme="dark"] .modal-content {
+    background-color: #182234 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #f1f5f9 !important;
+  }
+  [data-bs-theme="dark"] .modal-header,
+  [data-bs-theme="dark"] .modal-footer {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  [data-bs-theme="dark"] .bg-blue-lt {
+    background-color: rgba(32, 107, 196, 0.15) !important;
+    color: #f1f5f9 !important;
+    border: 1px solid rgba(32, 107, 196, 0.3) !important;
+  }
+  [data-bs-theme="dark"] .bg-blue-lt .text-body,
+  [data-bs-theme="dark"] .bg-blue-lt .fw-bold {
+    color: #f1f5f9 !important;
+  }
+  [data-bs-theme="dark"] .bg-blue-lt .text-muted {
+    color: #94a3b8 !important;
+  }
+  [data-bs-theme="dark"] .form-control,
+  [data-bs-theme="dark"] .form-select {
+    background-color: #131c2c !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #f1f5f9 !important;
+  }
+  [data-bs-theme="dark"] .form-label {
+    color: #cbd5e1 !important;
+  }
+  [data-bs-theme="dark"] .form-hint {
+    color: #94a3b8 !important;
+  }
+</style>
+
 <div class="page-header d-print-none">
   <div class="row align-items-center">
     <div class="col">
@@ -58,18 +94,22 @@
                 @endif
               </td>
               <td>
-                @if($trx->status === 'Borrowed')
-                    @can('edit_tool_transactions')
-                    <a href="{{ route('tool-transactions.edit', $trx) }}" class="btn btn-sm btn-success">Proses Kembali</a>
-                    @endcan
-                @endif
-                @can('delete_tool_transactions')
-                <form action="{{ route('tool-transactions.destroy', $trx) }}" method="post" class="d-inline" onsubmit="return confirm('Yakin menghapus transaksi ini?');">
-                  @csrf
-                  @method('DELETE')
-                  <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
-                </form>
-                @endcan
+                <div class="btn-list flex-nowrap">
+                  @if($trx->status === 'Borrowed')
+                      @can('edit_tool_transactions')
+                      <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modal-kembali-tool-{{ $trx->id }}">
+                        Proses Kembali
+                      </button>
+                      @endcan
+                  @endif
+                  @can('delete_tool_transactions')
+                  <form action="{{ route('tool-transactions.destroy', $trx) }}" method="post" class="d-inline" onsubmit="return confirm('Yakin menghapus transaksi ini?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                  </form>
+                  @endcan
+                </div>
               </td>
             </tr>
             @empty
@@ -165,6 +205,75 @@
     </div>
   </div>
 </div>
+
+{{-- Modals for Return Process (Pop-up) --}}
+@foreach($transactions as $trx)
+@if($trx->status === 'Borrowed')
+<div class="modal modal-blur fade" id="modal-kembali-tool-{{ $trx->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-rotate-2 text-success me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 4.55a8 8 0 0 0 -6 14.9" /><path d="M9 15v5h5" /></svg>
+          Proses Pengembalian Tool #TRX-{{ str_pad($trx->id, 4, '0', STR_PAD_LEFT) }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{{ route('tool-transactions.update', $trx) }}" method="post">
+        @csrf
+        @method('PUT')
+        <div class="modal-body">
+          <div class="mb-3 p-3 rounded bg-blue-lt border border-blue-subtle">
+            <div class="row g-2">
+              <div class="col-sm-6">
+                <div class="text-muted small">Mekanik Peminjam:</div>
+                <div class="fw-bold">{{ $trx->mechanic->nama_lengkap ?? '-' }}</div>
+              </div>
+              <div class="col-sm-6">
+                <div class="text-muted small">Nama Tool:</div>
+                <div class="fw-bold">{{ $trx->tool->name ?? '-' }}</div>
+              </div>
+              <div class="col-sm-6">
+                <div class="text-muted small">Waktu Pinjam:</div>
+                <div class="fw-bold">{{ \Carbon\Carbon::parse($trx->tanggal_pinjam)->format('d M Y H:i') }}</div>
+              </div>
+              <div class="col-sm-6">
+                <div class="text-muted small">Jumlah Dipinjam:</div>
+                <div><span class="badge bg-primary px-2 py-1">{{ $trx->borrow_qty }} Unit</span></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label required">Kembali (Kondisi Baik)</label>
+              <input type="number" class="form-control" name="returned_good_qty" value="{{ old('returned_good_qty', $trx->borrow_qty) }}" min="0" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label required">Kembali (Kondisi Rusak)</label>
+              <input type="number" class="form-control" name="returned_broken_qty" value="{{ old('returned_broken_qty', 0) }}" min="0" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label required">Hilang</label>
+              <input type="number" class="form-control" name="returned_lost_qty" value="{{ old('returned_lost_qty', 0) }}" min="0" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Catatan Pengembalian / Kronologi Kerusakan (jika ada)</label>
+              <textarea class="form-control" name="catatan" rows="3" placeholder="Tuliskan kronologi jika ada alat rusak atau hilang...">{{ old('catatan') }}</textarea>
+              <small class="form-hint text-muted">Jika terdapat alat rusak atau hilang, sistem akan otomatis membuat Berita Acara (B.A) dengan status Pending.</small>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn me-auto" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-success">Selesaikan Pengembalian</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+@endif
+@endforeach
 @endsection
 
 @section('scripts')

@@ -85,12 +85,14 @@
           </td>
           <td>{{ $jwo->date_sent ? \Carbon\Carbon::parse($jwo->date_sent)->format('d M Y') : '-' }}</td>
           <td>
-            <a href="{{ route('jwos.show', $jwo) }}" class="btn btn-sm btn-info">Detail</a>
-            <a href="{{ route('jwos.edit', $jwo) }}" class="btn btn-sm btn-primary">Edit</a>
-            <form action="{{ route('jwos.destroy', $jwo) }}" method="post" class="d-inline" onsubmit="return confirm('Hapus JWO ini?');">
-              @csrf @method('DELETE')
-              <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
-            </form>
+            <div class="btn-list flex-nowrap">
+              <a href="{{ route('jwos.show', $jwo) }}" class="btn btn-sm btn-outline-info">Detail</a>
+              <a href="{{ route('jwos.edit', $jwo) }}" class="btn btn-sm btn-outline-warning">Edit</a>
+              <form action="{{ route('jwos.destroy', $jwo) }}" method="post" class="d-inline" onsubmit="return confirm('Hapus JWO ini?');">
+                @csrf @method('DELETE')
+                <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+              </form>
+            </div>
           </td>
         </tr>
         @empty

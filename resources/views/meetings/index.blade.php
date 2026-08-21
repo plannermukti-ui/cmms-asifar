@@ -3,6 +3,34 @@
 @section('title', 'Notulen Rapat & Action Items Tracker - CMMS')
 
 @section('content')
+<style>
+  [data-bs-theme="dark"] .bg-light {
+    background-color: #131c2c !important;
+    color: #f1f5f9 !important;
+  }
+  [data-bs-theme="dark"] .table-light {
+    background-color: #131c2c !important;
+    color: #cbd5e1 !important;
+  }
+  [data-bs-theme="dark"] .table-light th {
+    background-color: #131c2c !important;
+    color: #cbd5e1 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  [data-bs-theme="dark"] .text-dark {
+    color: #f8fafc !important;
+  }
+  [data-bs-theme="dark"] .card.bg-light {
+    background-color: #131c2c !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  [data-bs-theme="dark"] .modal-header.bg-light,
+  [data-bs-theme="dark"] .modal-footer.bg-light {
+    background-color: #131c2c !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+</style>
+
 <div class="page-header d-print-none">
   <div class="container-xl">
     <div class="row g-2 align-items-center">

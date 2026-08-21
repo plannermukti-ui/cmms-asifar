@@ -134,7 +134,18 @@
                   }
               }
 
-              $dbNotifCount = auth()->user()->unreadNotifications->count();
+              // Auto-clean & filter orphaned database notifications
+              $userNotifications = [];
+              foreach(auth()->user()->unreadNotifications as $notif) {
+                  $woId = $notif->data['work_order_id'] ?? null;
+                  if ($woId && !\App\Models\WorkOrder::where('id', $woId)->exists()) {
+                      $notif->delete(); // Auto purge orphaned notification
+                      continue;
+                  }
+                  $userNotifications[] = $notif;
+              }
+
+              $dbNotifCount = count($userNotifications);
               $totalNotif = $pendingCount + $unreadMessages + $pendingSignatures + $dbNotifCount;
           @endphp
           @if($totalNotif > 0)
@@ -143,18 +154,26 @@
             <span class="badge bg-red d-none" id="notif-badge">0</span>
           @endif
         </a>
-        <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card">
+        <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card" style="min-width: 320px;">
           <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">Notifikasi</h3>
+            <div class="card-header d-flex justify-content-between align-items-center py-2 px-3">
+              <h3 class="card-title mb-0" style="font-size: 0.95rem;">Notifikasi</h3>
+              @if($dbNotifCount > 0)
+                <form action="{{ route('notifications.mark-all-read') }}" method="POST" class="m-0">
+                  @csrf
+                  <button type="submit" class="btn btn-link btn-sm text-muted p-0 text-decoration-none" style="font-size: 0.75rem;">
+                    Tandai semua dibaca
+                  </button>
+                </form>
+              @endif
             </div>
             <div class="list-group list-group-flush list-group-hoverable">
               @if($pendingSignatures > 0)
-              <div class="list-group-item">
+              <div class="list-group-item py-2 px-3">
                 <div class="row align-items-center">
                   <div class="col text-truncate">
-                    <a href="{{ route('work-orders.index') }}" class="text-body d-block text-primary fw-bold">Tanda Tangan Tertunda</a>
-                    <div class="d-block text-secondary text-truncate mt-n1">
+                    <a href="{{ route('work-orders.index') }}" class="text-body d-block text-primary fw-bold" style="font-size: 0.85rem;">Tanda Tangan Tertunda</a>
+                    <div class="d-block text-secondary text-truncate mt-n1 small">
                       Ada <strong>{{ $pendingSignatures }}</strong> Work Order butuh stempel digital Anda.
                     </div>
                   </div>
@@ -162,11 +181,11 @@
               </div>
               @endif
               @if($pendingCount > 0)
-              <div class="list-group-item">
+              <div class="list-group-item py-2 px-3">
                 <div class="row align-items-center">
                   <div class="col text-truncate">
-                    <a href="{{ route('users.index') }}" class="text-body d-block">Pendaftar Baru</a>
-                    <div class="d-block text-secondary text-truncate mt-n1">
+                    <a href="{{ route('users.index') }}" class="text-body d-block fw-bold" style="font-size: 0.85rem;">Pendaftar Baru</a>
+                    <div class="d-block text-secondary text-truncate mt-n1 small">
                       Ada <strong>{{ $pendingCount }}</strong> user menunggu persetujuan.
                     </div>
                   </div>
@@ -174,11 +193,11 @@
               </div>
               @endif
               @if($unreadMessages > 0)
-              <div class="list-group-item">
+              <div class="list-group-item py-2 px-3">
                 <div class="row align-items-center">
                   <div class="col text-truncate">
-                    <a href="{{ route('chat.index') }}" class="text-body d-block">Pesan Baru</a>
-                    <div class="d-block text-secondary text-truncate mt-n1">
+                    <a href="{{ route('chat.index') }}" class="text-body d-block fw-bold" style="font-size: 0.85rem;">Pesan Baru</a>
+                    <div class="d-block text-secondary text-truncate mt-n1 small">
                       Anda memiliki <strong>{{ $unreadMessages }}</strong> pesan belum dibaca.
                     </div>
                   </div>
@@ -186,21 +205,30 @@
               </div>
               @endif
               
-              @foreach(auth()->user()->unreadNotifications as $notification)
-              <div class="list-group-item">
-                <div class="row align-items-center">
-                  <div class="col text-truncate">
-                    <a href="{{ $notification->data['url'] ?? '#' }}" class="text-body d-block text-warning fw-bold">{{ $notification->data['title'] ?? 'Notifikasi' }}</a>
-                    <div class="d-block text-secondary text-truncate mt-n1">
+              @foreach($userNotifications as $notification)
+              <div class="list-group-item py-2 px-3">
+                <div class="d-flex align-items-center justify-content-between gap-2">
+                  <div class="text-truncate flex-grow-1">
+                    <a href="{{ route('notifications.read', $notification->id) }}" class="text-body d-block text-warning fw-bold text-truncate" style="font-size: 0.85rem;">
+                      {{ $notification->data['title'] ?? 'Notifikasi' }}
+                    </a>
+                    <div class="d-block text-secondary text-truncate small" style="font-size: 0.78rem;">
                       {{ $notification->data['message'] ?? '' }}
                     </div>
                   </div>
+                  <form action="{{ route('notifications.destroy', $notification->id) }}" method="POST" class="m-0 flex-shrink-0" onsubmit="return confirm('Hapus notifikasi ini?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-sm btn-icon btn-ghost-secondary text-muted p-1" title="Hapus Notifikasi" style="border: none; background: transparent; opacity: 0.6;">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-xs m-0" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>
+                    </button>
+                  </form>
                 </div>
               </div>
               @endforeach
               
               @if($totalNotif == 0)
-              <div class="list-group-item text-center text-muted py-3">
+              <div class="list-group-item text-center text-muted py-3 small">
                 Tidak ada notifikasi baru.
               </div>
               @endif

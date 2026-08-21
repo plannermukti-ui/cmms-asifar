@@ -4,8 +4,10 @@ namespace App\Models;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Hashidable;
+
 class ToolTransaction extends Model {
-    use LogsActivity;
+    use LogsActivity, Hashidable;
 
     public function getActivitylogOptions(): LogOptions
     {

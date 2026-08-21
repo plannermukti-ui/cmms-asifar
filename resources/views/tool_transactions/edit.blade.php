@@ -3,6 +3,30 @@
 @section('title', 'Pengembalian Tool - CMMS')
 
 @section('content')
+<style>
+  [data-bs-theme="dark"] .bg-blue-lt {
+    background-color: rgba(32, 107, 196, 0.15) !important;
+    color: #f1f5f9 !important;
+    border: 1px solid rgba(32, 107, 196, 0.3) !important;
+  }
+  [data-bs-theme="dark"] .bg-blue-lt strong,
+  [data-bs-theme="dark"] .bg-blue-lt span,
+  [data-bs-theme="dark"] .bg-blue-lt div {
+    color: #f1f5f9 !important;
+  }
+  [data-bs-theme="dark"] .form-control {
+    background-color: #131c2c !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #f1f5f9 !important;
+  }
+  [data-bs-theme="dark"] .form-label {
+    color: #cbd5e1 !important;
+  }
+  [data-bs-theme="dark"] .form-hint {
+    color: #94a3b8 !important;
+  }
+</style>
+
 <div class="page-header d-print-none">
   <div class="row align-items-center">
     <div class="col">
@@ -23,11 +47,24 @@
     <div class="card">
       <div class="card-body">
         <div class="mb-4 bg-blue-lt p-3 rounded">
-            <strong>Detail Peminjaman:</strong><br>
-            Mekanik: {{ $toolTransaction->mechanic->nama_lengkap ?? '-' }}<br>
-            Tool: {{ $toolTransaction->tool->name ?? '-' }}<br>
-            Jumlah Dipinjam: <span class="badge bg-primary">{{ $toolTransaction->borrow_qty }}</span><br>
-            Waktu Pinjam: {{ \Carbon\Carbon::parse($toolTransaction->tanggal_pinjam)->format('d M Y H:i') }}
+            <div class="row g-2">
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">Mekanik:</span>
+                <strong>{{ $toolTransaction->mechanic->nama_lengkap ?? '-' }}</strong>
+              </div>
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">Tool:</span>
+                <strong>{{ $toolTransaction->tool->name ?? '-' }}</strong>
+              </div>
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">Waktu Pinjam:</span>
+                <strong>{{ \Carbon\Carbon::parse($toolTransaction->tanggal_pinjam)->format('d M Y H:i') }}</strong>
+              </div>
+              <div class="col-sm-6">
+                <span class="text-muted small d-block">Jumlah Dipinjam:</span>
+                <span class="badge bg-primary px-2 py-1">{{ $toolTransaction->borrow_qty }} Unit</span>
+              </div>
+            </div>
         </div>
         
         <form action="{{ route('tool-transactions.update', $toolTransaction) }}" method="post">

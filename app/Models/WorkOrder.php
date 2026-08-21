@@ -11,6 +11,18 @@ use Spatie\Activitylog\LogOptions;
 class WorkOrder extends Model {
     use BelongsToSite, Hashidable, LogsActivity;
 
+    protected static function booted()
+    {
+        static::deleting(function ($workOrder) {
+            // Automatically clean notifications related to this work order
+            \DB::table('notifications')
+                ->where('data', 'like', '%"work_order_id":' . $workOrder->id . '%')
+                ->orWhere('data', 'like', '%"work_order_id":"' . $workOrder->id . '"%')
+                ->orWhere('data', 'like', '%' . $workOrder->no_wo . '%')
+                ->delete();
+        });
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

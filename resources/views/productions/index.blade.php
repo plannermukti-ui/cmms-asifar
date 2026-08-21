@@ -66,7 +66,7 @@
                                 <td>{{ $productions->firstItem() + $index }}</td>
                                 <td>
                                     <div class="font-weight-bold">{{ \Carbon\Carbon::parse($prod->date)->format('d M Y') }}</div>
-                                    <div class="text-muted">Shift: <span class="badge {{ $prod->shift == 'DS' ? 'bg-orange-lt' : 'bg-dark-lt' }}">{{ $prod->shift }}</span></div>
+                                    <div class="text-muted small">Shift: <span class="badge {{ ($prod->shift == 'DS' || $prod->shift == '1') ? 'bg-orange-lt text-orange' : 'bg-indigo-lt text-indigo' }} fw-bold px-2 py-0.5">{{ $prod->shift }}</span></div>
                                 </td>
                                 <td>
                                     <span class="badge bg-blue-lt">{{ $prod->fleets->count() }} Fleet(s)</span>

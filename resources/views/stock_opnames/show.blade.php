@@ -42,6 +42,23 @@
     height: 70px;
   }
 
+  /* ── Dark Mode Harmonization ── */
+  [data-bs-theme="dark"] .wo-report-card {
+    background: #182234 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #f1f5f9 !important;
+  }
+  [data-bs-theme="dark"] .table-report-header th {
+    background-color: #131c2c !important;
+    color: #cbd5e1 !important;
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  [data-bs-theme="dark"] .signature-box {
+    background-color: #131c2c !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #f1f5f9 !important;
+  }
+
   @media print {
     body {
       background: #fff !important;

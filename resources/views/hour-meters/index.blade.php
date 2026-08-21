@@ -15,10 +15,10 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M12 11v6" /><path d="M9.5 13.5l2.5 -2.5l2.5 2.5" /></svg>
         Import Excel
       </a>
-      <a href="{{ route('hour-meters.create') }}" class="btn btn-primary d-none d-sm-inline-block">
+      <button type="button" class="btn btn-primary d-none d-sm-inline-block shadow-sm" data-bs-toggle="modal" data-bs-target="#modal-tambah-hm">
         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
         Tambah HM
-      </a>
+      </button>
       @endcan
     </div>
   </div>
@@ -183,6 +183,63 @@
     </div>
   </div>
 </div>
+
+<!-- Modal Tambah Hour Meter -->
+<div class="modal modal-blur fade" id="modal-tambah-hm" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form action="{{ route('hour-meters.store') }}" method="POST">
+        @csrf
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon text-primary me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><polyline points="12 7 12 12 15 15" /></svg>
+            Tambah Hour Meter (HM) Baru
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label required">Tanggal</label>
+              <input type="date" class="form-control" name="date" value="{{ date('Y-m-d') }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label required">Pilih Unit</label>
+              <select name="master_unit_id" id="modal_master_unit_id" class="form-select" required>
+                <option value="">-- Pilih Unit --</option>
+                @foreach($masterUnits as $unit)
+                  <option value="{{ $unit->id }}" 
+                          data-model="{{ $unit->model ? $unit->model->name : '-' }}" 
+                          data-site="{{ $unit->siteRelation->name ?? $unit->site ?? '-' }}">
+                    {{ $unit->nomor_unit }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Model (Otomatis)</label>
+              <input type="text" class="form-control bg-light" id="modal_model_display" readonly disabled value="-">
+            </div>
+            @if(is_null(auth()->user()->site_id))
+            <div class="col-md-6">
+              <label class="form-label">Site (Otomatis)</label>
+              <input type="text" class="form-control bg-light" id="modal_site_display" readonly disabled value="-">
+            </div>
+            @endif
+            <div class="col-md-6">
+              <label class="form-label required">Hour Meter (HM)</label>
+              <input type="number" class="form-control fw-bold fs-3 text-primary" name="hm" step="0.1" min="0" placeholder="0.0" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn me-auto" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary fw-bold shadow-sm">Simpan Hour Meter</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -192,6 +249,23 @@
             $('.select2-filter').select2({
                 theme: 'bootstrap-5',
                 width: '100%'
+            });
+        }
+
+        const modalUnitSelect = document.getElementById('modal_master_unit_id');
+        const modalModelDisplay = document.getElementById('modal_model_display');
+        const modalSiteDisplay = document.getElementById('modal_site_display');
+
+        if (modalUnitSelect) {
+            modalUnitSelect.addEventListener('change', function() {
+                const opt = this.options[this.selectedIndex];
+                if (opt && opt.value) {
+                    if (modalModelDisplay) modalModelDisplay.value = opt.getAttribute('data-model') || '-';
+                    if (modalSiteDisplay) modalSiteDisplay.value = opt.getAttribute('data-site') || '-';
+                } else {
+                    if (modalModelDisplay) modalModelDisplay.value = '-';
+                    if (modalSiteDisplay) modalSiteDisplay.value = '-';
+                }
             });
         }
     });

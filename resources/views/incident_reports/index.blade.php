@@ -56,12 +56,14 @@
                 @endif
               </td>
               <td>
-                <a href="{{ route('incident-reports.show', $report) }}" class="btn btn-sm btn-info">Detail / Cetak</a>
-                @can('edit_incident_reports')
-                  @if($report->status_approval === 'Pending')
-                  <a href="{{ route('incident-reports.edit', $report) }}" class="btn btn-sm btn-primary">Review</a>
-                  @endif
-                @endcan
+                <div class="btn-list flex-nowrap">
+                  <a href="{{ route('incident-reports.show', $report) }}" class="btn btn-sm btn-outline-info">Detail / Cetak</a>
+                  @can('edit_incident_reports')
+                    @if($report->status_approval === 'Pending')
+                    <a href="{{ route('incident-reports.edit', $report) }}" class="btn btn-sm btn-outline-primary">Review</a>
+                    @endif
+                  @endcan
+                </div>
               </td>
             </tr>
             @empty

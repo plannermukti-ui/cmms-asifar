@@ -2,6 +2,22 @@
 @section('title', 'Buat PM Template - CMMS')
 
 @section('content')
+<style>
+  [data-bs-theme="dark"] .bg-light {
+    background-color: #131c2c !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  [data-bs-theme="dark"] .subtask-item {
+    background-color: #182234 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  [data-bs-theme="dark"] .form-select[multiple] {
+    background-color: #131c2c !important;
+    color: #f1f5f9 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+  }
+</style>
+
 <div class="page-header d-print-none">
   <div class="row align-items-center">
     <div class="col-auto">

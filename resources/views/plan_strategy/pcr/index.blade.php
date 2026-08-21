@@ -3,6 +3,13 @@
 @section('title', 'Plan Component Replacement (PCR)')
 
 @section('content')
+<style>
+  .pcr-cell-top-left {
+    vertical-align: top !important;
+    text-align: left !important;
+  }
+</style>
+
 <div class="page-header d-print-none">
   <div class="container-xl">
     <div class="row g-2 align-items-center">
@@ -93,21 +100,21 @@
           <table class="table card-table table-vcenter text-nowrap datatable table-bordered table-hover">
             <thead class="table-light text-center">
               <tr>
-                <th rowspan="2" class="align-middle">No</th>
+                <th rowspan="2" class="align-middle text-start ps-3">No</th>
                 
-                <th rowspan="2" class="align-middle">
+                <th rowspan="2" class="align-middle text-start">
                   <a href="{{ request()->fullUrlWithQuery(['sort' => 'unit_no', 'direction' => $currentSort === 'unit_no' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none">
                     Unit @if($currentSort === 'unit_no') {!! $currentDir === 'asc' ? '↑' : '↓' !!} @endif
                   </a>
                 </th>
 
-                <th rowspan="2" class="align-middle">
+                <th rowspan="2" class="align-middle text-start">
                   <a href="{{ request()->fullUrlWithQuery(['sort' => 'model', 'direction' => $currentSort === 'model' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none">
                     Model @if($currentSort === 'model') {!! $currentDir === 'asc' ? '↑' : '↓' !!} @endif
                   </a>
                 </th>
 
-                <th rowspan="2" class="align-middle">
+                <th rowspan="2" class="align-middle text-start">
                   <a href="{{ request()->fullUrlWithQuery(['sort' => 'component', 'direction' => $currentSort === 'component' ? $nextDir : 'asc']) }}" class="text-reset text-decoration-none">
                     Component @if($currentSort === 'component') {!! $currentDir === 'asc' ? '↑' : '↓' !!} @endif
                   </a>
@@ -136,12 +143,12 @@
                 @foreach($row['components'] as $index => $comp)
                 <tr>
                   @if($index === 0)
-                  <td class="text-center align-middle" rowspan="{{ $rowCount }}">{{ $loop->parent->iteration }}</td>
-                  <td class="fw-bold align-middle" rowspan="{{ $rowCount }}">{{ $row['unit_no'] }}</td>
-                  <td class="align-middle" rowspan="{{ $rowCount }}">{{ $row['model'] }}</td>
+                  <td class="pcr-cell-top-left ps-3" rowspan="{{ $rowCount }}">{{ $loop->parent->iteration }}</td>
+                  <td class="fw-bold pcr-cell-top-left" rowspan="{{ $rowCount }}">{{ $row['unit_no'] }}</td>
+                  <td class="pcr-cell-top-left" rowspan="{{ $rowCount }}">{{ $row['model'] }}</td>
                   @endif
                   
-                  <td>{{ $comp['component'] }}</td>
+                  <td class="text-start">{{ $comp['component'] }}</td>
                   <td class="text-end">{{ number_format($comp['target_life'], 1, ',', '.') }}</td>
                   <td class="text-end">{{ number_format($comp['current_life'], 1, ',', '.') }}</td>
                   <td class="text-end fw-bold text-primary">{{ number_format($row['current_hm'], 1, ',', '.') }}</td>
