@@ -79,9 +79,9 @@
                                 </td>
                                 <td>
                                     <div class="btn-list flex-nowrap">
-                                        <a href="{{ route('productions.show', $prod->id) }}" class="btn btn-sm btn-outline-info">Detail</a>
-                                        <a href="{{ route('productions.edit', $prod->id) }}" class="btn btn-sm btn-outline-warning">Edit</a>
-                                        <form action="{{ route('productions.destroy', $prod->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus laporan shift ini beserta seluruh data fleet-nya?');">
+                                        <a href="{{ route('productions.show', $prod) }}" class="btn btn-sm btn-outline-info">Detail</a>
+                                        <a href="{{ route('productions.edit', $prod) }}" class="btn btn-sm btn-outline-warning">Edit</a>
+                                        <form action="{{ route('productions.destroy', $prod) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus laporan shift ini beserta seluruh data fleet-nya?');">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>

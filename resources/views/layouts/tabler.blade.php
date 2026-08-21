@@ -58,6 +58,63 @@
         border-right: 1px solid var(--app-accent-glow, rgba(245, 158, 11, 0.2)) !important;
       }
 
+      /* Global VirtualSelect Dark Mode Compatibility */
+      [data-bs-theme="dark"] .vscomp-ele {
+        background-color: #182234 !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        color: #f1f5f9 !important;
+      }
+      [data-bs-theme="dark"] .vscomp-ele:hover,
+      [data-bs-theme="dark"] .vscomp-wrapper.focused .vscomp-ele {
+        border-color: var(--app-accent, #f59e0b) !important;
+        box-shadow: 0 0 0 2px var(--app-accent-glow, rgba(245, 158, 11, 0.25)) !important;
+      }
+      [data-bs-theme="dark"] .vscomp-value {
+        color: #f1f5f9 !important;
+      }
+      [data-bs-theme="dark"] .vscomp-placeholder {
+        color: #64748b !important;
+      }
+      [data-bs-theme="dark"] .vscomp-arrow::after {
+        border-color: #94a3b8 !important;
+      }
+      [data-bs-theme="dark"] .vscomp-dropbox {
+        background-color: #182234 !important;
+        border: 1px solid rgba(255, 255, 255, 0.14) !important;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+        color: #f1f5f9 !important;
+      }
+      [data-bs-theme="dark"] .vscomp-search-input {
+        background-color: #0f172a !important;
+        color: #f1f5f9 !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+      }
+      [data-bs-theme="dark"] .vscomp-option {
+        color: #cbd5e1 !important;
+      }
+      [data-bs-theme="dark"] .vscomp-option.focused,
+      [data-bs-theme="dark"] .vscomp-option:hover {
+        background-color: rgba(245, 158, 11, 0.15) !important;
+        color: #f8fafc !important;
+      }
+      [data-bs-theme="dark"] .vscomp-option.selected {
+        background-color: var(--app-accent, #f59e0b) !important;
+        color: #0f172a !important;
+        font-weight: 700 !important;
+      }
+      [data-bs-theme="dark"] .vscomp-option-description {
+        color: #94a3b8 !important;
+      }
+      [data-bs-theme="dark"] .vscomp-group-label {
+        color: var(--app-accent, #f59e0b) !important;
+        background-color: #131c2c !important;
+        font-weight: 700 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+      }
+      [data-bs-theme="dark"] .vscomp-no-options {
+        color: #64748b !important;
+      }
+
       /* Fix sidebar offcanvas text alignment that was lost when removing navbar-collapse */
       .navbar-vertical .navbar-nav {
         flex-direction: column;

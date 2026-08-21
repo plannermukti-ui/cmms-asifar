@@ -1,13 +1,71 @@
 @extends('layouts.tabler')
 
+@section('title', 'Buat Laporan Produksi Harian - CMMS Aisfar')
+
 @section('content')
+<style>
+  .fleet-card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+  .fleet-header {
+    background: #f8fafc;
+  }
+  .fleet-table-head th {
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    border: 1px solid #e2e8f0;
+    vertical-align: middle;
+  }
+  .ritasi-input {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.2rem;
+    border-radius: 4px;
+  }
+  .ritasi-input:focus {
+    border-color: var(--app-accent, #f59e0b);
+    box-shadow: 0 0 0 2px var(--app-accent-glow, rgba(245, 158, 11, 0.25));
+  }
+
+  /* ── Dark Mode Harmonization ── */
+  [data-bs-theme="dark"] .fleet-card {
+    background: #182234;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  [data-bs-theme="dark"] .fleet-header {
+    background: #131c2c;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  [data-bs-theme="dark"] .fleet-table-head th {
+    background: #131c2c !important;
+    color: #cbd5e1 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  [data-bs-theme="dark"] .table-bordered th,
+  [data-bs-theme="dark"] .table-bordered td {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  [data-bs-theme="dark"] .ritasi-input {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+  }
+</style>
+
 <div class="page-header d-print-none">
     <div class="container-xl">
         <div class="row g-2 align-items-center">
             <div class="col">
-                <h2 class="page-title text-uppercase font-weight-bold">
+                <h2 class="page-title text-uppercase font-weight-bold d-flex align-items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon text-primary" width="28" height="28" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 17l4 0" /><path d="M7 17l0 -4" /><path d="M7 13l5 0" /><path d="M12 13l3 4" /><path d="M17 17l3 0" /><path d="M14 9l5 0" /><path d="M17 9l0 8" /></svg>
                     Buat Laporan Produksi Harian (Shift)
                 </h2>
+                <div class="text-secondary mt-1">Input data ritasi alat muat (Digger), alat angkut (Hauler), unit support, dan catatan kendala operasional.</div>
             </div>
             <div class="col-auto ms-auto d-print-none">
                 <div class="btn-list">
@@ -26,9 +84,10 @@
             @csrf
             
             <!-- Section 1: Informasi Dasar -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-primary-lt">
-                    <h3 class="card-title font-weight-bold">Informasi Dasar Shift</h3>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header border-bottom py-2.5 d-flex align-items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon text-primary" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /></svg>
+                    <h3 class="card-title font-weight-bold m-0">Informasi Dasar Shift</h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -39,13 +98,13 @@
                         <div class="col-md-4 mb-3">
                             <label class="form-label required">Shift</label>
                             <select name="shift" class="form-select" required>
-                                <option value="DS">Day Shift (DS)</option>
-                                <option value="NS">Night Shift (NS)</option>
+                                <option value="DS">Day Shift (DS - Siang)</option>
+                                <option value="NS">Night Shift (NS - Malam)</option>
                             </select>
                         </div>
-                        <div class="col-md-12 mb-3">
+                        <div class="col-md-12 mb-2">
                             <label class="form-label">Catatan Tambahan (Opsional)</label>
-                            <input type="text" name="notes" class="form-control" placeholder="Contoh: Kondisi cuaca hujan di pagi hari...">
+                            <input type="text" name="notes" class="form-control" placeholder="Contoh: Kondisi cuaca hujan gerimis di pit pada pagi hari...">
                         </div>
                     </div>
                 </div>
@@ -58,26 +117,29 @@
 
             <div class="text-center mb-4">
                 <button type="button" class="btn btn-primary btn-pill shadow-sm" onclick="addFleet()">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
                     Tambah Fleet (Digger) Baru
                 </button>
             </div>
 
             <!-- Section 3: Support Units -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-green-lt d-flex justify-content-between align-items-center">
-                    <h3 class="card-title font-weight-bold">Unit Support (Dozer, Grader, dll)</h3>
-                    <button type="button" class="btn btn-sm btn-success" onclick="addSupport()">+ Tambah Support</button>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header border-bottom py-2.5 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon text-success" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" /></svg>
+                        <h3 class="card-title font-weight-bold m-0">Unit Support (Dozer, Grader, dll)</h3>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-success shadow-none" onclick="addSupport()">+ Tambah Support</button>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-vcenter card-table">
+                        <table class="table table-vcenter card-table table-bordered mb-0">
                             <thead>
-                                <tr>
+                                <tr class="fleet-table-head">
                                     <th style="width: 40%">Unit Support</th>
                                     <th>HM Awal</th>
                                     <th>HM Akhir</th>
-                                    <th class="w-1">Hapus</th>
+                                    <th class="w-1 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="support-list">
@@ -89,22 +151,25 @@
             </div>
 
             <!-- Section 4: Delay Events -->
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-red-lt d-flex justify-content-between align-items-center">
-                    <h3 class="card-title font-weight-bold">Delay / Standby Time (Kendala)</h3>
-                    <button type="button" class="btn btn-sm btn-danger" onclick="addDelay()">+ Tambah Delay</button>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header border-bottom py-2.5 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon text-warning" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="9" /><polyline points="12 7 12 12 15 15" /></svg>
+                        <h3 class="card-title font-weight-bold m-0">Delay / Standby Time (Kendala)</h3>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-warning shadow-none" onclick="addDelay()">+ Tambah Delay</button>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-vcenter card-table">
+                        <table class="table table-vcenter card-table table-bordered mb-0">
                             <thead>
-                                <tr>
-                                    <th>Jam Mulai</th>
-                                    <th>Jam Selesai</th>
+                                <tr class="fleet-table-head">
+                                    <th style="width: 140px;">Jam Mulai</th>
+                                    <th style="width: 140px;">Jam Selesai</th>
                                     <th>Kode Delay</th>
                                     <th>Terdampak Ke Fleet</th>
                                     <th>Keterangan</th>
-                                    <th class="w-1">Hapus</th>
+                                    <th class="w-1 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="delay-list">
@@ -116,8 +181,8 @@
             </div>
 
             <div class="mb-5 d-flex justify-content-end">
-                <button type="submit" class="btn btn-primary btn-lg shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" /><path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M14 4l0 4l-6 0l0 -4" /></svg>
+                <button type="submit" class="btn btn-primary btn-lg shadow-sm d-flex align-items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" /><path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M14 4l0 4l-6 0l0 -4" /></svg>
                     Simpan Laporan Shift
                 </button>
             </div>
@@ -143,10 +208,19 @@
         const fleetId = fleetIndex;
         
         let fleetHtml = `
-        <div class="card shadow-sm border border-secondary mb-4 fleet-card" id="fleet-card-${fleetId}">
-            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                <h3 class="card-title font-weight-bold m-0"><span class="badge bg-primary rounded-circle me-2">${fleetId + 1}</span> Fleet Digger</h3>
-                <button type="button" class="btn btn-sm btn-danger" onclick="removeFleet(${fleetId})">Hapus Fleet</button>
+        <div class="card shadow-sm mb-4 fleet-card" id="fleet-card-${fleetId}">
+            <div class="card-header fleet-header d-flex justify-content-between align-items-center py-2.5 border-bottom">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-primary text-primary-fg fw-bold px-2 py-1">${fleetId + 1}</span>
+                    <h3 class="card-title font-weight-bold m-0 d-flex align-items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon text-primary" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 17l4 0" /><path d="M7 17l0 -4" /><path d="M7 13l5 0" /><path d="M12 13l3 4" /><path d="M17 17l3 0" /><path d="M14 9l5 0" /><path d="M17 9l0 8" /></svg>
+                        Fleet Digger #${fleetId + 1}
+                    </h3>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger shadow-none d-flex align-items-center gap-1" onclick="removeFleet(${fleetId})">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
+                    Hapus Fleet
+                </button>
             </div>
             <div class="card-body">
                 <div class="row mb-3">
@@ -176,25 +250,27 @@
                     </div>
                 </div>
 
-                <hr>
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h4 class="m-0 text-azure font-weight-bold">Unit Angkut (Haulers)</h4>
-                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addHauler(${fleetId})">+ Tambah Hauler ke Fleet Ini</button>
+                <div class="d-flex justify-content-between align-items-center mb-2 pt-2 border-top">
+                    <h4 class="m-0 text-primary font-weight-bold d-flex align-items-center gap-1.5" style="font-size: 0.9rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon text-primary" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M5 17h-2v-11a1 1 0 0 1 1 -1h9v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5" /></svg>
+                        Unit Angkut (Haulers)
+                    </h4>
+                    <button type="button" class="btn btn-sm btn-outline-primary shadow-none" onclick="addHauler(${fleetId})">+ Tambah Hauler</button>
                 </div>
                 
                 <div class="table-responsive">
-                    <table class="table table-vcenter table-bordered table-sm">
-                        <thead class="bg-azure-lt">
+                    <table class="table table-vcenter table-bordered table-sm mb-0">
+                        <thead class="fleet-table-head">
                             <tr>
-                                <th style="min-width: 250px;">Unit Hauler</th>
-                                <th>Payload</th>
+                                <th style="min-width: 220px;">Unit Hauler</th>
+                                <th style="width: 90px;" class="text-center">Payload (BCM)</th>
                                 <th class="text-center" colspan="12">Ritasi per Jam (Jam 1 - 12)</th>
-                                <th class="w-1">Hapus</th>
+                                <th class="w-1 text-center">Aksi</th>
                             </tr>
                             <tr>
                                 <th></th>
-                                <th>(BCM)</th>
-                                ${[...Array(12).keys()].map(i => `<th class="text-center p-1" style="min-width: 40px; font-size:10px;">${i+1}</th>`).join('')}
+                                <th></th>
+                                ${[...Array(12).keys()].map(i => `<th class="text-center p-1" style="min-width: 38px; font-size:11px;">J${i+1}</th>`).join('')}
                                 <th></th>
                             </tr>
                         </thead>
@@ -247,14 +323,14 @@
         
         let hourlyInputs = '';
         for(let i=1; i<=12; i++) {
-            hourlyInputs += `<td><input type="number" min="0" name="fleets[${fleetId}][haulers][${hId}][hourly_ritasi][${i}]" class="form-control px-1 py-1 text-center" style="font-size:12px;"></td>`;
+            hourlyInputs += `<td class="p-1"><input type="number" min="0" name="fleets[${fleetId}][haulers][${hId}][hourly_ritasi][${i}]" class="form-control ritasi-input text-center" placeholder="0"></td>`;
         }
 
         tr.innerHTML = `
             <td>${selectHtml}</td>
-            <td><input type="number" step="0.01" name="fleets[${fleetId}][haulers][${hId}][payload]" class="form-control px-1" required></td>
+            <td><input type="number" step="0.01" name="fleets[${fleetId}][haulers][${hId}][payload]" class="form-control form-control-sm text-center" placeholder="20" required></td>
             ${hourlyInputs}
-            <td><button type="button" class="btn btn-icon btn-sm btn-danger" onclick="this.closest('tr').remove()"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button></td>
+            <td class="text-center"><button type="button" class="btn btn-icon btn-sm btn-ghost-danger shadow-none" onclick="this.closest('tr').remove()" title="Hapus Baris Hauler"><svg xmlns="http://www.w3.org/2000/svg" class="icon m-0" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button></td>
         `;
         tbody.appendChild(tr);
 
@@ -278,9 +354,9 @@
         
         tr.innerHTML = `
             <td>${selectHtml}</td>
-            <td><input type="number" step="0.01" name="supports[${supportIndex}][hm_awal]" class="form-control" placeholder="0.00" required></td>
-            <td><input type="number" step="0.01" name="supports[${supportIndex}][hm_akhir]" class="form-control" placeholder="0.00" required></td>
-            <td><button type="button" class="btn btn-icon btn-sm btn-danger" onclick="this.closest('tr').remove()">X</button></td>
+            <td><input type="number" step="0.01" name="supports[${supportIndex}][hm_awal]" class="form-control form-control-sm" placeholder="0.00" required></td>
+            <td><input type="number" step="0.01" name="supports[${supportIndex}][hm_akhir]" class="form-control form-control-sm" placeholder="0.00" required></td>
+            <td class="text-center"><button type="button" class="btn btn-icon btn-sm btn-ghost-danger shadow-none" onclick="this.closest('tr').remove()" title="Hapus"><svg xmlns="http://www.w3.org/2000/svg" class="icon m-0" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button></td>
         `;
         document.getElementById('support-list').appendChild(tr);
 
@@ -304,10 +380,10 @@
         const currDelayIdx = delayIndex++;
         
         tr.innerHTML = `
-            <td><input type="time" name="delays[${currDelayIdx}][start_time]" class="form-control" required></td>
-            <td><input type="time" name="delays[${currDelayIdx}][end_time]" class="form-control" required></td>
+            <td><input type="time" name="delays[${currDelayIdx}][start_time]" class="form-control form-control-sm" required></td>
+            <td><input type="time" name="delays[${currDelayIdx}][end_time]" class="form-control form-control-sm" required></td>
             <td>
-                <select name="delays[${currDelayIdx}][delay_code]" class="form-select" required>
+                <select name="delays[${currDelayIdx}][delay_code]" class="form-select form-select-sm" required>
                     <option value="Rain">Rain (Hujan)</option>
                     <option value="Slippery">Slippery (Licin)</option>
                     <option value="Breakdown">Breakdown Unit</option>
@@ -318,12 +394,12 @@
                 </select>
             </td>
             <td>
-                <select name="delays[${currDelayIdx}][fleet_id]" class="form-select delay-fleet-select">
+                <select name="delays[${currDelayIdx}][fleet_id]" class="form-select form-select-sm delay-fleet-select">
                     <option value="">-- Semua Fleet (Global) --</option>
                 </select>
             </td>
-            <td><input type="text" name="delays[${currDelayIdx}][remarks]" class="form-control" placeholder="Keterangan"></td>
-            <td><button type="button" class="btn btn-icon btn-sm btn-danger" onclick="this.closest('tr').remove()">X</button></td>
+            <td><input type="text" name="delays[${currDelayIdx}][remarks]" class="form-control form-control-sm" placeholder="Keterangan..."></td>
+            <td class="text-center"><button type="button" class="btn btn-icon btn-sm btn-ghost-danger shadow-none" onclick="this.closest('tr').remove()" title="Hapus"><svg xmlns="http://www.w3.org/2000/svg" class="icon m-0" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button></td>
         `;
         document.getElementById('delay-list').appendChild(tr);
         updateDelayFleetOptions();
@@ -342,8 +418,8 @@
             const diggerEl = document.querySelector(`#digger-select-${fId}`);
             let diggerName = 'Fleet ' + (parseInt(fId)+1);
             if(diggerEl && diggerEl.value) {
-                const label = diggerEl.querySelector('.vscomp-value').textContent;
-                if(label) diggerName = label;
+                const label = diggerEl.querySelector('.vscomp-value')?.textContent;
+                if(label && label.trim() !== '') diggerName = label;
             }
             fleets.push({ id: fId, name: diggerName });
         });
