@@ -230,20 +230,52 @@
       }
 
       @media (max-width: 767.98px) {
-          .stage { max-width: 100%; }
+          body {
+              padding: 20px 10px;
+          }
+          .stage { max-width: 100%; padding: 0 5px; margin-top: 10px; }
           .mascot-wrap {
-              position: static;
-              width: 220px;
-              margin: 0 auto -20px;
-              transform: none;
-              animation: pointDown 2.6s ease-in-out infinite;
-              z-index: 3;
+              display: none !important;
+          }
+          .navbar-brand {
+              display: none !important;
           }
           @keyframes pointDown {
               0%, 100% { transform: translateY(0); }
-              50%      { transform: translateY(8px); }
+              50%      { transform: translateY(5px); }
           }
           .deco-star.s2 { left: 82%; }
+          
+          /* Mobile-First Form Adjustments */
+          .card-auth {
+              border-radius: 24px; /* Sudut melengkung halus */
+              border-color: rgba(245, 158, 11, 0.4);
+          }
+          .card-auth .card-body {
+              padding: 2rem 1.25rem; /* Padding samping dikurangi */
+          }
+          .card-auth h2 {
+              font-size: 1.45rem;
+          }
+          .card-auth .form-control {
+              font-size: 16px !important; /* Mencegah auto-zoom di iPhone/iOS */
+              padding: 0.85rem 1rem; /* Target sentuh lebih tinggi */
+              border-radius: 12px;
+          }
+          .card-auth .btn-primary {
+              padding: 0.9rem; /* Tombol lebih besar untuk jempol */
+              font-size: 1.1rem;
+              border-radius: 12px;
+          }
+          .card-auth .form-label {
+              font-size: 0.95rem;
+              margin-bottom: 0.4rem;
+          }
+          .text-center.mt-3 a {
+              padding: 10px 20px;
+              display: block;
+              margin-bottom: 10px;
+          }
       }
     </style>
   </head>

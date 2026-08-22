@@ -133,64 +133,112 @@
       padding: 4px 12px !important;
       display: inline-block !important;
     }
+    .print-col-3 {
+      width: 25% !important;
+      flex: 0 0 25% !important;
+      max-width: 25% !important;
+    }
+    .print-col-4 {
+      width: 33.333333% !important;
+      flex: 0 0 33.333333% !important;
+      max-width: 33.333333% !important;
+    }
+    .print-col-8 {
+      width: 66.666667% !important;
+      flex: 0 0 66.666667% !important;
+      max-width: 66.666667% !important;
+    }
+    .print-col-4-hdr {
+      width: 33.333333% !important;
+      flex: 0 0 33.333333% !important;
+      max-width: 33.333333% !important;
+    }
     @page {
       size: A4 portrait;
       margin: 8mm;
+    }
+  }
+
+  /* Mobile specific enhancements */
+  @media (max-width: 767.98px) {
+    .wo-report-card {
+      padding: 0.85rem !important;
+    }
+    .wo-report-card .table-report-header th {
+      font-size: 0.72rem;
+      white-space: nowrap;
+    }
+    .signature-box {
+      padding: 6px;
+    }
+    .signature-space {
+      height: 48px;
     }
   }
 </style>
 
 <!-- Top Actions (Screen only) -->
 <div class="page-header d-print-none mb-3">
-  <div class="row align-items-center">
-    <div class="col">
-      <h2 class="page-title text-primary fw-bold">Laporan Work Order: {{ $workOrder->no_wo }}</h2>
+  <div class="row align-items-center g-2">
+    <div class="col-12 col-md-auto">
+      <h2 class="page-title text-primary fw-bold mb-0">Laporan Work Order: {{ $workOrder->no_wo }}</h2>
     </div>
-    <div class="col-auto ms-auto d-print-none gap-2 d-flex">
-      <!-- Dropdown Bagikan Link -->
-      <div class="dropdown">
-        <button type="button" class="btn btn-outline-primary dropdown-toggle fw-bold shadow-sm" data-bs-toggle="dropdown">
-          <svg class="icon icon-tabler icon-tabler-share me-1" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M18 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M8.7 10.7l6.6 -3.4" /><path d="M8.7 13.3l6.6 3.4" /></svg>
-          Bagikan Link
-        </button>
-        <div class="dropdown-menu dropdown-menu-end shadow-md">
-          <a class="dropdown-item d-flex align-items-center gap-2" href="#" onclick="copyToClipboard('[Work Order: {{ $workOrder->no_wo }}]({{ url()->current() }})', 'Link Format Chat berhasil disalin!'); return false;">
-            <svg class="icon icon-tabler icon-tabler-message-share text-primary" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11v-3a3 3 0 0 0 -3 -3h-10a3 3 0 0 0 -3 3v8a3 3 0 0 0 3 3h5" /><path d="M16 22l5 -5" /><path d="M21 21.5v-4.5h-4.5" /></svg>
-            <span>Salin Format Chat (`[WO](URL)`)</span>
-          </a>
-          <a class="dropdown-item d-flex align-items-center gap-2" href="#" onclick="copyToClipboard('{{ url()->current() }}', 'URL Web berhasil disalin!'); return false;">
-            <svg class="icon icon-tabler icon-tabler-link text-secondary" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 15l6 -6" /><path d="M11 6l.463 -.463a5 5 0 0 1 7.071 7.071l-.534 .534" /><path d="M13 18l-.397 .534a5 5 0 0 1 -7.071 -7.071l.534 -.534" /></svg>
-            <span>Salin URL Web Langsung</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('chat.index') }}" target="_blank" onclick="copyToClipboard('[Work Order: {{ $workOrder->no_wo }}]({{ url()->current() }})', 'Link disalin! Membuka Live Chat...');">
-            <svg class="icon icon-tabler icon-tabler-brand-hipchat text-success" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3a9 9 0 1 0 4.5 16.852l3.5 1.148l-1.148 -3.5a9 9 0 0 0 -6.852 -14.5z" /></svg>
-            <span>Buka Live Chat</span>
-          </a>
+    <div class="col-12 col-md-auto ms-md-auto d-print-none">
+      <div class="btn-list flex-wrap">
+        <!-- Dropdown Bagikan Link -->
+        <div class="dropdown">
+          <button type="button" class="btn btn-outline-primary dropdown-toggle fw-bold shadow-sm" data-bs-toggle="dropdown">
+            <svg class="icon icon-tabler icon-tabler-share me-1" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M18 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M8.7 10.7l6.6 -3.4" /><path d="M8.7 13.3l6.6 3.4" /></svg>
+            Bagikan Link
+          </button>
+          <div class="dropdown-menu dropdown-menu-end shadow-md">
+            <a class="dropdown-item d-flex align-items-center gap-2" href="#" onclick="copyToClipboard('[Work Order: {{ $workOrder->no_wo }}]({{ url()->current() }})', 'Link Format Chat berhasil disalin!'); return false;">
+              <svg class="icon icon-tabler icon-tabler-message-share text-primary" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11v-3a3 3 0 0 0 -3 -3h-10a3 3 0 0 0 -3 3v8a3 3 0 0 0 3 3h5" /><path d="M16 22l5 -5" /><path d="M21 21.5v-4.5h-4.5" /></svg>
+              <span>Salin Format Chat (`[WO](URL)`)</span>
+            </a>
+            <a class="dropdown-item d-flex align-items-center gap-2" href="#" onclick="copyToClipboard('{{ url()->current() }}', 'URL Web berhasil disalin!'); return false;">
+              <svg class="icon icon-tabler icon-tabler-link text-secondary" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 15l6 -6" /><path d="M11 6l.463 -.463a5 5 0 0 1 7.071 7.071l-.534 .534" /><path d="M13 18l-.397 .534a5 5 0 0 1 -7.071 -7.071l.534 -.534" /></svg>
+              <span>Salin URL Web Langsung</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item d-flex align-items-center gap-2" href="{{ route('chat.index') }}" target="_blank" onclick="copyToClipboard('[Work Order: {{ $workOrder->no_wo }}]({{ url()->current() }})', 'Link disalin! Membuka Live Chat...');">
+              <svg class="icon icon-tabler icon-tabler-brand-hipchat text-success" width="18" height="18" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3a9 9 0 1 0 4.5 16.852l3.5 1.148l-1.148 -3.5a9 9 0 0 0 -6.852 -14.5z" /></svg>
+              <span>Buka Live Chat</span>
+            </a>
+          </div>
         </div>
-      </div>
 
-      <button type="button" class="btn btn-success fw-bold shadow-sm" onclick="window.print();">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" /><path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" /><path d="M7 13m0 2a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2z" /></svg>
-        Cetak Report (A4)
-      </button>
-      @can('edit_work_orders')
-      <a href="{{ route('work-orders.edit', $workOrder) }}" class="btn btn-primary">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" /><path d="M13.5 6.5l4 4" /></svg>
-        Edit WO
-      </a>
-      @endcan
-      <a href="{{ route('work-orders.index') }}" class="btn btn-outline-secondary">Kembali</a>
+        <button type="button" class="btn btn-success fw-bold shadow-sm" onclick="window.print();">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 17h2a2 2 0 0 0 2 -2v-4a2 2 0 0 0 -2 -2h-14a2 2 0 0 0 -2 2v4a2 2 0 0 0 2 2h2" /><path d="M17 9v-4a2 2 0 0 0 -2 -2h-6a2 2 0 0 0 -2 2v4" /><path d="M7 13m0 2a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2z" /></svg>
+          Cetak Report (A4)
+        </button>
+        @can('edit_work_orders')
+        <a href="{{ route('work-orders.edit', $workOrder) }}" class="btn btn-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" /><path d="M13.5 6.5l4 4" /></svg>
+          Edit WO
+        </a>
+        @endcan
+        @can('delete_work_orders')
+        <form action="{{ route('work-orders.destroy', $workOrder) }}" method="post" class="d-inline" onsubmit="return confirm('Hapus WO ini beserta seluruh data terkait? Perhatian: Tindakan ini tidak dapat dibatalkan.');">
+          @csrf @method('DELETE')
+          <button type="submit" class="btn btn-danger shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon me-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
+            Hapus
+          </button>
+        </form>
+        @endcan
+        <a href="{{ route('work-orders.index') }}" class="btn btn-outline-secondary">Kembali</a>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- PRINTABLE WORK ORDER REPORT DOCUMENT -->
-<div class="card wo-report-card p-4 rounded-3">
+<div class="card wo-report-card p-3 p-md-4 rounded-3">
   
   <!-- Document Header -->
-  <div class="row align-items-center border-bottom pb-3 mb-3">
-    <div class="col-8">
+  <div class="row align-items-center border-bottom pb-3 mb-3 g-2">
+    <div class="col-12 col-md-8 print-col-8">
       <div class="d-flex align-items-center">
         @php
             $appLogo = \App\Models\AppSetting::where('key', 'app_logo')->first()?->value;
@@ -205,7 +253,7 @@
             <img src="{{ asset('storage/logos/' . $appLogo) }}" alt="Logo" style="max-height: 45px;" class="me-3">
         @endif
         <div>
-          <h2 class="m-0 fw-extrabold text-uppercase text-body tracking-wide" style="font-size: 1.3rem;">{{ $appName }}</h2>
+          <h2 class="m-0 fw-extrabold text-uppercase text-body tracking-wide" style="font-size: 1.25rem;">{{ $appName }}</h2>
           @if($appAddress)
             <div class="app-address" style="font-size: 0.75rem; color: #555; margin-bottom: 2px;">{{ $appAddress }}</div>
           @endif
@@ -213,7 +261,7 @@
         </div>
       </div>
     </div>
-    <div class="col-4 text-end">
+    <div class="col-12 col-md-4 print-col-4-hdr text-start text-md-end mt-2 mt-md-0">
       <div class="badge bg-dark text-white px-3 py-2 fs-4 mb-1 wo-no-badge">NO: {{ $workOrder->no_wo }}</div>
       <div class="small text-muted">Tanggal Cetak: {{ date('d M Y H:i') }}</div>
     </div>
@@ -223,7 +271,7 @@
   <div class="row g-2 mb-3">
     
     <!-- Box 1: Identitas WO -->
-    <div class="col-3">
+    <div class="col-12 col-sm-6 col-lg-3 print-col-3">
       <div class="border rounded p-2 bg-body-tertiary h-100">
         <div class="fw-bold text-primary border-bottom pb-1 mb-1 small text-uppercase">1. Identitas WO</div>
         <table class="w-100 small">
@@ -251,7 +299,7 @@
     </div>
 
     <!-- Box 2: Identitas Unit -->
-    <div class="col-3">
+    <div class="col-12 col-sm-6 col-lg-3 print-col-3">
       <div class="border rounded p-2 bg-body-tertiary h-100">
         <div class="fw-bold text-info border-bottom pb-1 mb-1 small text-uppercase">2. Identitas Unit</div>
         <table class="w-100 small">
@@ -265,7 +313,7 @@
     </div>
 
     <!-- Box 3: Waktu Breakdown -->
-    <div class="col-3">
+    <div class="col-12 col-sm-6 col-lg-3 print-col-3">
       <div class="border rounded p-2 bg-body-tertiary h-100">
         <div class="fw-bold text-warning border-bottom pb-1 mb-1 small text-uppercase">3. Waktu & Durasi</div>
         <table class="w-100 small">
@@ -277,7 +325,7 @@
     </div>
 
     <!-- Box 4: Klasifikasi -->
-    <div class="col-3">
+    <div class="col-12 col-sm-6 col-lg-3 print-col-3">
       <div class="border rounded p-2 bg-body-tertiary h-100">
         <div class="fw-bold text-teal border-bottom pb-1 mb-1 small text-uppercase">4. Klasifikasi</div>
         <table class="w-100 small">
@@ -294,6 +342,7 @@
   <div class="mb-3">
     <div class="fw-bold text-body mb-1 small text-uppercase border-bottom pb-1">5. Uraian Pekerjaan & Pelaksanaan (Execution Details)</div>
     
+    <div class="table-responsive">
     <table class="table table-bordered table-condensed mb-0">
       <thead class="table-report-header">
         <tr>
@@ -406,63 +455,192 @@
         @endforelse
       </tbody>
     </table>
+    </div>
   </div>
 
   <!-- HSE / K3 Documents Section -->
   <div class="mb-3 mt-4 pt-2 border-top">
-    <div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom">
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-2 pb-1 border-bottom gap-2">
         <div class="fw-bold text-body small text-uppercase">6. Dokumen Keselamatan (HSE / K3)</div>
-        <div class="d-print-none gap-2 d-flex">
+        <div class="d-print-none gap-2 d-flex flex-wrap">
+            @can('create_hse_jsas')
             <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modal-jsa">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /><path d="M9 14l2 2l4 -4" /></svg>
                 Buat JSA
             </button>
+            @endcan
+            @can('create_hse_ptws')
             <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#modal-ptw">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-certificate" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M5 8v-3a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-5" /><path d="M6 14m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M4.5 17l-1.5 5l3 -1.5l3 1.5l-1.5 -5" /></svg>
                 Buat Permit (PTW)
             </button>
+            @endcan
+            @can('create_hse_lotos')
             <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modal-loto">
                 <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-lock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg>
                 Tambah LOTO
             </button>
+            @endcan
         </div>
     </div>
     
     <div class="row g-2">
         <!-- JSA List -->
-        <div class="col-4">
-            <div class="border rounded p-2 h-100 bg-body-tertiary">
-                <div class="fw-bold small text-muted mb-2">JSA (Job Safety Analysis)</div>
+        <div class="col-12 col-md-4 print-col-4">
+            <div class="border rounded p-2.5 h-100 bg-body-tertiary">
+                <div class="fw-bold small text-muted mb-2 text-uppercase d-flex justify-content-between align-items-center">
+                    <span>JSA (Job Safety Analysis)</span>
+                    <span class="badge bg-primary-lt">{{ $workOrder->jsas->count() }} Dokumen</span>
+                </div>
                 @forelse($workOrder->jsas as $jsa)
-                    <div class="card mb-2 shadow-sm border-0">
-                        <div class="card-body p-2 small">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="fw-bold">JSA #{{ $jsa->id }}</span>
-                                <span class="badge {{ $jsa->status == 'Approved' ? 'bg-success' : 'bg-secondary' }}">{{ $jsa->status }}</span>
+                    <div class="card mb-2 shadow-sm border">
+                        <div class="card-body p-2.5 small">
+                            <div class="d-flex justify-content-between align-items-center mb-1.5">
+                                <span class="fw-bold fs-4 text-primary">JSA #{{ $jsa->id }}</span>
+                                <span class="badge {{ $jsa->status == 'Approved' ? 'bg-success text-white' : 'bg-secondary text-white' }} fw-bold px-2 py-0.5">{{ $jsa->status }}</span>
                             </div>
-                            <div class="text-muted mb-1">{{ $jsa->steps->count() }} Langkah Kerja</div>
+                            
+                            @if($jsa->notes)
+                            <div class="text-secondary small mb-1.5">
+                                <span class="fw-semibold text-body">Ket:</span> {{ $jsa->notes }}
+                            </div>
+                            @endif
+
+                            @if($jsa->steps->count() > 0)
+                            <div class="mt-2 pt-1.5 border-top">
+                                <div class="small fw-bold text-body mb-1 d-flex align-items-center justify-content-between">
+                                    <span>Langkah Kerja & Bahaya:</span>
+                                    <span class="badge bg-blue-lt font-monospace" style="font-size: 0.65rem;">{{ $jsa->steps->count() }} Langkah</span>
+                                </div>
+                                <div class="list-group list-group-flush border rounded bg-body-tertiary">
+                                    @foreach($jsa->steps as $sIdx => $step)
+                                    <div class="list-group-item p-2">
+                                        <div class="fw-bold text-primary small">#{{ $sIdx+1 }}. {{ $step->job_step }}</div>
+                                        <div class="text-danger small mt-0.5"><span class="fw-semibold">⚠ Bahaya:</span> {{ $step->potential_hazard }}</div>
+                                        <div class="text-success small mt-0.5"><span class="fw-semibold">🛡 Kontrol:</span> {{ $step->control_measure }}</div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @else
+                            <div class="text-muted small fst-italic my-1">Tidak ada rincian langkah kerja manual.</div>
+                            @endif
+
                             @if($jsa->document_scan)
-                            <div class="mb-1">
-                                <a href="{{ Storage::url($jsa->document_scan) }}" target="_blank" class="badge bg-blue text-white text-decoration-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-download" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M12 17v-6" /><path d="M9.5 14.5l2.5 2.5l2.5 -2.5" /></svg>
-                                    Lihat Dokumen
+                            <div class="mt-2">
+                                <a href="{{ Storage::url($jsa->document_scan) }}" target="_blank" class="badge bg-blue text-white text-decoration-none py-1 px-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-download me-1" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M12 17v-6" /><path d="M9.5 14.5l2.5 2.5l2.5 -2.5" /></svg>
+                                    Lihat Lampiran Scan
                                 </a>
                             </div>
                             @endif
-                            <div class="d-print-none text-end mt-2">
+
+                            <div class="d-print-none d-flex justify-content-end align-items-center gap-1 mt-2.5 pt-1.5 border-top">
+                                <!-- Tombol Mata: Lihat Detail Lengkap -->
+                                <button type="button" class="btn btn-xs btn-outline-info" data-bs-toggle="modal" data-bs-target="#modal-jsa-detail-{{ $jsa->id }}" title="Lihat Rincian Lengkap JSA">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye me-1" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="12" r="2" /><path d="M22 12c-2.667 4.667 -6 7 -10 7s-7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7" /></svg>
+                                    Detail
+                                </button>
+                                
+                                @can('edit_hse_jsas')
                                 <button type="button" class="btn btn-xs btn-outline-primary" onclick="loadJsaForEdit({{ $jsa->id }})">Edit</button>
+                                @endcan
+
                                 @if($jsa->status != 'Approved' && auth()->user()->can('approve_hse'))
                                 <form action="{{ route('hse.jsa.approve', $jsa) }}" method="POST" class="d-inline">
                                     @csrf
-                                    <button class="btn btn-xs btn-success">Approve</button>
+                                    <button class="btn btn-xs btn-success fw-bold">Approve</button>
                                 </form>
                                 @endif
-                                <form action="{{ route('hse.jsa.destroy', $jsa) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus JSA?');">
+
+                                @can('delete_hse_jsas')
+                                <form action="{{ route('hse.jsa.destroy', $jsa) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus JSA ini?');">
                                     @csrf @method('DELETE')
                                     <button class="btn btn-xs btn-outline-danger">Hapus</button>
                                 </form>
+                                @endcan
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Modal Detail Lengkap JSA -->
+                    <div class="modal modal-blur fade" id="modal-jsa-detail-{{ $jsa->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title d-flex align-items-center gap-2">
+                              <svg class="icon icon-tabler icon-tabler-clipboard-check text-primary" width="22" height="22" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" /><path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" /><path d="M9 14l2 2l4 -4" /></svg>
+                              Rincian Lengkap: JSA #{{ $jsa->id }}
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="row g-2 mb-3 bg-body-tertiary p-2.5 rounded border">
+                              <div class="col-6 col-md-3">
+                                <div class="text-muted small">Status</div>
+                                <span class="badge {{ $jsa->status == 'Approved' ? 'bg-success text-white' : 'bg-secondary text-white' }} fw-bold px-2 py-0.5">{{ $jsa->status }}</span>
+                              </div>
+                              <div class="col-6 col-md-3">
+                                <div class="text-muted small">Dibuat Oleh</div>
+                                <div class="fw-bold small text-body">{{ $jsa->creator->nama_lengkap ?? $jsa->creator->name ?? '-' }}</div>
+                              </div>
+                              <div class="col-6 col-md-3">
+                                <div class="text-muted small">Disetujui Oleh</div>
+                                <div class="fw-bold small text-body">{{ $jsa->approver->nama_lengkap ?? $jsa->approver->name ?? '-' }}</div>
+                              </div>
+                              <div class="col-6 col-md-3">
+                                <div class="text-muted small">Waktu Disetujui</div>
+                                <div class="fw-bold small text-body">{{ $jsa->approved_at ? $jsa->approved_at->format('d/m/Y H:i') : '-' }}</div>
+                              </div>
+                              @if($jsa->notes)
+                              <div class="col-12 border-top pt-2 mt-1">
+                                <div class="text-muted small fw-bold">Catatan / Keterangan:</div>
+                                <div class="small text-body">{{ $jsa->notes }}</div>
+                              </div>
+                              @endif
+                              @if($jsa->document_scan)
+                              <div class="col-12 border-top pt-2 mt-1">
+                                <a href="{{ Storage::url($jsa->document_scan) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                  <svg class="icon icon-tabler icon-tabler-file-download me-1" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M12 17v-6" /><path d="M9.5 14.5l2.5 2.5l2.5 -2.5" /></svg>
+                                  Buka File Lampiran Scan JSA
+                                </a>
+                              </div>
+                              @endif
+                            </div>
+
+                            <h4 class="fw-bold text-primary mb-2">Tabel Langkah Kerja & Analisis Bahaya (JSA)</h4>
+                            <div class="table-responsive border rounded">
+                              <table class="table table-vcenter table-bordered mb-0">
+                                <thead class="bg-body-tertiary">
+                                  <tr>
+                                    <th class="text-center" style="width: 40px;">No</th>
+                                    <th style="width: 32%;">Uraian Langkah Kerja</th>
+                                    <th style="width: 32%;">Potensi Bahaya</th>
+                                    <th style="width: 32%;">Tindakan Pengendalian</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  @forelse($jsa->steps as $sIdx => $step)
+                                  <tr>
+                                    <td class="text-center align-top fw-bold">{{ $sIdx + 1 }}</td>
+                                    <td class="align-top fw-bold text-primary">{{ $step->job_step }}</td>
+                                    <td class="align-top text-danger">{{ $step->potential_hazard }}</td>
+                                    <td class="align-top text-success">{{ $step->control_measure }}</td>
+                                  </tr>
+                                  @empty
+                                  <tr>
+                                    <td colspan="4" class="text-center text-muted py-3">Tidak ada data langkah kerja terlampir.</td>
+                                  </tr>
+                                  @endforelse
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                 @empty
                     <div class="text-muted small fst-italic">Belum ada JSA.</div>
@@ -471,37 +649,46 @@
         </div>
 
         <!-- PTW List -->
-        <div class="col-4">
-            <div class="border rounded p-2 h-100 bg-body-tertiary">
-                <div class="fw-bold small text-muted mb-2">Permit to Work (PTW)</div>
+        <div class="col-12 col-md-4 print-col-4">
+            <div class="border rounded p-2.5 h-100 bg-body-tertiary">
+                <div class="fw-bold small text-muted mb-2 text-uppercase d-flex justify-content-between align-items-center">
+                    <span>Permit to Work (PTW)</span>
+                    <span class="badge bg-info-lt">{{ $workOrder->ptws->count() }} Izin</span>
+                </div>
                 @forelse($workOrder->ptws as $ptw)
-                    <div class="card mb-2 shadow-sm border-0">
-                        <div class="card-body p-2 small">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="fw-bold text-info">{{ $ptw->permit_type }}</span>
-                                <span class="badge {{ $ptw->status == 'Approved' ? 'bg-success' : 'bg-secondary' }}">{{ $ptw->status }}</span>
+                    <div class="card mb-2 shadow-sm border">
+                        <div class="card-body p-2.5 small">
+                            <div class="d-flex justify-content-between align-items-center mb-1.5">
+                                <span class="fw-bold fs-4 text-info">{{ $ptw->permit_type }}</span>
+                                <span class="badge {{ $ptw->status == 'Approved' ? 'bg-success text-white' : 'bg-secondary text-white' }} fw-bold px-2 py-0.5">{{ $ptw->status }}</span>
                             </div>
-                            <div class="text-muted mb-1">Valid: {{ $ptw->valid_from->format('d/m H:i') }} - {{ $ptw->valid_to->format('d/m H:i') }}</div>
+                            <div class="text-secondary small mb-1">
+                                <span class="fw-semibold text-body">Valid:</span> {{ $ptw->valid_from->format('d/m/Y H:i') }} <span class="text-muted">s/d</span> {{ $ptw->valid_to->format('d/m/Y H:i') }}
+                            </div>
                             @if($ptw->document_scan)
-                            <div class="mb-1">
-                                <a href="{{ Storage::url($ptw->document_scan) }}" target="_blank" class="badge bg-blue text-white text-decoration-none">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-download" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M12 17v-6" /><path d="M9.5 14.5l2.5 2.5l2.5 -2.5" /></svg>
-                                    Lihat Dokumen
+                            <div class="mt-1.5 mb-1">
+                                <a href="{{ Storage::url($ptw->document_scan) }}" target="_blank" class="badge bg-blue text-white text-decoration-none py-1 px-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-download me-1" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M12 17v-6" /><path d="M9.5 14.5l2.5 2.5l2.5 -2.5" /></svg>
+                                    Lihat Lampiran Scan
                                 </a>
                             </div>
                             @endif
-                            <div class="d-print-none text-end mt-2">
+                            <div class="d-print-none d-flex justify-content-end align-items-center gap-1 mt-2.5 pt-1.5 border-top">
+                                @can('edit_hse_ptws')
                                 <button type="button" class="btn btn-xs btn-outline-info" onclick="loadPtwForEdit({{ $ptw->id }})">Edit</button>
+                                @endcan
                                 @if($ptw->status != 'Approved' && auth()->user()->can('approve_hse'))
                                 <form action="{{ route('hse.ptw.approve', $ptw) }}" method="POST" class="d-inline">
                                     @csrf
-                                    <button class="btn btn-xs btn-success">Approve</button>
+                                    <button class="btn btn-xs btn-success fw-bold">Approve</button>
                                 </form>
                                 @endif
-                                <form action="{{ route('hse.ptw.destroy', $ptw) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus PTW?');">
+                                @can('delete_hse_ptws')
+                                <form action="{{ route('hse.ptw.destroy', $ptw) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus PTW ini?');">
                                     @csrf @method('DELETE')
                                     <button class="btn btn-xs btn-outline-danger">Hapus</button>
                                 </form>
+                                @endcan
                             </div>
                         </div>
                     </div>
@@ -512,33 +699,85 @@
         </div>
 
         <!-- LOTO List -->
-        <div class="col-4">
-            <div class="border rounded p-2 h-100 bg-body-tertiary">
-                <div class="fw-bold small text-muted mb-2">LOTO (Lockout/Tagout)</div>
+        <div class="col-12 col-md-4 print-col-4">
+            <div class="border rounded p-2.5 h-100 bg-body-tertiary">
+                <div class="fw-bold small text-muted mb-2 text-uppercase d-flex justify-content-between align-items-center">
+                    <span>LOTO (Lockout/Tagout)</span>
+                    <span class="badge bg-danger-lt">{{ $workOrder->lotos->count() }} Titik</span>
+                </div>
                 @forelse($workOrder->lotos as $loto)
-                    <div class="card mb-2 shadow-sm border-0">
-                        <div class="card-body p-2 small">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span class="fw-bold text-danger">{{ $loto->isolation_point }}</span>
-                                <span class="badge {{ $loto->status == 'Active' ? 'bg-danger' : 'bg-secondary' }}">{{ $loto->status }}</span>
+                    <div class="card mb-2 shadow-sm border">
+                        <div class="card-body p-2.5 small">
+                            <div class="d-flex justify-content-between align-items-center mb-1.5">
+                                <span class="fw-bold fs-4 text-danger">{{ $loto->isolation_point }}</span>
+                                <span class="badge {{ $loto->status == 'Active' ? 'bg-danger text-white' : 'bg-secondary text-white' }} fw-bold px-2 py-0.5">{{ $loto->status }}</span>
                             </div>
-                            <div class="text-muted mb-1">
-                                Lock: {{ $loto->lock_number ?? '-' }} | Tag: {{ $loto->tag_number ?? '-' }}
+                            <div class="text-secondary small mb-1">
+                                <span>Gembok: <strong>{{ $loto->lock_number ?? '-' }}</strong></span>
+                                <span class="text-muted mx-1">|</span>
+                                <span>Tag: <strong>{{ $loto->tag_number ?? '-' }}</strong></span>
                             </div>
-                            <div class="text-muted mb-1" style="font-size: 0.7rem">
-                                By: {{ $loto->applier->name ?? '-' }} ({{ $loto->applied_at->format('d/m H:i') }})
+                            <div class="border-top pt-1 mt-1 small" style="font-size: 0.75rem;">
+                                <div class="d-flex justify-content-between align-items-center mb-0.5">
+                                    <span><span class="badge bg-primary-lt px-1 py-0 me-1">Lock</span> <strong class="text-body">{{ $loto->appliedMechanic->nama_lengkap ?? $loto->applier->nama_lengkap ?? $loto->applier->name ?? '-' }}</strong></span>
+                                    <span class="text-muted font-monospace">{{ $loto->applied_at ? $loto->applied_at->format('d/m/y H:i') : '-' }}</span>
+                                </div>
+                                @if($loto->status == 'Removed')
+                                <div class="d-flex justify-content-between align-items-center pt-0.5 border-top">
+                                    <span><span class="badge bg-warning-lt px-1 py-0 me-1">Remove</span> <strong class="text-body">{{ $loto->removedMechanic->nama_lengkap ?? $loto->remover->nama_lengkap ?? $loto->remover->name ?? '-' }}</strong></span>
+                                    <span class="text-muted font-monospace">{{ $loto->removed_at ? $loto->removed_at->format('d/m/y H:i') : '-' }}</span>
+                                </div>
+                                @endif
                             </div>
-                            <div class="d-print-none text-end mt-2">
+                            <div class="d-print-none d-flex justify-content-end align-items-center gap-1 mt-2 pt-1.5 border-top">
+                                @can('edit_hse_lotos')
                                 <button type="button" class="btn btn-xs btn-outline-danger" onclick="loadLotoForEdit({{ $loto->id }})">Edit</button>
                                 @if($loto->status == 'Active')
-                                <form action="{{ route('hse.loto.remove', $loto) }}" method="POST" class="d-inline" onsubmit="return confirm('Lepas gembok LOTO ini?');">
-                                    @csrf
-                                    <button class="btn btn-xs btn-warning">Lepas (Remove)</button>
-                                </form>
+                                <button type="button" class="btn btn-xs btn-warning fw-bold" data-bs-toggle="modal" data-bs-target="#modal-remove-loto-{{ $loto->id }}">Lepas (Remove)</button>
                                 @endif
+                                @endcan
                             </div>
                         </div>
                     </div>
+
+                    @if($loto->status == 'Active')
+                    <!-- Modal Lepas LOTO -->
+                    <div class="modal modal-blur fade" id="modal-remove-loto-{{ $loto->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                          <form action="{{ route('hse.loto.remove', $loto) }}" method="POST">
+                            @csrf
+                            <div class="modal-header">
+                              <h5 class="modal-title text-warning">Lepas Gembok & Tag LOTO</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <div class="alert alert-warning small mb-3">
+                                Anda akan melepas penguncian LOTO pada titik isolasi: <strong>{{ $loto->isolation_point }}</strong>
+                              </div>
+                              <div class="mb-3">
+                                <label class="form-label required">Dilepas Oleh (Mekanik)</label>
+                                <select name="removed_mechanic_id" class="form-select" required>
+                                  <option value="">-- Pilih Mekanik yang Melepas --</option>
+                                  @foreach($mechanics as $m)
+                                    <option value="{{ $m->id }}">{{ $m->nama_lengkap }} ({{ $m->jabatan->name ?? 'Mekanik' }})</option>
+                                  @endforeach
+                                </select>
+                              </div>
+                              <div class="mb-3">
+                                <label class="form-label required">Tanggal & Jam Dilepas</label>
+                                <input type="datetime-local" class="form-control" name="removed_at" value="{{ now()->format('Y-m-d\TH:i') }}" required>
+                              </div>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn me-auto" data-bs-dismiss="modal">Batal</button>
+                              <button type="submit" class="btn btn-warning fw-bold">Konfirmasi Lepas LOTO</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                    @endif
                 @empty
                     <div class="text-muted small fst-italic">Belum ada LOTO.</div>
                 @endforelse
@@ -881,7 +1120,7 @@
               }
           }
       @endphp
-      <div class="col-3">
+      <div class="col-6 col-md-3 print-col-3">
         <div class="signature-box position-relative">
           <div class="fw-bold small text-uppercase">{{ $config['title'] }}</div>
           <div class="text-muted" style="font-size: 0.7rem;">{{ $config['subtitle'] }}</div>
@@ -926,7 +1165,7 @@
 </div>
 
 <!-- Ruang Diskusi & Komentar Bergaya Postingan -->
-<div class="card mt-4 shadow-sm" id="wo-discussion-card" style="background-color: #f0f4f8; border-top: 3px solid #206bc4;">
+<div class="card mt-4 shadow-sm d-print-none" id="wo-discussion-card" style="background-color: #f0f4f8; border-top: 3px solid #206bc4;">
   <div class="card-header border-0 pb-1">
     <h3 class="card-title text-primary d-flex align-items-center gap-2 m-0">
       <svg class="icon" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" /><path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" /></svg>
@@ -1109,7 +1348,7 @@
             <label class="form-label required">Titik Isolasi (Isolation Point)</label>
             <input type="text" class="form-control" name="isolation_point" placeholder="Misal: Battery Disconnect Switch" required>
           </div>
-          <div class="row g-2">
+          <div class="row g-2 mb-3">
             <div class="col-6">
               <label class="form-label">Nomor Gembok (Lock No)</label>
               <input type="text" class="form-control" name="lock_number" placeholder="Opsional">
@@ -1118,6 +1357,19 @@
               <label class="form-label">Nomor Tag (Tag No)</label>
               <input type="text" class="form-control" name="tag_number" placeholder="Opsional">
             </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label required">Dipasang Oleh (Mekanik)</label>
+            <select name="applied_mechanic_id" class="form-select" required>
+              <option value="">-- Pilih Mekanik --</option>
+              @foreach($mechanics as $m)
+                <option value="{{ $m->id }}">{{ $m->nama_lengkap }} ({{ $m->jabatan->name ?? 'Mekanik' }})</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label required">Tanggal & Jam Dipasang</label>
+            <input type="datetime-local" class="form-control" name="applied_at" value="{{ now()->format('Y-m-d\TH:i') }}" required>
           </div>
         </div>
         <div class="modal-footer">
@@ -1233,7 +1485,7 @@
             <label class="form-label required">Titik Isolasi (Isolation Point)</label>
             <input type="text" class="form-control" name="isolation_point" id="edit-loto-isolation-point" placeholder="Misal: Battery Disconnect Switch" required>
           </div>
-          <div class="row g-2">
+          <div class="row g-2 mb-3">
             <div class="col-6">
               <label class="form-label">Nomor Gembok (Lock No)</label>
               <input type="text" class="form-control" name="lock_number" id="edit-loto-lock-number" placeholder="Opsional">
@@ -1241,6 +1493,36 @@
             <div class="col-6">
               <label class="form-label">Nomor Tag (Tag No)</label>
               <input type="text" class="form-control" name="tag_number" id="edit-loto-tag-number" placeholder="Opsional">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label required">Dipasang Oleh (Mekanik)</label>
+            <select name="applied_mechanic_id" id="edit-loto-applied-mechanic-id" class="form-select" required>
+              <option value="">-- Pilih Mekanik --</option>
+              @foreach($mechanics as $m)
+                <option value="{{ $m->id }}">{{ $m->nama_lengkap }} ({{ $m->jabatan->name ?? 'Mekanik' }})</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label required">Tanggal & Jam Dipasang</label>
+            <input type="datetime-local" class="form-control" name="applied_at" id="edit-loto-applied-at" required>
+          </div>
+          <div id="edit-loto-removed-section" style="display: none;">
+            <div class="border-top pt-2 mt-2">
+              <div class="mb-3">
+                <label class="form-label">Dilepas Oleh (Mekanik)</label>
+                <select name="removed_mechanic_id" id="edit-loto-removed-mechanic-id" class="form-select">
+                  <option value="">-- Pilih Mekanik --</option>
+                  @foreach($mechanics as $m)
+                    <option value="{{ $m->id }}">{{ $m->nama_lengkap }} ({{ $m->jabatan->name ?? 'Mekanik' }})</option>
+                  @endforeach
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Tanggal & Jam Dilepas</label>
+                <input type="datetime-local" class="form-control" name="removed_at" id="edit-loto-removed-at">
+              </div>
             </div>
           </div>
         </div>
@@ -1466,6 +1748,17 @@
         document.getElementById('edit-loto-isolation-point').value = data.isolation_point || '';
         document.getElementById('edit-loto-lock-number').value = data.lock_number || '';
         document.getElementById('edit-loto-tag-number').value = data.tag_number || '';
+        document.getElementById('edit-loto-applied-mechanic-id').value = data.applied_mechanic_id || '';
+        document.getElementById('edit-loto-applied-at').value = data.applied_at || '';
+
+        const removedSection = document.getElementById('edit-loto-removed-section');
+        if (data.status === 'Removed' || data.removed_at || data.removed_mechanic_id) {
+          removedSection.style.display = 'block';
+          document.getElementById('edit-loto-removed-mechanic-id').value = data.removed_mechanic_id || '';
+          document.getElementById('edit-loto-removed-at').value = data.removed_at || '';
+        } else {
+          removedSection.style.display = 'none';
+        }
         
         const modal = new bootstrap.Modal(document.getElementById('modal-edit-loto'));
         modal.show();

@@ -121,10 +121,15 @@
   /* ── Responsive Mobile ── */
   @media (max-width: 767.98px) {
     .chat-shell { height: calc(100vh - 140px); min-height: 380px; }
-    .chat-contact-pane { height: 190px; min-width: 0; border-right: 0; border-bottom: 1px solid rgba(0, 0, 0, 0.08); }
+    .chat-contact-pane { height: 100%; min-width: 0; border-right: 0; border-bottom: 0; }
+    .chat-conversation-pane { display: none !important; height: 100%; }
     .message-bubble { max-width: 90%; }
     #chatHeader { padding: .65rem !important; }
     #chatHeader .btn span { display: none; }
+    
+    /* State saat chat dibuka di HP */
+    .chat-shell.mobile-chat-active .chat-contact-pane { display: none !important; }
+    .chat-shell.mobile-chat-active .chat-conversation-pane { display: flex !important; }
   }
 
   /* ── Dark Mode Harmonization ── */
@@ -282,6 +287,11 @@
       <!-- Chat Header -->
       <div id="chatHeader" class="p-3 border-bottom d-none align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-2">
+          <!-- Back button (Mobile only) -->
+          <button type="button" class="btn btn-sm btn-icon btn-ghost-secondary d-md-none me-1" id="btnBackToContacts" style="border: none; padding: 0;">
+            <svg class="icon icon-tabler icon-tabler-arrow-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l14 0" /><path d="M5 12l6 6" /><path d="M5 12l6 -6" /></svg>
+          </button>
+          
           <span id="chatAvatar" class="avatar avatar-md fw-bold bg-primary text-white shadow-xs rounded-circle"></span>
           <div>
             <div id="chatUserName" class="fw-bold fs-3"></div>
@@ -538,6 +548,9 @@ function selectUserConversation(userId, userName, userAvatar, userSite) {
   }
 
   document.getElementById('chatInputArea').style.display = 'block';
+  
+  // Mobile UI toggle (SPA feel)
+  document.querySelector('.chat-shell').classList.add('mobile-chat-active');
 
   // Reset attachment
   clearPendingAttachment();
@@ -547,6 +560,13 @@ function selectUserConversation(userId, userName, userAvatar, userSite) {
   if (pollingInterval) clearInterval(pollingInterval);
   pollingInterval = setInterval(loadMessages, 3000);
 }
+
+// Back button handler for mobile
+document.getElementById('btnBackToContacts')?.addEventListener('click', function() {
+  document.querySelector('.chat-shell').classList.remove('mobile-chat-active');
+  selectedUserId = null;
+  if (pollingInterval) clearInterval(pollingInterval);
+});
 
 // ── Attachment Handling (Image & Doc) ──
 const chatImageInput = document.getElementById('chatImageInput');

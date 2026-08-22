@@ -302,7 +302,6 @@
           <th>Site</th>
           <th>Waktu BD</th>
           <th>Durasi (Hrs)</th>
-          <th>Aksi</th>
         </tr>
       </thead>
       <tbody>
@@ -321,7 +320,7 @@
         @endphp
 
         @if(!$hasAny)
-          <tr><td colspan="8" class="text-center text-muted py-4">Belum ada data Work Order.</td></tr>
+          <tr><td colspan="7" class="text-center text-muted py-4">Belum ada data Work Order.</td></tr>
         @else
           @foreach($statusOrder as $statusKey)
             @if($grouped->has($statusKey))
@@ -335,7 +334,7 @@
                   style="--group-color: {{ $cfg['bg'] }}1a;"
                   onclick="toggleWoGroup('{{ $groupId }}')"
                   id="{{ $groupId }}-header">
-                <td colspan="8">
+                <td colspan="7">
                   <div class="d-flex align-items-center gap-2">
                     <span class="wo-group-chevron text-muted">▼</span>
                     <span class="badge fs-6 fw-bold"
@@ -353,7 +352,10 @@
               </tr>
               {{-- Group Rows --}}
               @foreach($items as $wo)
-              <tr class="wo-group-row {{ $statusKey === 'Completed' ? 'status-completed-section' : '' }}" data-group="{{ $groupId }}">
+              <tr class="wo-group-row hover-bg-light {{ $statusKey === 'Completed' ? 'status-completed-section' : '' }}" 
+                  data-group="{{ $groupId }}"
+                  style="cursor: pointer;"
+                  onclick="window.location='{{ route('work-orders.show', $wo) }}'">
                 <td class="fw-bold">{{ $wo->no_wo }}</td>
                 <td>
                   <span class="badge fw-semibold"
@@ -365,18 +367,6 @@
                 <td>{{ $wo->site->name ?? ($wo->unit->siteRelation->name ?? ($wo->unit->site->name ?? '-')) }}</td>
                 <td>{{ $wo->waktu_bd ? \Carbon\Carbon::parse($wo->waktu_bd)->format('d M Y H:i') : '-' }}</td>
                 <td>{{ $wo->durasi_hrs ?? '-' }}</td>
-                <td>
-                  <a href="{{ route('work-orders.show', $wo) }}" class="btn btn-sm btn-info">Detail</a>
-                  @can('edit_work_orders')
-                  <a href="{{ route('work-orders.edit', $wo) }}" class="btn btn-sm btn-primary">Edit</a>
-                  @endcan
-                  @can('delete_work_orders')
-                  <form action="{{ route('work-orders.destroy', $wo) }}" method="post" class="d-inline" onsubmit="return confirm('Hapus WO ini beserta seluruh data terkait?');">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
-                  </form>
-                  @endcan
-                </td>
               </tr>
               @endforeach
             @endif

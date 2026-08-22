@@ -228,9 +228,9 @@
       }
 
       body:not([data-bs-theme="dark"]) header.navbar {
-        background-color: rgba(255, 255, 255, 0.94) !important;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+        background-color: #f1f5f9 !important; /* Slightly distinct cool gray */
+        border-bottom: 1px solid rgba(var(--tblr-primary-rgb, 32, 107, 196), 0.15) !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04) !important;
       }
 
       /* Industrial Hazard Stripe Top Bar (Dark Mode Only) */
@@ -1078,6 +1078,9 @@
         </div>
       </div>
     </div>
+
+    <!-- Mobile Bottom Navigation (Native App Feel) -->
+    @include('partials.mobile-bottom-nav')
 
     @yield('scripts')
   </body>

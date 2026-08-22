@@ -95,9 +95,15 @@ class RoleController extends Controller
         $request->validate([
             'name' => 'required|string|max:255|unique:roles,name',
             'permissions' => 'nullable|array',
+            'mobile_menus' => 'nullable|array|max:5',
         ]);
 
         $role = Role::create(['name' => $request->name]);
+        
+        if ($request->has('mobile_menus')) {
+            $role->mobile_menus = json_encode($request->mobile_menus);
+            $role->save();
+        }
         
         if ($request->has('permissions')) {
             $role->syncPermissions($request->permissions);
@@ -106,7 +112,7 @@ class RoleController extends Controller
         activity('role_access')
             ->causedBy(auth()->user())
             ->performedOn($role)
-            ->withProperties(['permissions' => $request->permissions ?? []])
+            ->withProperties(['permissions' => $request->permissions ?? [], 'mobile_menus' => $request->mobile_menus ?? []])
             ->log('Role dan matriks hak akses dibuat');
 
         return redirect()->route('roles.index')->with('success', 'Role berhasil ditambahkan.');
@@ -118,8 +124,9 @@ class RoleController extends Controller
         $modules = $this->modules;
         $actions = $this->actions;
         $rolePermissions = $role->permissions->pluck('name')->toArray();
+        $mobileMenus = $role->mobile_menus ? json_decode($role->mobile_menus, true) : [];
 
-        return view('roles.edit', compact('role', 'modules', 'actions', 'rolePermissions'));
+        return view('roles.edit', compact('role', 'modules', 'actions', 'rolePermissions', 'mobileMenus'));
     }
 
     public function update(Request $request, string $id)
@@ -129,9 +136,13 @@ class RoleController extends Controller
         $request->validate([
             'name' => 'required|string|max:255|unique:roles,name,'.$role->id,
             'permissions' => 'nullable|array',
+            'mobile_menus' => 'nullable|array|max:5',
         ]);
 
         $role->update(['name' => $request->name]);
+        
+        $role->mobile_menus = $request->has('mobile_menus') ? json_encode($request->mobile_menus) : null;
+        $role->save();
 
         // Sync permissions
         $permissions = $request->permissions ?? [];
@@ -140,7 +151,7 @@ class RoleController extends Controller
         activity('role_access')
             ->causedBy(auth()->user())
             ->performedOn($role)
-            ->withProperties(['permissions' => $permissions])
+            ->withProperties(['permissions' => $permissions, 'mobile_menus' => $request->mobile_menus ?? []])
             ->log('Matriks hak akses role diperbarui');
 
         return redirect()->route('roles.index')->with('success', 'Role berhasil diperbarui.');

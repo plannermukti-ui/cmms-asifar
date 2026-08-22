@@ -13,6 +13,24 @@ use Illuminate\Support\Facades\DB;
 
 class HseController extends Controller
 {
+    public function __construct()
+    {
+        // JSA Permissions
+        $this->middleware('permission:create_hse_jsas')->only(['storeJsa']);
+        $this->middleware('permission:edit_hse_jsas')->only(['editJsa', 'updateJsa']);
+        $this->middleware('permission:delete_hse_jsas')->only(['destroyJsa']);
+
+        // PTW Permissions
+        $this->middleware('permission:create_hse_ptws')->only(['storePtw']);
+        $this->middleware('permission:edit_hse_ptws')->only(['editPtw', 'updatePtw']);
+        $this->middleware('permission:delete_hse_ptws')->only(['destroyPtw']);
+
+        // LOTO Permissions
+        $this->middleware('permission:create_hse_lotos')->only(['storeLoto']);
+        $this->middleware('permission:edit_hse_lotos')->only(['editLoto', 'updateLoto']);
+        $this->middleware('permission:delete_hse_lotos')->only(['removeLoto']);
+    }
+
     // ==========================================
     // JSA (Job Safety Analysis)
     // ==========================================
@@ -275,6 +293,8 @@ class HseController extends Controller
             'isolation_point' => 'required|string',
             'lock_number' => 'nullable|string',
             'tag_number' => 'nullable|string',
+            'applied_mechanic_id' => 'nullable|exists:mechanics,id',
+            'applied_at' => 'nullable|date',
         ]);
 
         HseLoto::create([
@@ -283,8 +303,9 @@ class HseController extends Controller
             'isolation_point' => $request->isolation_point,
             'lock_number' => $request->lock_number,
             'tag_number' => $request->tag_number,
+            'applied_mechanic_id' => $request->applied_mechanic_id,
             'applied_by' => Auth::id(),
-            'applied_at' => now(),
+            'applied_at' => $request->applied_at ? \Carbon\Carbon::parse($request->applied_at) : now(),
             'status' => 'Active',
         ]);
 
@@ -298,6 +319,10 @@ class HseController extends Controller
             'isolation_point' => $loto->isolation_point,
             'lock_number' => $loto->lock_number,
             'tag_number' => $loto->tag_number,
+            'applied_mechanic_id' => $loto->applied_mechanic_id,
+            'applied_at' => $loto->applied_at ? $loto->applied_at->format('Y-m-d\TH:i') : '',
+            'removed_mechanic_id' => $loto->removed_mechanic_id,
+            'removed_at' => $loto->removed_at ? $loto->removed_at->format('Y-m-d\TH:i') : '',
             'status' => $loto->status,
         ]);
     }
@@ -308,23 +333,48 @@ class HseController extends Controller
             'isolation_point' => 'required|string',
             'lock_number' => 'nullable|string',
             'tag_number' => 'nullable|string',
+            'applied_mechanic_id' => 'nullable|exists:mechanics,id',
+            'applied_at' => 'nullable|date',
+            'removed_mechanic_id' => 'nullable|exists:mechanics,id',
+            'removed_at' => 'nullable|date',
+            'status' => 'nullable|in:Active,Removed',
         ]);
 
-        $loto->update([
+        $updateData = [
             'isolation_point' => $request->isolation_point,
             'lock_number' => $request->lock_number,
             'tag_number' => $request->tag_number,
-        ]);
+            'applied_mechanic_id' => $request->applied_mechanic_id,
+            'applied_at' => $request->applied_at ? \Carbon\Carbon::parse($request->applied_at) : $loto->applied_at,
+        ];
+
+        if ($request->filled('removed_mechanic_id')) {
+            $updateData['removed_mechanic_id'] = $request->removed_mechanic_id;
+        }
+        if ($request->filled('removed_at')) {
+            $updateData['removed_at'] = \Carbon\Carbon::parse($request->removed_at);
+        }
+        if ($request->filled('status')) {
+            $updateData['status'] = $request->status;
+        }
+
+        $loto->update($updateData);
 
         return response()->json(['success' => true, 'message' => 'LOTO berhasil diperbarui.']);
     }
 
-    public function removeLoto(HseLoto $loto)
+    public function removeLoto(Request $request, HseLoto $loto)
     {
+        $request->validate([
+            'removed_mechanic_id' => 'nullable|exists:mechanics,id',
+            'removed_at' => 'nullable|date',
+        ]);
+
         $loto->update([
             'status' => 'Removed',
+            'removed_mechanic_id' => $request->removed_mechanic_id,
             'removed_by' => Auth::id(),
-            'removed_at' => now(),
+            'removed_at' => $request->removed_at ? \Carbon\Carbon::parse($request->removed_at) : now(),
         ]);
 
         return back()->with('success', 'LOTO berhasil dilepas.');

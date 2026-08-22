@@ -1,7 +1,7 @@
 <header class="navbar navbar-expand-md d-print-none sticky-top">
   <div class="container-xl">
-    <!-- Sidebar Toggler on Mobile -->
-    <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar-menu" aria-controls="sidebar-menu" aria-label="Toggle navigation" style="border: none; padding: 0;">
+    <!-- Sidebar Toggler on Mobile (Hidden because we use bottom nav) -->
+    <button class="navbar-toggler d-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar-menu" aria-controls="sidebar-menu" aria-label="Toggle navigation" style="border: none; padding: 0;">
       <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -11,7 +11,7 @@
     </button>
     
     <!-- Brand / Logo in Header -->
-    <div class="navbar-brand navbar-brand-autodark me-auto ms-3 ms-lg-0" style="position: static !important; transform: none !important; left: auto;">
+    <div class="navbar-brand navbar-brand-autodark me-auto ms-3 ms-lg-0 d-none d-lg-flex" style="position: static !important; transform: none !important; left: auto;">
       <a href="{{ route('dashboard') }}" class="d-flex align-items-center text-decoration-none text-reset">
         @php
             $appLogo = \App\Models\AppSetting::where('key', 'app_logo')->first()?->value;
@@ -31,8 +31,8 @@
     </div>
 
     <!-- Right Header Controls -->
-    <div class="navbar-nav flex-row order-md-last align-items-center gap-1">
-      <div class="d-none d-md-flex align-items-center gap-1">
+    <div class="navbar-nav flex-row order-md-last align-items-center gap-1 ms-auto">
+      <div class="d-flex align-items-center gap-1">
         <!-- Dark / Light Mode Toggle -->
         <a href="?theme=dark" class="nav-link px-2 hide-theme-dark" title="Enable dark mode" data-bs-toggle="tooltip"
 		   data-bs-placement="bottom" onclick="event.preventDefault(); localStorage.setItem('tablerTheme', 'dark'); document.body.setAttribute('data-bs-theme', 'dark');">
@@ -108,7 +108,7 @@
       </div>
 
       <!-- Notifications Dropdown -->
-      <div class="nav-item dropdown d-none d-md-flex me-2">
+      <div class="nav-item dropdown d-flex me-2">
         <a href="#" class="nav-link px-2" data-bs-toggle="dropdown" tabindex="-1" aria-label="Show notifications">
           <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /></svg>
           @php

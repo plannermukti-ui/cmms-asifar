@@ -27,8 +27,17 @@ class Handler extends ExceptionHandler
             //
         });
 
-        $this->renderable(function (\Spatie\Permission\Exceptions\UnauthorizedException $e, $request) {
-            return redirect($request->headers->get('referer', route('dashboard')))->with('error', 'Akses Ditolak: Anda tidak memiliki hak akses (permission) untuk membuka halaman tersebut atau melakukan tindakan ini.');
+        $this->renderable(function (\Throwable $e, $request) {
+            if ($e instanceof \Spatie\Permission\Exceptions\UnauthorizedException || 
+                $e instanceof \Illuminate\Auth\Access\AuthorizationException || 
+                ($e instanceof \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException)) {
+                
+                if ($request->expectsJson()) {
+                    return response()->json(['error' => 'Akses Ditolak: Anda tidak memiliki hak akses.'], 403);
+                }
+                
+                return redirect($request->headers->get('referer', route('dashboard')))->with('error', 'Akses Ditolak: Anda tidak memiliki hak akses (permission) untuk membuka halaman tersebut atau melakukan tindakan ini.');
+            }
         });
     }
 }

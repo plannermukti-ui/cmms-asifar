@@ -137,6 +137,11 @@
       padding: 4px 12px !important;
       display: inline-block !important;
     }
+    /* Memaksa box 1,2,3,4 sejajar saat dicetak */
+    .row.g-2.mb-3 > .col-md-3 {
+      flex: 0 0 auto !important;
+      width: 25% !important;
+    }
     @page {
       size: A4 portrait;
       margin: 8mm;

@@ -146,59 +146,11 @@
 
     <form id="pwo-filter" method="GET" action="{{ route('pra-work-orders.index') }}"></form>
 
-    <!-- Filter khusus mobile (tampil < md; di desktop filter tabel tetap seperti biasa) -->
-    <div class="card d-md-none mb-3">
-      <div class="card-header py-2 d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="icon text-muted" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 4h16v2.172a2 2 0 0 1 -.586 1.414l-4.414 4.414v7l-6 2v-8.5l-4.48 -4.928a2 2 0 0 1 -.52 -1.4z" /></svg>
-          <h3 class="card-title mb-0">Filter Laporan</h3>
-        </div>
-        <button type="button" class="btn btn-sm btn-link p-0 text-muted" data-bs-toggle="collapse" data-bs-target="#pwo-mobile-filter" aria-expanded="true" aria-controls="pwo-mobile-filter" aria-label="Buka / tutup filter">
-          <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 9l6 6l6 -6" /></svg>
-        </button>
-      </div>
-      <div class="card-body collapse show" id="pwo-mobile-filter">
-        <div class="row g-2">
-          <div class="col-6">
-            <label class="form-label mb-1">ID Request</label>
-            <input type="text" class="form-control form-control-sm" form="pwo-filter" name="id_request" value="{{ request('id_request') }}" placeholder="Filter ID">
-          </div>
-          <div class="col-6">
-            <label class="form-label mb-1">Nomor Unit</label>
-            <input type="text" class="form-control form-control-sm" form="pwo-filter" name="nomor_unit" value="{{ request('nomor_unit') }}" placeholder="Filter Unit">
-          </div>
-          <div class="col-6">
-            <label class="form-label mb-1">Waktu BD</label>
-            <input type="date" class="form-control form-control-sm" form="pwo-filter" name="waktu_bd" value="{{ request('waktu_bd') }}">
-          </div>
-          <div class="col-6">
-            <label class="form-label mb-1">Status</label>
-            <select name="status" form="pwo-filter" class="form-select form-select-sm">
-              <option value="">Semua</option>
-              <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }}>Pending</option>
-              <option value="Generated" {{ request('status') == 'Generated' ? 'selected' : '' }}>Generated</option>
-              <option value="Cancelled" {{ request('status') == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
-            </select>
-          </div>
-          <div class="col-12">
-            <label class="form-label mb-1">Lokasi Kerusakan</label>
-            <input type="text" class="form-control form-control-sm" form="pwo-filter" name="lokasi_kerusakan" value="{{ request('lokasi_kerusakan') }}" placeholder="Filter Lokasi">
-          </div>
-          <div class="col-12">
-            <label class="form-label mb-1">Problem</label>
-            <input type="text" class="form-control form-control-sm" form="pwo-filter" name="problem" value="{{ request('problem') }}" placeholder="Filter Problem">
-          </div>
-        </div>
-        <div class="d-flex gap-2 mt-3">
-          <button type="submit" form="pwo-filter" class="btn btn-primary w-100">Cari</button>
-          <a href="{{ route('pra-work-orders.index') }}" class="btn btn-outline-secondary w-100">Reset</a>
-        </div>
-      </div>
-    </div>
+
 
     <div class="card">
       <div class="table-responsive">
-        <table class="table table-vcenter table-mobile-md card-table table-striped">
+        <table class="table table-vcenter card-table table-striped">
           <thead>
             <tr>
               <th>ID Request</th>
@@ -208,7 +160,6 @@
               <th>Lokasi Kerusakan</th>
               <th>Problem</th>
               <th>Status</th>
-              <th class="w-1">Aksi</th>
             </tr>
             <tr>
               <th><input type="text" class="form-control form-control-sm" form="pwo-filter" name="id_request" value="{{ request('id_request') }}" placeholder="Filter ID"></th>
@@ -218,24 +169,22 @@
               <th><input type="text" class="form-control form-control-sm" form="pwo-filter" name="lokasi_kerusakan" value="{{ request('lokasi_kerusakan') }}" placeholder="Filter Lokasi"></th>
               <th><input type="text" class="form-control form-control-sm" form="pwo-filter" name="problem" value="{{ request('problem') }}" placeholder="Filter Problem"></th>
               <th>
-                <select name="status" form="pwo-filter" class="form-select form-select-sm" onchange="document.getElementById('pwo-filter').submit()">
+                <select name="status" form="pwo-filter" class="form-select form-select-sm mb-1" onchange="document.getElementById('pwo-filter').submit()">
                   <option value="">Semua</option>
                   <option value="Pending" {{ request('status') == 'Pending' ? 'selected' : '' }}>Pending</option>
                   <option value="Generated" {{ request('status') == 'Generated' ? 'selected' : '' }}>Generated</option>
                   <option value="Cancelled" {{ request('status') == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
                 </select>
-              </th>
-              <th>
-                <div class="d-flex gap-1">
-                  <button type="submit" form="pwo-filter" class="btn btn-sm btn-primary">Cari</button>
-                  <a href="{{ route('pra-work-orders.index') }}" class="btn btn-sm btn-outline-secondary">Reset</a>
+                <div class="d-flex gap-1 mt-1">
+                  <button type="submit" form="pwo-filter" class="btn btn-sm btn-primary w-100 p-1">Cari</button>
+                  <a href="{{ route('pra-work-orders.index') }}" class="btn btn-sm btn-outline-secondary w-100 p-1">Reset</a>
                 </div>
               </th>
             </tr>
           </thead>
           <tbody>
             @forelse($praWorkOrders as $pra)
-            <tr>
+            <tr style="cursor: pointer;" class="hover-bg-light" data-bs-toggle="modal" data-bs-target="#modal-action-{{ $pra->id }}">
               <td class="text-muted" data-label="ID Request">
                 REQ-{{ str_pad($pra->id, 4, '0', STR_PAD_LEFT) }}<br>
                 <small>By: {{ $pra->creator->name ?? 'System' }}</small>
@@ -262,28 +211,6 @@
                   <span class="badge bg-danger text-white">Cancelled</span>
                 @endif
               </td>
-              <td data-label="Aksi">
-                <div class="btn-list flex-nowrap">
-                  <button type="button" class="btn btn-sm btn-success text-nowrap" data-bs-toggle="modal" data-bs-target="#modal-wa-{{ $pra->id }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" /><path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" /></svg>
-                    Share WA
-                  </button>
-                @if($pra->status == 'Pending')
-                    <form action="{{ route('pra-work-orders.generate', $pra) }}" method="POST" onsubmit="return confirm('Generate request ini menjadi Work Order?');">
-                      @csrf
-                      <button type="submit" class="btn btn-sm btn-primary text-nowrap">
-                        Generate WO
-                      </button>
-                    </form>
-                    <form action="{{ route('pra-work-orders.cancel', $pra) }}" method="POST" onsubmit="return confirm('Batalkan request ini?');">
-                      @csrf
-                      <button type="submit" class="btn btn-sm btn-outline-danger">
-                        Cancel
-                      </button>
-                    </form>
-                @endif
-                </div>
-              </td>
             </tr>
             @php
                 $waText = "🚨 *Laporan Kerusakan Unit (Pra-WO)* 🚨\n"
@@ -294,29 +221,74 @@
                         . "Problem: \n" . $pra->problem . "\n\n"
                         . "Mohon segera diverifikasi. Terima kasih.";
             @endphp
-            <div class="modal modal-blur fade" id="modal-wa-{{ $pra->id }}" tabindex="-1" role="dialog" aria-hidden="true">
-              <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+            <div class="modal modal-blur fade" id="modal-action-{{ $pra->id }}" tabindex="-1" role="dialog" aria-hidden="true">
+              <div class="modal-dialog modal-md modal-dialog-centered" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title text-success">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2 text-success" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" /><path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" /></svg>
-                      Kirim Laporan WA
+                    <h5 class="modal-title">
+                      Detail Request: REQ-{{ str_pad($pra->id, 4, '0', STR_PAD_LEFT) }}
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
-                    <p class="small text-muted mb-2">Salin teks di bawah ini dan kirimkan ke grup WA tim mekanik:</p>
-                    <textarea class="form-control bg-light text-dark font-monospace small mb-3" rows="8" readonly id="wa-text-{{ $pra->id }}">{!! $waText !!}</textarea>
-                    <button type="button" class="btn btn-success w-100 fw-bold shadow-sm" onclick="copyWaText({{ $pra->id }}, this)">
-                      Salin Teks WA
-                    </button>
+                    <div class="datagrid mb-3">
+                      <div class="datagrid-item">
+                        <div class="datagrid-title">Nomor Unit</div>
+                        <div class="datagrid-content fw-bold">{{ $pra->masterUnit->nomor_unit }}</div>
+                      </div>
+                      <div class="datagrid-item">
+                        <div class="datagrid-title">Lokasi Kerusakan</div>
+                        <div class="datagrid-content">{{ $pra->lokasi_kerusakan }}</div>
+                      </div>
+                      <div class="datagrid-item">
+                        <div class="datagrid-title">Waktu BD</div>
+                        <div class="datagrid-content">{{ $pra->waktu_bd->format('d/m/Y H:i') }}</div>
+                      </div>
+                      <div class="datagrid-item">
+                        <div class="datagrid-title">Status</div>
+                        <div class="datagrid-content">
+                          @if($pra->status == 'Pending')
+                            <span class="badge bg-warning text-white">Pending</span>
+                          @elseif($pra->status == 'Generated')
+                            <span class="badge bg-success text-white">Generated</span>
+                          @else
+                            <span class="badge bg-danger text-white">Cancelled</span>
+                          @endif
+                        </div>
+                      </div>
+                      <div class="datagrid-item" style="grid-column: 1 / -1;">
+                        <div class="datagrid-title">Problem</div>
+                        <div class="datagrid-content text-wrap">{{ $pra->problem }}</div>
+                      </div>
+                    </div>
+                    
+                    <p class="small text-muted mb-2 fw-bold">Teks Salinan Laporan (Opsional):</p>
+                    <textarea class="form-control bg-light text-dark font-monospace small mb-3" rows="4" readonly id="wa-text-{{ $pra->id }}">{!! $waText !!}</textarea>
+                  </div>
+                  <div class="modal-footer bg-light">
+                    <div class="w-100 d-flex gap-2 flex-wrap justify-content-end">
+                      <button type="button" class="btn btn-outline-success" onclick="copyWaText({{ $pra->id }}, this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" /><path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" /></svg>
+                        Salin WA
+                      </button>
+                    @if($pra->status == 'Pending')
+                        <form action="{{ route('pra-work-orders.cancel', $pra) }}" method="POST" onsubmit="return confirm('Batalkan request ini?');">
+                          @csrf
+                          <button type="submit" class="btn btn-outline-danger">Cancel</button>
+                        </form>
+                        <form action="{{ route('pra-work-orders.generate', $pra) }}" method="POST" onsubmit="return confirm('Generate request ini menjadi Work Order?');">
+                          @csrf
+                          <button type="submit" class="btn btn-primary">Generate WO</button>
+                        </form>
+                    @endif
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
             @empty
             <tr>
-              <td colspan="8" class="text-center text-muted py-4">Belum ada data request perbaikan.</td>
+              <td colspan="7" class="text-center text-muted py-4">Belum ada data request perbaikan.</td>
             </tr>
             @endforelse
           </tbody>

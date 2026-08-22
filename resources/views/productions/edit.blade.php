@@ -5,55 +5,42 @@
 @section('content')
 <style>
   .fleet-card {
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(var(--tblr-border-color-rgb), 0.8);
     border-radius: 8px;
     transition: all 0.2s ease;
   }
   .fleet-header {
-    background: #f8fafc;
+    background: rgba(var(--tblr-primary-rgb), 0.04);
   }
   .fleet-table-head th {
-    background: #f1f5f9;
-    color: #475569;
+    background: rgba(var(--tblr-primary-rgb), 0.02);
+    color: var(--tblr-body-color);
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    border: 1px solid #e2e8f0;
     vertical-align: middle;
   }
   .ritasi-input {
     font-size: 0.8rem;
     padding: 0.25rem 0.2rem;
     border-radius: 4px;
+    background-color: var(--tblr-bg-surface);
+    color: var(--tblr-body-color);
+    border: 1px solid var(--tblr-border-color);
   }
   .ritasi-input:focus {
-    border-color: var(--app-accent, #f59e0b);
-    box-shadow: 0 0 0 2px var(--app-accent-glow, rgba(245, 158, 11, 0.25));
+    border-color: var(--tblr-primary);
+    box-shadow: 0 0 0 2px rgba(var(--tblr-primary-rgb), 0.25);
+    outline: none;
   }
 
   /* ── Dark Mode Harmonization ── */
-  [data-bs-theme="dark"] .fleet-card {
-    background: #182234;
-    border-color: rgba(255, 255, 255, 0.08);
-  }
   [data-bs-theme="dark"] .fleet-header {
-    background: #131c2c;
-    border-color: rgba(255, 255, 255, 0.08);
+    background: rgba(var(--tblr-primary-rgb), 0.1);
   }
   [data-bs-theme="dark"] .fleet-table-head th {
-    background: #131c2c !important;
-    color: #cbd5e1 !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
-  }
-  [data-bs-theme="dark"] .table-bordered th,
-  [data-bs-theme="dark"] .table-bordered td {
-    border-color: rgba(255, 255, 255, 0.08) !important;
-  }
-  [data-bs-theme="dark"] .ritasi-input {
-    background-color: #0f172a !important;
-    color: #f8fafc !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
+    background: rgba(var(--tblr-primary-rgb), 0.05);
   }
 </style>
 

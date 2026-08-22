@@ -277,11 +277,22 @@ class WorkOrderController extends Controller
             'ptws',
             'lotos.applier',
             'lotos.remover',
+            'lotos.appliedMechanic',
+            'lotos.removedMechanic',
             'fars',
             'jwos'
         ]);
         $summary = app(WorkOrderDurationService::class)->summarize($workOrder);
-        return view('work_orders.show', compact('workOrder', 'summary'));
+        $mechanics = \App\Models\Mechanic::where('is_active', true)
+            ->when($workOrder->site_id, function($q) use ($workOrder) {
+                $q->where(function($sq) use ($workOrder) {
+                    $sq->where('site_id', $workOrder->site_id)->orWhereNull('site_id');
+                });
+            })
+            ->orderBy('nama_lengkap')
+            ->get();
+
+        return view('work_orders.show', compact('workOrder', 'summary', 'mechanics'));
     }
 
     public function edit(WorkOrder $workOrder)

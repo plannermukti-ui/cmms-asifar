@@ -1,6 +1,6 @@
-<aside class="navbar navbar-vertical navbar-expand-lg sidebar-transparent-mobile" data-bs-theme="dark">
+<aside class="navbar navbar-vertical navbar-expand-lg sidebar-transparent-mobile d-none d-lg-flex" data-bs-theme="dark">
   <div class="container-fluid">
-    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar-menu" aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler d-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar-menu" aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     

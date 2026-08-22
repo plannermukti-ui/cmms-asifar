@@ -235,8 +235,98 @@ document.addEventListener("DOMContentLoaded", function() {
   const contactView = document.getElementById('widgetContactView');
   const conversationView = document.getElementById('widgetConversationView');
 
+  // --- Draggable Widget Button Logic ---
+  let isDragging = false;
+  let dragStartX, dragStartY;
+  let initX, initY;
+
+  function dragStart(e) {
+    if (e.type === 'touchstart') {
+      dragStartX = e.touches[0].clientX;
+      dragStartY = e.touches[0].clientY;
+    } else {
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+    }
+    const rect = toggleBtn.getBoundingClientRect();
+    initX = rect.left;
+    initY = rect.top;
+    
+    toggleBtn.style.transition = 'none'; // Disable transition during drag
+    
+    if (e.type === 'mousedown') {
+      document.addEventListener('mousemove', drag);
+      document.addEventListener('mouseup', dragEnd);
+    } else {
+      document.addEventListener('touchmove', drag, {passive: false});
+      document.addEventListener('touchend', dragEnd);
+    }
+  }
+
+  function drag(e) {
+    let currentX, currentY;
+    if (e.type === 'touchmove') {
+      currentX = e.touches[0].clientX;
+      currentY = e.touches[0].clientY;
+      if (Math.abs(currentX - dragStartX) > 5 || Math.abs(currentY - dragStartY) > 5) {
+          e.preventDefault(); // Prevent scrolling on touch
+      }
+    } else {
+      currentX = e.clientX;
+      currentY = e.clientY;
+    }
+    
+    const dx = currentX - dragStartX;
+    const dy = currentY - dragStartY;
+    
+    if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+      isDragging = true;
+    }
+
+    if (isDragging) {
+        let newX = initX + dx;
+        let newY = initY + dy;
+        
+        // Bounds checking
+        const maxX = window.innerWidth - toggleBtn.offsetWidth;
+        const maxY = window.innerHeight - toggleBtn.offsetHeight;
+        newX = Math.max(0, Math.min(newX, maxX));
+        newY = Math.max(0, Math.min(newY, maxY));
+        
+        toggleBtn.style.right = 'auto';
+        toggleBtn.style.bottom = 'auto';
+        toggleBtn.style.left = newX + 'px';
+        toggleBtn.style.top = newY + 'px';
+    }
+  }
+
+  function dragEnd(e) {
+    if (e.type === 'mouseup') {
+      document.removeEventListener('mousemove', drag);
+      document.removeEventListener('mouseup', dragEnd);
+    } else {
+      document.removeEventListener('touchmove', drag);
+      document.removeEventListener('touchend', dragEnd);
+    }
+    
+    toggleBtn.style.transition = 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    
+    setTimeout(() => {
+        isDragging = false;
+    }, 50);
+  }
+
+  toggleBtn.addEventListener('mousedown', dragStart);
+  toggleBtn.addEventListener('touchstart', dragStart, {passive: false});
+  // ---------------------------------------
+
   // Toggle open/close
-  toggleBtn.addEventListener('click', function() {
+  toggleBtn.addEventListener('click', function(e) {
+    if (isDragging) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
     if (widgetCard.classList.contains('open')) {
       widgetCard.classList.remove('open');
       if (widgetPollingInterval) clearInterval(widgetPollingInterval);

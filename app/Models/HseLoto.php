@@ -42,8 +42,18 @@ class HseLoto extends Model
         return $this->belongsTo(User::class, 'applied_by');
     }
 
+    public function appliedMechanic()
+    {
+        return $this->belongsTo(Mechanic::class, 'applied_mechanic_id');
+    }
+
     public function remover()
     {
         return $this->belongsTo(User::class, 'removed_by');
+    }
+
+    public function removedMechanic()
+    {
+        return $this->belongsTo(Mechanic::class, 'removed_mechanic_id');
     }
 }
