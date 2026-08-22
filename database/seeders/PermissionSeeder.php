@@ -73,6 +73,17 @@ class PermissionSeeder extends Seeder
             'swap_components' => 'Swap Component Report',
             'pcr' => 'Plan Component Replacement (PCR)',
             'meetings' => 'Notulen Rapat & Tindak Lanjut',
+
+            // Fuel Management System (FMS)
+            'fuel_storages' => 'Fuel Storage & Station',
+            'fuel_supplier_trucks' => 'Truk Tangki Supplier',
+            'fuel_trucks' => 'Master Fuel Truck',
+            'fuel_receivings' => 'Penerimaan BBM (Inbound)',
+            'fuel_transfers' => 'Mutasi/Transfer BBM',
+            'fuel_truck_fillings' => 'Pengisian Fuel Truck',
+            'fuel_distributions' => 'Distribusi BBM Unit',
+            'fuel_flowmeter_adjustments' => 'Berita Acara Flowmeter',
+            'fuel_reports' => 'Laporan & Stok Fuel',
         ];
 
         // Aksi standar (CRUD)
@@ -93,9 +104,16 @@ class PermissionSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'download_backup']);
         Permission::firstOrCreate(['name' => 'send_chat']);
         Permission::firstOrCreate(['name' => 'export_kpi']);
+        Permission::firstOrCreate(['name' => 'approve_fuel_receivings']);
+        Permission::firstOrCreate(['name' => 'approve_flowmeter_adjustments']);
+        Permission::firstOrCreate(['name' => 'export_fuel_reports']);
+
         $permissions[] = 'download_backup';
         $permissions[] = 'send_chat';
         $permissions[] = 'export_kpi';
+        $permissions[] = 'approve_fuel_receivings';
+        $permissions[] = 'approve_flowmeter_adjustments';
+        $permissions[] = 'export_fuel_reports';
 
         // Berikan semua akses ke Role Super Admin (ID 1 atau role dengan nama Super Admin)
         $superAdminRole = Role::firstOrCreate(['name' => 'Super Admin']);

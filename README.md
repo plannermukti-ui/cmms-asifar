@@ -64,18 +64,28 @@ Aplikasi ini mendigitalisasi operasional workshop menjadi **100% Paperless** did
 - **Berita Acara (B.A) Insiden:** Laporan resmi kejadian kerusakan atau kehilangan alat kerja beserta unggahan dokumen hasil investigasi.
 - **Stock Opname:** Audit fisik periodik dan penyesuaian inventaris perkakas dengan verifikasi tanda tangan digital.
 
-### 7. 📈 KPI & Reporting
+### 7. ⛽ Fuel Management System (FMS)
+- **Penerimaan BBM & Sonding Fisik (Inbound):** Pencatatan penerimaan solar dari vendor supplier, registrasi truk tangki supplier, pengukuran sonding (cm), suhu (°C), densitas, losses, pop-up lampiran Surat Jalan/BAP, dan approval berjenjang atasan.
+- **Mutasi Antar Tangki Timbun:** Pengelolaan multi-storage/station per site dengan opsi transfer pipa pompa langsung (*Direct Pump*) atau diangkut unit armada *Fuel Truck*.
+- **Isi Ulang Armada (Mobile Fuel Truck Refill):** Pengisian BBM dari Fuel Storage ke Fuel Truck terdaftar dengan pencatatan totalizer awal/akhir & saldo dua arah otomatis.
+- **Distribusi Unit Lapangan Berbasis Shift:** Sesi shift kerja pengisian alat berat tambang (Excavator, Hauler, Dozer, Support) mencakup Nomor Unit, Reading Meter (HM/KM), Nama Operator, Jam, Lokasi, dan Volume Liter, disertai rekonsiliasi flowmeter variance dan auto-deduct stok Fuel Truck.
+- **Berita Acara Flowmeter (Site Manager Signed):** Pencatatan pergantian meteran rusak, tera ulang, atau kalibrasi berkala bertandatangan Site Manager.
+- **Reporting Real-time & Kartu Stok:** Laporan posisi stok terkini (Tangki + Truk), rekapitulasi konsumsi & *Burn Rate* (L/HM), audit trail kartu stok, serta cetak PDF resmi ber-Kop Surat terpusat yang terhubung otomatis ke `/settings`.
+- **Super Admin Rollback & Tabler UI Modal:** Fitur pembatalan transaksi dengan pembersihan log & pengembalian saldo stok otomatis didukung Tabler UI Modal Confirmation (*bebas popup browser*).
+
+### 8. 📈 KPI & Reporting
 - **Report Breakdown & Downtime:** Analitik downtime unit, frekuensi kerusakan, serta klasifikasi breakdown.
 - **KPI Master Data:** Kalkulasi metrik ketersediaan unit (*Physical Availability / PA*), MTTR (*Mean Time To Repair*), dan MTBF (*Mean Time Between Failures*) berstandar industri alat berat.
 
-### 8. ⚙️ Master Data Terpusat
+### 9. ⚙️ Master Data Terpusat
 - **Master Unit (Asset):** Populasi alat berat, Model Unit, Tipe Unit, dan pembagian Site operasional.
 - **Master Part & Komponen:** Katalog suku cadang terintegrasi multi-model unit (TomSelect) dan target jam kerja.
 - **Master Vendor & Bengkel:** Database rekanan jasa servis dan fabrikasi luar.
 - **Master Mekanik:** Data kepegawaian mekanik dengan pop-up riwayat lengkap kinerja & inventaris tool.
 - **Master Tool & Kategori:** Database perkakas, spesifikasi, dan kuantitas stok.
+- **Master Fuel:** Master Storage / Tangki Timbun, Truk Tangki Supplier, dan Armada Fuel Truck.
 
-### 9. 🔐 Administrator, Keamanan & Hak Akses
+### 10. 🔐 Administrator, Keamanan & Hak Akses
 - **Manajemen User & Multi-Site:** Pengaturan pengguna berbasis hak akses dan lokasi tambang (Site).
 - **Matriks Hak Akses (Categorized Permissions):** Manajemen perizinan Role dan User yang dikelompokkan secara rapi per kategori modul dengan tombol *quick-toggle* instan.
 - **Approval Matrix & Digital Signatures:** Matriks persetujuan berjenjang untuk dokumen operasional.

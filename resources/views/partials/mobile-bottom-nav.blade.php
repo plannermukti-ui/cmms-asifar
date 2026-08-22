@@ -99,6 +99,13 @@ function getMobileMenuHtml($key) {
             $label = 'HM';
             $icon = '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 7v5l3 3" /></svg>';
             break;
+        case 'fuel':
+        case 'fuel_management':
+            $route = route('fuel.dashboard');
+            $isActive = request()->is('fuel*');
+            $label = 'Fuel';
+            $icon = '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 21v-14a3 3 0 0 1 3 -3h6a3 3 0 0 1 3 3v14" /><path d="M9 11l6 0" /><path d="M6 21l12 0" /><path d="M16 13l2.5 2.5a2 2 0 0 1 0 2.828l-1.328 1.328a2 2 0 0 1 -2.828 0l-2.344 -2.344" /><path d="M18 10v-4" /></svg>';
+            break;
         default:
             $route = route('dashboard');
             $label = 'Lainnya';

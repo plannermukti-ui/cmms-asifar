@@ -279,6 +279,80 @@
 
 
         <!-- ======================================================== -->
+        <!-- CATEGORY: FUEL MANAGEMENT SYSTEM (FMS)                   -->
+        <!-- ======================================================== -->
+        @if(auth()->user()->can('view_fuel_management') || auth()->user()->can('view_fuel_receivings') || auth()->user()->can('view_fuel_distributions') || auth()->user()->can('view_fuel_reports') || auth()->user()->can('view_fuel_storages'))
+        <li class="nav-item text-muted text-uppercase fw-bold px-3 pt-3 pb-1" style="font-size: 0.65rem; letter-spacing: 0.08em; opacity: 0.5;">
+          Fuel Management (FMS)
+        </li>
+
+        @php
+            $isFuelActive = request()->is('fuel*');
+        @endphp
+        <li class="nav-item dropdown {{ $isFuelActive ? 'active' : '' }}">
+          <a class="nav-link dropdown-toggle rounded-2 mx-2 mb-1 px-2.5 {{ $isFuelActive ? 'active bg-primary-lt font-weight-bold' : '' }}" href="#navbar-fuel" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="{{ $isFuelActive ? 'true' : 'false' }}">
+            <span class="nav-link-icon me-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon text-azure" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 21v-14a3 3 0 0 1 3 -3h6a3 3 0 0 1 3 3v14" /><path d="M9 11l6 0" /><path d="M6 21l12 0" /><path d="M16 13l2.5 2.5a2 2 0 0 1 0 2.828l-1.328 1.328a2 2 0 0 1 -2.828 0l-2.344 -2.344" /><path d="M18 10v-4" /></svg>
+            </span>
+            <span class="nav-link-title">Manajemen BBM (FMS)</span>
+          </a>
+          <div class="dropdown-menu {{ $isFuelActive ? 'show' : '' }}">
+            <a class="dropdown-item py-1.5 {{ request()->routeIs('fuel.dashboard') ? 'active font-weight-bold' : '' }}" href="{{ route('fuel.dashboard') }}">
+              Dashboard FMS
+            </a>
+            <a class="dropdown-item py-1.5 {{ request()->routeIs('fuel.reports.current-stock') ? 'active font-weight-bold' : '' }}" href="{{ route('fuel.reports.current-stock') }}">
+              Stok Real-time Terkini
+            </a>
+            @can('view_fuel_receivings')
+            <a class="dropdown-item py-1.5 {{ request()->routeIs('fuel.receivings.*') ? 'active font-weight-bold' : '' }}" href="{{ route('fuel.receivings.index') }}">
+              Penerimaan BBM (Inbound)
+            </a>
+            @endcan
+            @can('view_fuel_transfers')
+            <a class="dropdown-item py-1.5 {{ request()->routeIs('fuel.transfers.*') ? 'active font-weight-bold' : '' }}" href="{{ route('fuel.transfers.index') }}">
+              Mutasi Antar Tangki
+            </a>
+            @endcan
+            @can('view_fuel_truck_fillings')
+            <a class="dropdown-item py-1.5 {{ request()->routeIs('fuel.truck-fillings.*') ? 'active font-weight-bold' : '' }}" href="{{ route('fuel.truck-fillings.index') }}">
+              Pengisian Fuel Truck
+            </a>
+            @endcan
+            @can('view_fuel_distributions')
+            <a class="dropdown-item py-1.5 {{ request()->routeIs('fuel.distributions.*') ? 'active font-weight-bold' : '' }}" href="{{ route('fuel.distributions.index') }}">
+              Distribusi BBM Unit
+            </a>
+            @endcan
+            @can('view_fuel_flowmeter_adjustments')
+            <a class="dropdown-item py-1.5 {{ request()->routeIs('fuel.flowmeter-adjustments.*') ? 'active font-weight-bold' : '' }}" href="{{ route('fuel.flowmeter-adjustments.index') }}">
+              B.A Pergantian Flowmeter
+            </a>
+            @endcan
+            @can('view_fuel_reports')
+            <a class="dropdown-item py-1.5 {{ request()->routeIs('fuel.reports.index') ? 'active font-weight-bold' : '' }}" href="{{ route('fuel.reports.index') }}">
+              Rekap & Burn Rate Unit
+            </a>
+            <a class="dropdown-item py-1.5 {{ request()->routeIs('fuel.reports.stock-card') ? 'active font-weight-bold' : '' }}" href="{{ route('fuel.reports.stock-card') }}">
+              Buku Kas / Kartu Stok
+            </a>
+            @endcan
+            @can('view_fuel_storages')
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item py-1.5 {{ request()->routeIs('fuel.storages.*') ? 'active font-weight-bold' : '' }}" href="{{ route('fuel.storages.index') }}">
+              Master Tangki & Supplier
+            </a>
+            @endcan
+            @can('view_fuel_trucks')
+            <a class="dropdown-item py-1.5 {{ request()->routeIs('fuel.trucks.*') ? 'active font-weight-bold' : '' }}" href="{{ route('fuel.trucks.index') }}">
+              Master Fuel Truck
+            </a>
+            @endcan
+          </div>
+        </li>
+        @endif
+
+
+        <!-- ======================================================== -->
         <!-- CATEGORY 5: KPI & REPORTING                              -->
         <!-- ======================================================== -->
         @if(auth()->user()->can('view_kpi_master_data') || auth()->user()->can('view_breakdown_reports'))
@@ -478,3 +552,20 @@
     </div>
   </div>
 </aside>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    try {
+        const activeNav = document.querySelector('.navbar-vertical .dropdown.active') 
+            || document.querySelector('.navbar-vertical .nav-link.active') 
+            || document.querySelector('.navbar-vertical .dropdown-item.active');
+        if (activeNav) {
+            setTimeout(function() {
+                activeNav.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 150);
+        }
+    } catch (e) {
+        console.error(e);
+    }
+});
+</script>

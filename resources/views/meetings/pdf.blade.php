@@ -140,39 +140,13 @@
             <button class="btn-print" onclick="window.print()">🖨️ Cetak Dokumen (Print)</button>
         </div>
 
-        {{-- KOP SURAT --}}
-        @php
-            $appLogo = \App\Models\AppSetting::where('key', 'app_logo')->first()?->value;
-            $appName = \App\Models\AppSetting::where('key', 'app_name')->first()?->value ?? 'CMMS AISFAR';
-            $appAddress = \App\Models\AppSetting::where('key', 'app_address')->first()?->value ?? '';
-            $siteName = $meeting->site->name ?? 'Head Office / All Sites';
-        @endphp
-        <table class="kop-table">
-            <tr>
-                <td style="width: 70%; padding-right: 15px;">
-                    <table style="width: 100%; border: none;">
-                        <tr>
-                            @if($appLogo)
-                            <td style="width: 50px; vertical-align: top; padding-right: 12px; border: none;">
-                                <img src="{{ asset('storage/logos/' . $appLogo) }}" alt="Logo" style="max-height: 45px;">
-                            </td>
-                            @endif
-                            <td style="vertical-align: top; border: none;">
-                                <div class="kop-title" style="margin-top: 2px;">{{ $appName }}</div>
-                                @if($appAddress)
-                                    <div class="kop-sub" style="margin-bottom: 2px;">{{ $appAddress }}</div>
-                                @endif
-                                <div class="kop-sub" style="font-weight: 500;">Site: {{ $siteName }}</div>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-                <td style="width: 30%; text-align: right; vertical-align: middle;">
-                    <div style="font-size: 12px; font-weight: bold; font-family: monospace;">{{ $meeting->meeting_number }}</div>
-                    <div style="font-size: 9px; color: #666;">Tgl: {{ $meeting->meeting_date->format('d/m/Y') }}</div>
-                </td>
-            </tr>
-        </table>
+        {{-- KOP SURAT TERPUSAT --}}
+        @include('partials.kop-surat-pdf', [
+            'docTitle' => 'NOTULEN RAPAT KOORDINASI',
+            'docNumber' => $meeting->meeting_number,
+            'docDate' => $meeting->meeting_date->format('d/m/Y'),
+            'siteName' => $meeting->site->name ?? 'Head Office / All Sites',
+        ])
 
     {{-- JUDUL DOKUMEN --}}
     <div class="doc-title">

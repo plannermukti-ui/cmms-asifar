@@ -264,6 +264,7 @@
         .c-blue { color:var(--primary); } .c-cyan { color:var(--accent); } .c-purple { color:var(--accent2); }
         .c-amber { color:var(--accent3); } .c-green { color:var(--success); } .c-red { color:var(--danger); }
         .c-orange { color:var(--orange); } .c-indigo { color:var(--indigo); } .c-teal { color:var(--teal); } .c-rose { color:var(--rose); }
+        .c-sky { color:#0284c7; }
         .bg-blue-s { background:#eff6ff; border-color:#bfdbfe !important; }
         .bg-cyan-s { background:#ecfeff; border-color:#a5f3fc !important; }
         .bg-purple-s { background:#f5f3ff; border-color:#ddd6fe !important; }
@@ -273,8 +274,19 @@
         .bg-orange-s { background:#fff7ed; border-color:#fed7aa !important; }
         .bg-indigo-s { background:#eef2ff; border-color:#c7d2fe !important; }
         .bg-teal-s { background:#f0fdfa; border-color:#99f6e4 !important; }
+        .bg-sky-s { background:#f0f9ff; border-color:#bae6fd !important; }
 
-        /* RESPONSIVE */
+        /* FMS INFOGRAPHIC STYLES */
+        .fms-diagram-box { background:linear-gradient(135deg,#0b192c,#1e293b); border:1.5px solid #334155; border-radius:14px; padding:28px 24px; color:#f8fafc; margin:22px 0; position:relative; overflow:hidden; }
+        .fms-diagram-box::before { content:''; position:absolute; inset:0; background-image:radial-gradient(rgba(14,165,233,.12) 1px,transparent 1px); background-size:24px 24px; }
+        .fms-diagram-inner { position:relative; z-index:1; }
+        .fms-flow-track { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; position:relative; margin-top:20px; }
+        .fms-step-card { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:16px 14px; backdrop-filter:blur(6px); transition:all .25s ease; position:relative; }
+        .fms-step-card:hover { transform:translateY(-3px); border-color:#38bdf8; background:rgba(255,255,255,.08); box-shadow:0 8px 24px rgba(14,165,233,.2); }
+        .fms-step-badge { width:24px; height:24px; border-radius:50%; background:linear-gradient(135deg,#0284c7,#38bdf8); color:#fff; font-size:.72rem; font-weight:800; display:inline-flex; align-items:center; justify-content:center; margin-bottom:8px; }
+        .fms-step-title { font-family:'Plus Jakarta Sans',sans-serif; font-size:.85rem; font-weight:700; color:#e2e8f0; margin-bottom:6px; }
+        .fms-step-desc { font-size:.74rem; color:#94a3b8; line-height:1.5; }
+        .fms-badge-tag { display:inline-block; font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; padding:2px 7px; border-radius:4px; margin-top:8px; }
         @media (max-width:1024px) {
             .guide-layout { grid-template-columns:1fr; }
             .g-sidebar { position:static; }
@@ -481,6 +493,15 @@
                 <div class="mod-arrow" style="background:#eef2ff;color:#6366f1;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg></div>
             </div>
 
+            <div class="mod-card" style="--cc:#0284c7;" onclick="openModuleModal('fuel-management')">
+                <div class="mod-pill-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Quick View</div>
+                <div class="mod-icon" style="background:#f0f9ff;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2"><path d="M3 2v20h6v-8h2v8h4V8l-4-4H3z"/><path d="M15 16h2a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><circle cx="6" cy="7" r="1"/></svg></div>
+                <div class="mod-eyebrow c-sky">Fuel & Energy</div>
+                <h3>Fuel Management System (FMS)</h3>
+                <p>Siklus penuh BBM: Inbound & Sonding, Mutasi Tangki, Refill Fuel Truck, Distribusi Unit per Shift & BA Flowmeter.</p>
+                <div class="mod-arrow" style="background:#f0f9ff;color:#0284c7;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9,18 15,12 9,6"/></svg></div>
+            </div>
+
             <div class="mod-card" style="--cc:#10b981;" onclick="openModuleModal('architecture')">
                 <div class="mod-pill-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Quick View</div>
                 <div class="mod-icon" style="background:#ecfdf5;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><rect x="2" y="2" width="6" height="6" rx="1"/><rect x="16" y="2" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="16" y="16" width="6" height="6" rx="1"/></svg></div>
@@ -593,6 +614,12 @@
                     <button class="sb-link" onclick="activateSection('pm')">
                         <div class="sb-icon" style="background:#eef2ff;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg></div>
                         Preventive Maintenance
+                    </button>
+
+                    <div class="sb-group-title">Fuel & Energi</div>
+                    <button class="sb-link" onclick="activateSection('fuel-management')">
+                        <div class="sb-icon" style="background:#f0f9ff;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.5"><path d="M3 2v20h6v-8h2v8h4V8l-4-4H3z"/><path d="M15 16h2a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><circle cx="6" cy="7" r="1"/></svg></div>
+                        Fuel Management (FMS)
                     </button>
 
                     <div class="sb-group-title">Fitur Tambahan</div>
@@ -1148,6 +1175,214 @@
                     </div>
                 </div>
 
+                <!-- FUEL MANAGEMENT SYSTEM (FMS) -->
+                <div id="fuel-management" class="g-section">
+                    <div class="s-card">
+                        <div class="s-card-head" style="--sc:#0284c7;">
+                            <div class="s-title-row">
+                                <div class="s-icon-wrap" style="background:#f0f9ff;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.5"><path d="M3 2v20h6v-8h2v8h4V8l-4-4H3z"/><path d="M15 16h2a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><circle cx="6" cy="7" r="1"/></svg></div>
+                                <div><div class="s-eyebrow c-sky">Fuel & Energy Management</div><h2 class="s-h2">Fuel Management System (FMS) Terpadu</h2></div>
+                            </div>
+                            <p class="s-lead">Sistem tata kelola bahan bakar solar industri (HSD) tambang terintegrasi dari hulu ke hilir: penerimaan vendor & sonding fisik, mutasi multi-storage, isi ulang armada Fuel Truck, distribusi unit berbasis shift dengan rekonsiliasi flowmeter, berita acara tera meteran, hingga kalkulasi burn rate (L/HM) dan kartu stok otomatis.</p>
+                        </div>
+                        <div class="s-card-body">
+
+                            <!-- KEY METRICS BANNER -->
+                            <div class="four-col">
+                                <div class="metric-pill">
+                                    <div class="metric-pill-icon" style="background:#f0f9ff;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+                                    <div><div class="metric-pill-val">&lt; 0.3%</div><div class="metric-pill-lbl">Losses Tolerance</div></div>
+                                </div>
+                                <div class="metric-pill">
+                                    <div class="metric-pill-icon" style="background:#eff6ff;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><path d="M12 20v-6M6 20V10M18 20V4"/></svg></div>
+                                    <div><div class="metric-pill-val">L / HM</div><div class="metric-pill-lbl">Unit Burn Rate</div></div>
+                                </div>
+                                <div class="metric-pill">
+                                    <div class="metric-pill-icon" style="background:#ecfdf5;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+                                    <div><div class="metric-pill-val">100% Audit</div><div class="metric-pill-lbl">Stock Card Trail</div></div>
+                                </div>
+                                <div class="metric-pill">
+                                    <div class="metric-pill-icon" style="background:#fffbeb;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg></div>
+                                    <div><div class="metric-pill-val">0 Variance</div><div class="metric-pill-lbl">Shift Reconciliation</div></div>
+                                </div>
+                            </div>
+
+                            <!-- INFOGRAFIS SIKLUS LENGKAP ALUR BBM -->
+                            <div class="fms-diagram-box">
+                                <div class="fms-diagram-inner">
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span style="background:rgba(56,189,248,.2);color:#38bdf8;padding:4px 10px;border-radius:6px;font-size:.72rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;">Infografis Interaktif</span>
+                                            <h3 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.15rem;font-weight:800;color:#fff;margin:0;">Siklus 6 Tahap Alur BBM: Hulu ke Hilir & Pelaporan</h3>
+                                        </div>
+                                        <span class="text-white-50" style="font-size:.75rem;">100% Terintegrasi Logistik Tambang</span>
+                                    </div>
+                                    <p style="font-size:.82rem;color:#94a3b8;line-height:1.6;margin-bottom:16px;">Setiap liter BBM solar yang masuk dari vendor supplier hingga dikonsumsi oleh Excavator, Hauler, dan Dozer dicatat dengan verifikasi meteran & otorisasi berjenjang:</p>
+                                    
+                                    <div class="fms-flow-track">
+                                        <div class="fms-step-card">
+                                            <div class="fms-step-badge">1</div>
+                                            <div class="fms-step-title">Inbound & Sonding</div>
+                                            <div class="fms-step-desc">Truk vendor tiba &rarr; Sonding cm, densitas & suhu &rarr; Upload Surat Jalan/BAP &rarr; Approval atasan.</div>
+                                            <span class="fms-badge-tag" style="background:#0369a1;color:#e0f2fe;">Stok Masuk Tangki</span>
+                                        </div>
+
+                                        <div class="fms-step-card">
+                                            <div class="fms-step-badge">2</div>
+                                            <div class="fms-step-title">Mutasi Antar Tangki</div>
+                                            <div class="fms-step-desc">Transfer BBM antar storage site via pipa pompa langsung atau diangkut unit Fuel Truck.</div>
+                                            <span class="fms-badge-tag" style="background:#0f766e;color:#ccfbf1;">Balancing Storage</span>
+                                        </div>
+
+                                        <div class="fms-step-card">
+                                            <div class="fms-step-badge">3</div>
+                                            <div class="fms-step-title">Isi Ulang Fuel Truck</div>
+                                            <div class="fms-step-desc">Pengisian BBM dari Storage ke armada Fuel Truck terdaftar &rarr; Catat totalizer awal/akhir & driver.</div>
+                                            <span class="fms-badge-tag" style="background:#b45309;color:#fef3c7;">Mobile Stock Out</span>
+                                        </div>
+
+                                        <div class="fms-step-card">
+                                            <div class="fms-step-badge">4</div>
+                                            <div class="fms-step-title">Distribusi Shift Unit</div>
+                                            <div class="fms-step-desc">Fuelman buka shift &rarr; Isi unit tambang (HM/KM, Jam, Lokasi, Liter) &rarr; Tutup shift & rekonsiliasi.</div>
+                                            <span class="fms-badge-tag" style="background:#15803d;color:#dcfce7;">Unit Dispensing</span>
+                                        </div>
+
+                                        <div class="fms-step-card">
+                                            <div class="fms-step-badge">5</div>
+                                            <div class="fms-step-title">Berita Acara Flowmeter</div>
+                                            <div class="fms-step-desc">Pencatatan kerusakan / tera meteran baru bertandatangan Site Manager & penyesuaian totalizer.</div>
+                                            <span class="fms-badge-tag" style="background:#7e22ce;color:#f3e8ff;">BAP Flowmeter</span>
+                                        </div>
+
+                                        <div class="fms-step-card">
+                                            <div class="fms-step-badge">6</div>
+                                            <div class="fms-step-title">Laporan & Kartu Stok</div>
+                                            <div class="fms-step-desc">Posisi stok real-time, burn rate L/HM, audit trail kartu stok, cetak PDF resmi Kop Surat `/settings`.</div>
+                                            <span class="fms-badge-tag" style="background:#be123c;color:#ffe4e6;">Report & Analytics</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 1. INBOUND PENERIMAAN BBM -->
+                            <div class="sub-block">
+                                <div class="sub-block-title c-sky">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9,15 12,18 15,15"/></svg>
+                                    1. Penerimaan BBM dari Vendor Supplier & Pengukuran Sonding Fisik
+                                </div>
+                                <p style="font-size:.86rem;color:var(--text-secondary);margin-bottom:14px;">Mencegah manipulasi volume solar yang dikirimkan oleh supplier melalui pencatatan parameter fisik lengkap dan verifikasi approval berjenjang sebelum stok diakui oleh sistem.</p>
+                                <div class="info-grid">
+                                    <div class="i-card bg-sky-s">
+                                        <div class="i-icon" style="background:#bae6fd80;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.5"><path d="M3 2v20h6v-8h2v8h4V8l-4-4H3z"/><circle cx="6" cy="7" r="1"/></svg></div>
+                                        <h4>Registrasi Truk Tangki Supplier</h4>
+                                        <p>Data vendor, transportir ekspedisi, nomor polisi truk, nama driver, nomor handphone, dan kapasitas kompartemen terdata resmi.</p>
+                                    </div>
+                                    <div class="i-card bg-sky-s">
+                                        <div class="i-icon" style="background:#bae6fd80;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+                                        <h4>Sonding Fisik & Analisa Densitas</h4>
+                                        <p>Mencatat ketinggian minyak sebelum/sesudah bongkar (cm), suhu tangki (°C), densitas minyak, dan volume DO surat jalan vs volume aktual.</p>
+                                    </div>
+                                    <div class="i-card bg-sky-s">
+                                        <div class="i-icon" style="background:#bae6fd80;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+                                        <h4>Pop-up Lampiran Dokumen Scan</h4>
+                                        <p>Pratinjau instan berkas Surat Jalan / BAP fisik (PDF/Foto) dalam pop-up modal interaktif tanpa perlu berpindah tab browser.</p>
+                                    </div>
+                                    <div class="i-card bg-sky-s">
+                                        <div class="i-icon" style="background:#bae6fd80;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+                                        <h4>Approval Berjenjang Atasan</h4>
+                                        <p>Pembuat dokumen memilih pejabat approver. Stok tangki timbun baru bertambah setelah disetujui, lengkap dengan Berita Acara Penerimaan (PDF).</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2. MUTASI TANGKI & ISI ULANG FUEL TRUCK -->
+                            <div class="sub-block">
+                                <div class="sub-block-title c-cyan">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                                    2. Mutasi Antar Tangki Timbun & Pengisian ke Mobile Fuel Truck
+                                </div>
+                                <div class="two-col">
+                                    <div>
+                                        <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7;margin-bottom:12px;">Operasional tambang dapat memiliki banyak titik penyimpanan (*Main Fuel Storage*, *Pit Station 1*, *Workshop Tank*):</p>
+                                        <ul class="f-list">
+                                            <li><div class="f-check" style="background:#ccfbf1;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="3"><polyline points="20,6 9,17 4,12"/></svg></div><span><strong>Metode Mutasi Fleksibel:</strong> Opsi perpindahan langsung via pipa pompa (*Direct Pump*) atau diangkut menggunakan unit *Fuel Truck* mobile.</span></li>
+                                            <li><div class="f-check" style="background:#ccfbf1;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="3"><polyline points="20,6 9,17 4,12"/></svg></div><span><strong>Master Fuel Truck Terintegrasi:</strong> Unit armada Fuel Truck terhubung langsung ke Master Unit (Asset), kapasitas tangki, dan totalizer flowmeter dispenser.</span></li>
+                                            <li><div class="f-check" style="background:#ccfbf1;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="3"><polyline points="20,6 9,17 4,12"/></svg></div><span><strong>Akumulasi Flowmeter Monoton:</strong> Totalizer meteran tangki terus bertambah secara akumulatif baik saat BBM masuk maupun keluar.</span></li>
+                                        </ul>
+                                    </div>
+                                    <div class="i-card bg-cyan-s" style="margin-top:0;">
+                                        <h4 class="c-cyan" style="margin-bottom:8px;">⚖️ Otomatisasi Kartu Stok Dua Arah</h4>
+                                        <p style="color:#155e75;font-size:.82rem;line-height:1.6;">Saat pengisian Fuel Truck disimpan, sistem otomatis memotong stok tangki sumber, menambah stok pada armada Fuel Truck, dan mencatat log mutasi lengkap dengan nomor referensi transaksi.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. DISTRIBUSI UNIT BERBASIS SHIFT -->
+                            <div class="sub-block">
+                                <div class="sub-block-title c-green">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                                    3. Sesi Shift Distribusi Lapangan & Pencatatan Unit (HM/KM)
+                                </div>
+                                <div class="step-flow">
+                                    <div class="step-item">
+                                        <div class="step-num" style="background:linear-gradient(135deg,#0284c7,#0369a1);">A</div>
+                                        <div class="step-body">
+                                            <h4>Buka Sesi Shift Distribusi (Open)</h4>
+                                            <p>Fuelman memilih unit Fuel Truck, tanggal, shift kerja (Shift 1 / Shift 2), dan mencatat <strong>Totalizer Awal Shift</strong> pada nozzle dispenser.</p>
+                                        </div>
+                                    </div>
+                                    <div class="step-item">
+                                        <div class="step-num" style="background:linear-gradient(135deg,#0284c7,#0369a1);">B</div>
+                                        <div class="step-body">
+                                            <h4>Input Pengisian Setiap Unit Alat Berat</h4>
+                                            <p>Setiap pengisian unit alat tambang dicatat rinci: <strong>Nomor Unit</strong> (Excavator/Hauler), <strong>Reading Meter</strong> (Hours Meter / Kilometer terpadu), <strong>Nama Operator Unit</strong>, <strong>Jam Pengisian</strong>, <strong>Lokasi Pit</strong>, dan <strong>Volume Liter</strong>.</p>
+                                        </div>
+                                    </div>
+                                    <div class="step-item">
+                                        <div class="step-num" style="background:linear-gradient(135deg,#0284c7,#0369a1);">C</div>
+                                        <div class="step-body">
+                                            <h4>Tutup Shift & Rekonsiliasi Variance Flowmeter</h4>
+                                            <p>Di akhir shift, Fuelman menginput <strong>Totalizer Akhir</strong>. Sistem otomatis menghitung <em>Delta Flowmeter</em> vs <em>Total Liter Terdistribusi</em>, menghitung selisih (<em>Variance</em>), memotong stok armada Fuel Truck, dan men-generate Lembar Kontrol Distribusi Shift (PDF).</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 4. FITUR SUPER ADMIN ROLLBACK & TABLER MODAL -->
+                            <div class="sub-block">
+                                <div class="sub-block-title c-red">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 11,14 15,10"/></svg>
+                                    4. Otoritas Super Admin: Rollback Transaksi & Tabler UI Modal Bebas Popup
+                                </div>
+                                <div class="two-col">
+                                    <div>
+                                        <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7;margin-bottom:12px;">Untuk menjamin fleksibilitas operasional jika terjadi salah input tanpa merusak integritas stok:</p>
+                                        <ul class="f-list">
+                                            <li><div class="f-check" style="background:#fecaca;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3"><polyline points="20,6 9,17 4,12"/></svg></div><span><strong>Rollback Inbound & Mutasi:</strong> Membatalkan penerimaan atau transfer, otomatis mengembalikan saldo stok tangki, dan membersihkan seluruh log audit trail.</span></li>
+                                            <li><div class="f-check" style="background:#fecaca;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3"><polyline points="20,6 9,17 4,12"/></svg></div><span><strong>Reopen Shift Distribusi:</strong> Buka kembali shift yang sudah ditutup untuk revisi pengisian unit dengan pengembalian stok sementara ke Fuel Truck.</span></li>
+                                        </ul>
+                                    </div>
+                                    <div class="i-card bg-red-s" style="margin-top:0;">
+                                        <h4 class="c-red" style="margin-bottom:8px;">🎨 Tabler UI Confirmation Dialog</h4>
+                                        <p style="color:#991b1b;font-size:.82rem;line-height:1.6;">Seluruh aksi konfirmasi kritis menggunakan modal dialog Tabler UI asli yang modern dengan badge status warna (*Danger / Warning / Success*), bebas dari pop-up alert bawaan browser (`window.confirm`).</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 5. STANDARISASI KOP SURAT TERPUSAT -->
+                            <div class="sub-block">
+                                <div class="sub-block-title c-purple">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                                    5. Standarisasi Dokumen PDF & Kop Surat Terpusat (`/settings`)
+                                </div>
+                                <p style="font-size:.85rem;color:var(--text-secondary);line-height:1.7;">Seluruh cetakan dokumen resmi FMS (Berita Acara Penerimaan, Lembar Kontrol Distribusi Shift, Berita Acara Flowmeter, Laporan Posisi Stok, dan Rekapitulasi Burn Rate) menggunakan template Kop Surat korporat terpusat yang otomatis membaca Logo Perusahaan (Base64), Nama Perusahaan, dan Alamat Site dari menu <code>/settings</code>.</p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
                 <!-- ARCHITECTURE -->
                 <div id="architecture" class="g-section">
                     <div class="s-card">
@@ -1237,6 +1472,7 @@ const MODULE_LIST = [
     { id: 'budget', name: 'Budget & Cost Control', category: 'Cost Management', color: '#f59e0b', bg: '#fffbeb' },
     { id: 'pm', name: 'PM Template & Schedule', category: 'Preventive Maintenance', color: '#6366f1', bg: '#eef2ff' },
     { id: 'collaboration', name: 'Live Chat & Real-time', category: 'Collaboration', color: '#6366f1', bg: '#eef2ff' },
+    { id: 'fuel-management', name: 'Fuel Management System (FMS)', category: 'Fuel & Energy Management', color: '#0284c7', bg: '#f0f9ff' },
     { id: 'architecture', name: 'Arsitektur Enterprise', category: 'Technology Stack', color: '#10b981', bg: '#ecfdf5' }
 ];
 

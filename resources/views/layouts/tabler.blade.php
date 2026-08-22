@@ -805,7 +805,7 @@
         const message = options.message || 'Apakah Anda yakin ingin melanjutkan tindakan ini?';
         const confirmText = options.confirmText || 'Lanjutkan';
         const cancelText = options.cancelText || 'Batal';
-        const type = options.type || 'warning'; // warning, danger, primary
+        const type = options.type || 'warning'; // warning, danger, primary, success
         const onConfirm = options.onConfirm || function() {};
         const onCancel = options.onCancel || function() {};
 
@@ -817,7 +817,10 @@
         const iconEl = document.getElementById('globalTablerConfirmIcon');
 
         if (titleEl) titleEl.innerText = title;
-        if (msgEl) msgEl.innerHTML = message;
+        if (msgEl) {
+            // Support formatted HTML or \n converted to line breaks
+            msgEl.innerHTML = (typeof message === 'string') ? message.replace(/\n/g, '<br>') : message;
+        }
         if (okBtn) okBtn.innerText = confirmText;
         if (cancelBtn) cancelBtn.innerText = cancelText;
 
@@ -829,6 +832,10 @@
             if (statusEl) statusEl.className = 'modal-status bg-primary';
             if (iconEl) iconEl.className = 'avatar avatar-lg bg-primary-lt text-primary mb-3 rounded-circle mx-auto';
             if (okBtn) okBtn.className = 'btn btn-primary w-100 fw-bold';
+        } else if (type === 'success') {
+            if (statusEl) statusEl.className = 'modal-status bg-success';
+            if (iconEl) iconEl.className = 'avatar avatar-lg bg-success-lt text-success mb-3 rounded-circle mx-auto';
+            if (okBtn) okBtn.className = 'btn btn-success w-100 fw-bold';
         } else {
             if (statusEl) statusEl.className = 'modal-status bg-warning';
             if (iconEl) iconEl.className = 'avatar avatar-lg bg-warning-lt text-warning mb-3 rounded-circle mx-auto';
@@ -842,18 +849,72 @@
           const handleOk = function() {
             okBtn.removeEventListener('click', handleOk);
             bsModal.hide();
-            window.showCrudLoader('Menjalankan Tindakan...', 'Mohon tunggu sementara sistem memproses konfirmasi Anda.', 'CONFIRMED ACTION');
             onConfirm();
           };
           okBtn.addEventListener('click', handleOk, { once: true });
 
           modalEl.addEventListener('hidden.bs.modal', function() {
             okBtn.removeEventListener('click', handleOk);
+            onCancel();
           }, { once: true });
 
           bsModal.show();
         }
       };
+
+      // Auto-bind any form or button with onsubmit/onclick confirm or data-confirm
+      window.initTablerConfirmInterceptors = function() {
+        document.querySelectorAll('form').forEach(form => {
+            const onsubmitAttr = form.getAttribute('onsubmit');
+            if (onsubmitAttr && onsubmitAttr.includes('confirm(')) {
+                const match = onsubmitAttr.match(/confirm\((['"`])([\s\S]*?)\1\)/);
+                const msg = match ? match[2] : 'Apakah Anda yakin ingin melanjutkan tindakan ini?';
+                form.removeAttribute('onsubmit');
+                form.dataset.tablerConfirm = msg;
+                if (!form.dataset.tablerConfirmType) {
+                    const action = (form.getAttribute('action') || '').toLowerCase();
+                    const html = form.innerHTML;
+                    if (html.includes('DELETE') || action.includes('destroy') || action.includes('delete') || action.includes('cancel')) {
+                        form.dataset.tablerConfirmType = 'danger';
+                        form.dataset.tablerConfirmBtn = 'Ya, Hapus / Lanjutkan';
+                    }
+                }
+            }
+
+            if (form.dataset.tablerConfirm && !form.dataset.tablerBound) {
+                form.dataset.tablerBound = "true";
+                form.addEventListener('submit', function(e) {
+                    if (form.dataset.tablerConfirmed === "true") {
+                        form.dataset.tablerConfirmed = "false";
+                        return true;
+                    }
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+
+                    const msg = form.dataset.tablerConfirm;
+                    const type = form.dataset.tablerConfirmType || 'warning';
+                    const title = form.dataset.tablerConfirmTitle || (type === 'danger' ? 'Konfirmasi Tindakan Penting' : 'Konfirmasi Tindakan');
+                    const confirmBtn = form.dataset.tablerConfirmBtn || (type === 'danger' ? 'Ya, Lanjutkan' : 'Lanjutkan');
+
+                    window.showTablerConfirm({
+                        title: title,
+                        message: msg,
+                        type: type,
+                        confirmText: confirmBtn,
+                        cancelText: 'Batal',
+                        onConfirm: function() {
+                            form.dataset.tablerConfirmed = "true";
+                            form.submit();
+                        }
+                    });
+                });
+            }
+        });
+      };
+
+      document.addEventListener('DOMContentLoaded', function() {
+          window.initTablerConfirmInterceptors();
+      });
 
       // =========================================================
       // GLOBAL INDUSTRIAL LOADER & CRUD ACTION INTERCEPTORS

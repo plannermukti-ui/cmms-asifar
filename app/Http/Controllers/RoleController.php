@@ -71,6 +71,17 @@ class RoleController extends Controller
         'swap_components' => 'Swap Component Report',
         'pcr' => 'Plan Component Replacement (PCR)',
         'meetings' => 'Notulen Rapat & Tindak Lanjut',
+
+        // Fuel Management System (FMS)
+        'fuel_storages' => 'Fuel Storage & Station',
+        'fuel_supplier_trucks' => 'Truk Tangki Supplier',
+        'fuel_trucks' => 'Master Fuel Truck',
+        'fuel_receivings' => 'Penerimaan BBM (Inbound)',
+        'fuel_transfers' => 'Mutasi/Transfer BBM',
+        'fuel_truck_fillings' => 'Pengisian Fuel Truck',
+        'fuel_distributions' => 'Distribusi BBM Unit',
+        'fuel_flowmeter_adjustments' => 'Berita Acara Flowmeter',
+        'fuel_reports' => 'Laporan & Stok Fuel',
     ];
 
     private $actions = ['view', 'create', 'edit', 'delete'];

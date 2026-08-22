@@ -185,5 +185,50 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/notifications/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
     Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
     Route::post('/notifications/clear-all', [\App\Http\Controllers\NotificationController::class, 'clearAll'])->name('notifications.clear-all');
+
+    // ========================================================
+    // FUEL MANAGEMENT SYSTEM (FMS)
+    // ========================================================
+    Route::prefix('fuel')->name('fuel.')->group(function () {
+        // Dashboard FMS
+        Route::get('/dashboard', [\App\Http\Controllers\FuelDashboardController::class, 'index'])->name('dashboard');
+
+        // Master Fuel Storages & Supplier Trucks
+        Route::resource('storages', \App\Http\Controllers\FuelStorageController::class);
+        Route::post('supplier-trucks', [\App\Http\Controllers\FuelStorageController::class, 'storeSupplierTruck'])->name('supplier-trucks.store');
+        Route::delete('supplier-trucks/{truck}', [\App\Http\Controllers\FuelStorageController::class, 'destroySupplierTruck'])->name('supplier-trucks.destroy');
+
+        // Master Fuel Trucks
+        Route::resource('trucks', \App\Http\Controllers\FuelTruckController::class);
+
+        // Penerimaan BBM (Inbound)
+        Route::post('receivings/{receiving}/approve', [\App\Http\Controllers\FuelReceivingController::class, 'approve'])->name('receivings.approve');
+        Route::post('receivings/{receiving}/reject', [\App\Http\Controllers\FuelReceivingController::class, 'reject'])->name('receivings.reject');
+        Route::get('receivings/{receiving}/pdf', [\App\Http\Controllers\FuelReceivingController::class, 'exportPdf'])->name('receivings.pdf');
+        Route::resource('receivings', \App\Http\Controllers\FuelReceivingController::class);
+
+        // Mutasi Antar Storage
+        Route::resource('transfers', \App\Http\Controllers\FuelTransferController::class)->only(['index', 'create', 'store', 'destroy']);
+
+        // Pengisian ke Fuel Truck
+        Route::resource('truck-fillings', \App\Http\Controllers\FuelTruckFillingController::class)->only(['index', 'create', 'store', 'destroy']);
+
+        // Distribusi ke Unit (Shift & Items)
+        Route::post('distributions/{distribution}/items', [\App\Http\Controllers\FuelDistributionController::class, 'storeUnitItem'])->name('distributions.items.store');
+        Route::delete('distributions/items/{item}', [\App\Http\Controllers\FuelDistributionController::class, 'deleteUnitItem'])->name('distributions.items.destroy');
+        Route::post('distributions/{distribution}/close', [\App\Http\Controllers\FuelDistributionController::class, 'closeShift'])->name('distributions.close');
+        Route::post('distributions/{distribution}/reopen', [\App\Http\Controllers\FuelDistributionController::class, 'reopenShift'])->name('distributions.reopen');
+        Route::get('distributions/{distribution}/pdf', [\App\Http\Controllers\FuelDistributionController::class, 'exportPdf'])->name('distributions.pdf');
+        Route::resource('distributions', \App\Http\Controllers\FuelDistributionController::class);
+
+        // Berita Acara Flowmeter
+        Route::get('flowmeter-adjustments/{flowmeterAdjustment}/pdf', [\App\Http\Controllers\FuelFlowmeterAdjustmentController::class, 'exportPdf'])->name('flowmeter-adjustments.pdf');
+        Route::resource('flowmeter-adjustments', \App\Http\Controllers\FuelFlowmeterAdjustmentController::class);
+
+        // Reports
+        Route::get('reports/current-stock', [\App\Http\Controllers\FuelReportController::class, 'currentStock'])->name('reports.current-stock');
+        Route::get('reports/stock-card', [\App\Http\Controllers\FuelReportController::class, 'stockCard'])->name('reports.stock-card');
+        Route::get('reports', [\App\Http\Controllers\FuelReportController::class, 'index'])->name('reports.index');
+    });
 });
 require __DIR__.'/auth.php';
